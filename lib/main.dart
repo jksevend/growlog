@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(const WeedyApp());
 }
 
 class WeedyApp extends StatelessWidget {
