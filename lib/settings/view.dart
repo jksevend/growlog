@@ -17,9 +17,14 @@ class _SettingsViewState extends State<SettingsView> {
     return StreamBuilder<Settings>(
         stream: widget.provider.settings,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
           final settings = snapshot.data!;
           return Padding(
             padding: const EdgeInsets.all(8.0),
@@ -31,6 +36,8 @@ class _SettingsViewState extends State<SettingsView> {
                   textAlign: TextAlign.center,
                 ),
                 Divider(),
+
+                /// Notifications
                 SwitchListTile(
                   value: settings.notification.enabled,
                   onChanged: (value) async {
@@ -40,6 +47,19 @@ class _SettingsViewState extends State<SettingsView> {
                   title: const Text('Notifications'),
                   subtitle: const Text('Enable or disable notifications'),
                 ),
+
+                /// About the app
+                ListTile(
+                    title: const Text('About'),
+                    subtitle: const Text('Information about the app'),
+                    onTap: () {
+                      showAboutDialog(
+                        context: context,
+                        applicationName: 'Weedy',
+                        applicationVersion: '1.0.0',
+                        applicationLegalese: 'MIT LICENSE 2024 Weedy\ngithub.com/jksevend/weedy',
+                      );
+                    }),
               ],
             ),
           );

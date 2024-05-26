@@ -6,6 +6,16 @@ part of 'model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+Plants _$PlantsFromJson(Map<String, dynamic> json) => Plants(
+      plants: (json['plants'] as List<dynamic>)
+          .map((e) => Plant.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
+Map<String, dynamic> _$PlantsToJson(Plants instance) => <String, dynamic>{
+      'plants': instance.plants,
+    };
+
 Plant _$PlantFromJson(Map<String, dynamic> json) => Plant(
       id: json['id'] as String,
       name: json['name'] as String,

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weedy/environments/view.dart';
+import 'package:weedy/home/view.dart';
+import 'package:weedy/plants/provider.dart';
+import 'package:weedy/plants/view.dart';
 import 'package:weedy/settings/provider.dart';
 import 'package:weedy/settings/view.dart';
 
@@ -17,15 +21,19 @@ class WeedyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
+        ChangeNotifierProvider(create: (_) => PlantProvider()),
       ],
-      child: Consumer<SettingsProvider>(
-        builder: (context, settingsProvider, _) {
+      child: Consumer2<SettingsProvider, PlantProvider>(
+        builder: (context, settingsProvider, plantProvider, _) {
           return MaterialApp(
             title: 'Weedy',
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark(),
             themeMode: ThemeMode.system,
-            home: MainView(settingsProvider: settingsProvider),
+            home: MainView(
+              settingsProvider: settingsProvider,
+              plantProvider: plantProvider,
+            ),
           );
         },
       ),
@@ -35,7 +43,9 @@ class WeedyApp extends StatelessWidget {
 
 class MainView extends StatefulWidget {
   final SettingsProvider settingsProvider;
-  const MainView({super.key, required this.settingsProvider});
+  final PlantProvider plantProvider;
+
+  const MainView({super.key, required this.settingsProvider, required this.plantProvider});
 
   @override
   State<MainView> createState() => _MainViewState();
@@ -44,9 +54,9 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int _selectedIndex = 0;
   late final List<Widget> _pages = [
-    Center(child: Text('Home Page')),
-    Center(child: Text('Plants Page')),
-    Center(child: Text('Environments Page')),
+    HomeView(),
+    PlantOverview(plantProvider: widget.plantProvider),
+    EnvironmentOverview(),
     SettingsView(provider: widget.settingsProvider),
   ];
 
@@ -98,9 +108,7 @@ class _MainViewState extends State<MainView> {
       return FloatingActionButton(
         backgroundColor: Colors.green[900],
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Pflanze hinzufügen!')),
-          );
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatePlantView()));
         },
         tooltip: 'Pflanze hinzufügen',
         child: Stack(
@@ -140,4 +148,3 @@ class _MainViewState extends State<MainView> {
     return null;
   }
 }
-

@@ -11,22 +11,31 @@ import 'package:weedy/settings/model.dart';
 /// and can be accessed via a stream called [settings] and changed via [setSettings]
 /// which will also update the JSON file on the device's file system.
 class SettingsProvider extends ChangeNotifier {
+
+  /// The name of the JSON file that holds the settings.
   static const String _fileName = 'settings.json';
+
+  /// The standard settings that are used if the JSON file does not exist.
   static final Settings _standardSettings = Settings.standard();
 
+  /// A stream controller that holds the current settings.
   final BehaviorSubject<Settings> _settings = BehaviorSubject();
 
+  /// A getter that returns the current settings as a stream.
   Stream<Settings> get settings => _settings.stream;
 
+  /// Sets the current settings to [settings] and updates the JSON file on the device's file system.
   Future<void> setSettings(Settings settings) async {
     await writeJsonFile(name: _fileName, content: settings.toJson());
     _settings.sink.add(settings);
   }
 
+  /// Initializes the settings provider by reading the JSON file from the device's file system.
   SettingsProvider() {
     _initialize();
   }
 
+  /// Reads the JSON file from the device's file system and initializes the settings provider.
   void _initialize() async {
     final settingsJson = await readJsonFile(
       name: _fileName,

@@ -2,6 +2,25 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'model.g.dart';
 
+@JsonSerializable()
+class Plants {
+  final List<Plant> plants;
+
+  Plants({
+    required this.plants,
+  });
+
+  factory Plants.fromJson(Map<String, dynamic> json) => _$PlantsFromJson(json);
+
+  Map<String, dynamic> toJson() => _$PlantsToJson(this);
+
+  factory Plants.standard() {
+    return Plants(
+      plants: [],
+    );
+  }
+}
+
 enum LifeCycleState {
   germination,
   seedling,
@@ -31,4 +50,6 @@ class Plant {
   factory Plant.fromJson(Map<String, dynamic> json) => _$PlantFromJson(json);
 
   Map<String, dynamic> toJson() => _$PlantToJson(this);
+
+
 }

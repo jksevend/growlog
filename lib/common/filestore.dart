@@ -18,7 +18,7 @@ Future<Map<String, dynamic>> readJsonFile({
   return json.decode(content);
 }
 
-/// Attempt to write a JSON file to the device's file system called [name].
+/// Attempt to write json [content] to the device's file system called [name].
 Future<void> writeJsonFile({
   required String name,
   required Map<String, dynamic> content,
