@@ -36,19 +36,37 @@ class PlantOverview extends StatelessWidget {
               children: plants.plants
                   .map(
                     (plant) => Card(
-                  child: ListTile(
-                    title: Text(plant.name),
-                    subtitle: Text(plant.description),
-                    onTap: () {
-                      debugPrint('Navigate to the plant detail view for ${plant.name}');
-                    },
-                  ),
-                ),
-              )
+                      child: ListTile(
+                        leading: _plantLifeCycleIcon(plant.lifeCycleState),
+                        title: Text(plant.name),
+                        subtitle: Text(plant.description),
+                        onTap: () {
+                          debugPrint('Navigate to the plant detail view for ${plant.name}');
+                        },
+                      ),
+                    ),
+                  )
                   .toList(),
             );
           }),
     );
+  }
+
+  Icon _plantLifeCycleIcon(LifeCycleState lifeCycleState) {
+    switch (lifeCycleState) {
+      case LifeCycleState.germination:
+        return const Icon(Icons.spa, color: Colors.brown);
+      case LifeCycleState.seedling:
+        return Icon(Icons.grass, color: Colors.green[900]);
+      case LifeCycleState.vegetative:
+        return Icon(Icons.nature, color: Colors.green[700]);
+      case LifeCycleState.flowering:
+        return Icon(Icons.local_florist, color: Colors.green[200]);
+      case LifeCycleState.drying:
+        return Icon(Icons.hourglass_empty, color: Colors.orange[600]);
+      case LifeCycleState.curing:
+        return Icon(Icons.check_circle_outline, color: Colors.red[600]);
+    }
   }
 }
 
@@ -71,7 +89,6 @@ class _CreatePlantViewState extends State<CreatePlantView> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   final List<bool> _selectedLifeCycleState = <bool>[true, false, false, false, false, false];
-
   late Environment _currentEnvironment;
 
   @override
@@ -209,12 +226,12 @@ class _CreatePlantViewState extends State<CreatePlantView> {
                               });
                             },
                             children: [
-                              Icon(Icons.spa),
-                              Icon(Icons.grass),
-                              Icon(Icons.nature),
-                              Icon(Icons.local_florist),
-                              Icon(Icons.hourglass_empty),
-                              Icon(Icons.check_circle_outline),
+                              Icon(Icons.spa, color: Colors.brown),
+                              Icon(Icons.grass, color: Colors.green[900]),
+                              Icon(Icons.nature, color: Colors.green[700]),
+                              Icon(Icons.local_florist, color: Colors.green[200]),
+                              Icon(Icons.hourglass_empty, color: Colors.orange[600]),
+                              Icon(Icons.check_circle_outline, color: Colors.red[600]),
                             ],
                           ),
                           Divider(),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weedy/actions/provider.dart';
+import 'package:weedy/actions/view.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/environments/view.dart';
 import 'package:weedy/home/view.dart';
@@ -24,9 +26,11 @@ class WeedyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
         ChangeNotifierProvider(create: (_) => PlantsProvider()),
         ChangeNotifierProvider(create: (_) => EnvironmentsProvider()),
+        ChangeNotifierProvider(create: (_) => ActionsProvider()),
       ],
-      child: Consumer3<SettingsProvider, PlantsProvider, EnvironmentsProvider>(
-        builder: (context, settingsProvider, plantsProvider, environmentsProvider, _) {
+      child: Consumer4<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider>(
+        builder:
+            (context, settingsProvider, plantsProvider, environmentsProvider, actionsProvider, _) {
           return MaterialApp(
             title: 'Weedy',
             theme: ThemeData.light(),
@@ -36,6 +40,7 @@ class WeedyApp extends StatelessWidget {
               settingsProvider: settingsProvider,
               plantsProvider: plantsProvider,
               environmentsProvider: environmentsProvider,
+              actionsProvider: actionsProvider,
             ),
           );
         },
@@ -48,12 +53,14 @@ class MainView extends StatefulWidget {
   final SettingsProvider settingsProvider;
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
+  final ActionsProvider actionsProvider;
 
   const MainView({
     super.key,
     required this.settingsProvider,
     required this.plantsProvider,
     required this.environmentsProvider,
+    required this.actionsProvider,
   });
 
   @override
@@ -63,7 +70,9 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int _selectedIndex = 0;
   late final List<Widget> _pages = [
-    HomeView(),
+    HomeView(
+      actionsProvider: widget.actionsProvider,
+    ),
     PlantOverview(
       plantsProvider: widget.plantsProvider,
     ),
@@ -86,6 +95,7 @@ class _MainViewState extends State<MainView> {
     return Scaffold(
       body: _pages[_selectedIndex],
       floatingActionButton: _floatingActionButton(),
+      floatingActionButtonLocation: _floatingActionButtonLocation(),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
@@ -119,14 +129,40 @@ class _MainViewState extends State<MainView> {
   }
 
   Widget? _floatingActionButton() {
+    if (_selectedIndex == 0) {
+      return FloatingActionButton(
+        backgroundColor: Colors.blue[900],
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => ChooseActionView(
+                    plantsProvider: widget.plantsProvider,
+                    environmentsProvider: widget.environmentsProvider,
+                    actionsProvider: widget.actionsProvider,
+                  )));
+        },
+        tooltip: 'Aktion ausführen',
+        child: Stack(
+          children: <Widget>[
+            Icon(Icons.bolt, size: 36),
+            Positioned(
+              top: 22,
+              left: 22,
+              child: Icon(Icons.add, size: 18),
+            ),
+          ],
+        ),
+      );
+    }
+
     if (_selectedIndex == 1) {
       return FloatingActionButton(
         backgroundColor: Colors.green[900],
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatePlantView(
-            plantsProvider: widget.plantsProvider,
-            environmentsProvider: widget.environmentsProvider,
-          )));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CreatePlantView(
+                    plantsProvider: widget.plantsProvider,
+                    environmentsProvider: widget.environmentsProvider,
+                  )));
         },
         tooltip: 'Pflanze hinzufügen',
         child: Stack(
@@ -165,5 +201,10 @@ class _MainViewState extends State<MainView> {
       );
     }
     return null;
+  }
+
+  FloatingActionButtonLocation _floatingActionButtonLocation() {
+    if (_selectedIndex > 0) return FloatingActionButtonLocation.endFloat;
+    return FloatingActionButtonLocation.centerFloat;
   }
 }
