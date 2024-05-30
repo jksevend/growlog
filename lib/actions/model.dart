@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:intl/intl.dart';
+
 
 part 'model.g.dart';
 
@@ -14,6 +16,8 @@ class Action {
     required this.description,
     required this.createdAt,
   });
+
+  String get formattedDate => DateFormat('MM-dd-yyyy HH:mm').format(createdAt);
 
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
 

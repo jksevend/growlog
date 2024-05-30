@@ -21,7 +21,12 @@ class _HomeViewState extends State<HomeView> {
           shrinkWrap: true,
           children: [
             Divider(),
-            Text('Plant Actions'),
+            Row(
+              children: [
+                Icon(Icons.eco, color: Colors.green[900],),
+                Text('Plant Actions'),
+              ],
+            ),
             StreamBuilder(
               stream: widget.actionsProvider.plantActions,
               builder: (context, snapshot) {
@@ -44,14 +49,19 @@ class _HomeViewState extends State<HomeView> {
                       .map((action) => ListTile(
                             leading: action.type.icon,
                             title: Text(action.description),
-                            subtitle: Text(action.createdAt.toIso8601String()),
+                            subtitle: Text(action.formattedDate),
                           ))
                       .toList(),
                 );
               },
             ),
             Divider(),
-            Text('Environment Actions'),
+            Row(
+              children: [
+                Icon(Icons.lightbulb, color: Colors.yellow[900]),
+                Text('Environment Actions'),
+              ],
+            ),
             StreamBuilder(
                 stream: widget.actionsProvider.environmentActions,
                 builder: (context, snapshot) {
@@ -73,7 +83,7 @@ class _HomeViewState extends State<HomeView> {
                     children: environmentActions
                         .map((action) => ListTile(
                               title: Text(action.description),
-                              subtitle: Text(action.createdAt.toIso8601String()),
+                              subtitle: Text(action.formattedDate),
                             ))
                         .toList(),
                   );
