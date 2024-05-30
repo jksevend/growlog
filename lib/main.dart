@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weedy/environments/provider.dart';
 import 'package:weedy/environments/view.dart';
 import 'package:weedy/home/view.dart';
 import 'package:weedy/plants/provider.dart';
@@ -21,10 +22,11 @@ class WeedyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SettingsProvider()),
-        ChangeNotifierProvider(create: (_) => PlantProvider()),
+        ChangeNotifierProvider(create: (_) => PlantsProvider()),
+        ChangeNotifierProvider(create: (_) => EnvironmentsProvider()),
       ],
-      child: Consumer2<SettingsProvider, PlantProvider>(
-        builder: (context, settingsProvider, plantProvider, _) {
+      child: Consumer3<SettingsProvider, PlantsProvider, EnvironmentsProvider>(
+        builder: (context, settingsProvider, plantsProvider, environmentsProvider, _) {
           return MaterialApp(
             title: 'Weedy',
             theme: ThemeData.light(),
@@ -32,7 +34,8 @@ class WeedyApp extends StatelessWidget {
             themeMode: ThemeMode.system,
             home: MainView(
               settingsProvider: settingsProvider,
-              plantProvider: plantProvider,
+              plantsProvider: plantsProvider,
+              environmentsProvider: environmentsProvider,
             ),
           );
         },
@@ -43,9 +46,15 @@ class WeedyApp extends StatelessWidget {
 
 class MainView extends StatefulWidget {
   final SettingsProvider settingsProvider;
-  final PlantProvider plantProvider;
+  final PlantsProvider plantsProvider;
+  final EnvironmentsProvider environmentsProvider;
 
-  const MainView({super.key, required this.settingsProvider, required this.plantProvider});
+  const MainView({
+    super.key,
+    required this.settingsProvider,
+    required this.plantsProvider,
+    required this.environmentsProvider,
+  });
 
   @override
   State<MainView> createState() => _MainViewState();
@@ -55,9 +64,15 @@ class _MainViewState extends State<MainView> {
   int _selectedIndex = 0;
   late final List<Widget> _pages = [
     HomeView(),
-    PlantOverview(plantProvider: widget.plantProvider),
-    EnvironmentOverview(),
-    SettingsView(provider: widget.settingsProvider),
+    PlantOverview(
+      plantsProvider: widget.plantsProvider,
+    ),
+    EnvironmentOverview(
+      environmentsProvider: widget.environmentsProvider,
+    ),
+    SettingsView(
+      settingsProvider: widget.settingsProvider,
+    ),
   ];
 
   void _onItemTapped(int index) {
@@ -108,7 +123,10 @@ class _MainViewState extends State<MainView> {
       return FloatingActionButton(
         backgroundColor: Colors.green[900],
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatePlantView()));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => CreatePlantView(
+            plantsProvider: widget.plantsProvider,
+            environmentsProvider: widget.environmentsProvider,
+          )));
         },
         tooltip: 'Pflanze hinzufügen',
         child: Stack(
@@ -128,9 +146,10 @@ class _MainViewState extends State<MainView> {
       return FloatingActionButton(
         backgroundColor: Colors.yellow[900],
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Umgebung hinzufügen!')),
-          );
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CreateEnvironmentView(
+                    environmentsProvider: widget.environmentsProvider,
+                  )));
         },
         tooltip: 'Umgebung hinzufügen',
         child: Stack(

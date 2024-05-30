@@ -3,9 +3,9 @@ import 'package:weedy/settings/model.dart';
 import 'package:weedy/settings/provider.dart';
 
 class SettingsView extends StatefulWidget {
-  final SettingsProvider provider;
+  final SettingsProvider settingsProvider;
 
-  const SettingsView({super.key, required this.provider});
+  const SettingsView({super.key, required this.settingsProvider});
 
   @override
   State<SettingsView> createState() => _SettingsViewState();
@@ -15,7 +15,7 @@ class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Settings>(
-        stream: widget.provider.settings,
+        stream: widget.settingsProvider.settings,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -42,7 +42,7 @@ class _SettingsViewState extends State<SettingsView> {
                   value: settings.notification.enabled,
                   onChanged: (value) async {
                     settings.notification.enabled = value;
-                    await widget.provider.setSettings(settings);
+                    await widget.settingsProvider.setSettings(settings);
                   },
                   title: const Text('Notifications'),
                   subtitle: const Text('Enable or disable notifications'),
