@@ -55,4 +55,16 @@ class ActionsProvider with ChangeNotifier {
     environmentActions.add(environmentAction);
     await setEnvironmentActions(environmentActions);
   }
+
+  Future<void> removeActionsForPlant(String plantId) async {
+    final plantActions = await _plantActions.first;
+    final actions = plantActions.where((action) => action.plantId != plantId).toList();
+    await setPlantActions(actions);
+  }
+
+  Future<void> removeActionsForEnvironment(String environmentId) async {
+    final environmentActions = await _environmentActions.first;
+    final actions = environmentActions.where((action) => action.environmentId != environmentId).toList();
+    await setEnvironmentActions(actions);
+  }
 }

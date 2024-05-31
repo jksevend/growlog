@@ -68,16 +68,24 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
+  final GlobalKey<State<BottomNavigationBar>> _bottomNavigationKey = GlobalKey();
   int _selectedIndex = 0;
   late final List<Widget> _pages = [
     HomeView(
       actionsProvider: widget.actionsProvider,
+      plantsProvider: widget.plantsProvider,
+      environmentsProvider: widget.environmentsProvider,
     ),
     PlantOverview(
       plantsProvider: widget.plantsProvider,
+      environmentsProvider: widget.environmentsProvider,
+      actionsProvider: widget.actionsProvider,
+      bottomNavigationKey: _bottomNavigationKey,
     ),
     EnvironmentOverview(
       environmentsProvider: widget.environmentsProvider,
+      plantsProvider: widget.plantsProvider,
+      actionsProvider: widget.actionsProvider,
     ),
     SettingsView(
       settingsProvider: widget.settingsProvider,
@@ -97,6 +105,7 @@ class _MainViewState extends State<MainView> {
       floatingActionButton: _floatingActionButton(),
       floatingActionButtonLocation: _floatingActionButtonLocation(),
       bottomNavigationBar: BottomNavigationBar(
+        key: _bottomNavigationKey,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),

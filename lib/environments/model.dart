@@ -4,13 +4,14 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Environments {
-  final List<Environment> environments;
+  List<Environment> environments;
 
   Environments({
     required this.environments,
   });
 
   factory Environments.fromJson(Map<String, dynamic> json) => _$EnvironmentsFromJson(json);
+
   Map<String, dynamic> toJson() => _$EnvironmentsToJson(this);
 
   factory Environments.standard() {
@@ -38,8 +39,8 @@ class Dimension {
   });
 
   factory Dimension.fromJson(Map<String, dynamic> json) => _$DimensionFromJson(json);
-  Map<String, dynamic> toJson() => _$DimensionToJson(this);
 
+  Map<String, dynamic> toJson() => _$DimensionToJson(this);
 }
 
 @JsonSerializable()
@@ -61,7 +62,25 @@ class Environment {
   });
 
   factory Environment.fromJson(Map<String, dynamic> json) => _$EnvironmentFromJson(json);
+
   Map<String, dynamic> toJson() => _$EnvironmentToJson(this);
+
+  Environment copyWith({
+    required String name,
+    required String description,
+    required EnvironmentType type,
+    required LightDetails lightDetails,
+    required Dimension dimension,
+  }) {
+    return Environment(
+      id: id,
+      name: name,
+      description: description,
+      type: type,
+      lightDetails: lightDetails,
+      dimension: dimension,
+    );
+  }
 }
 
 enum LightType {
@@ -86,6 +105,7 @@ class Light {
   });
 
   factory Light.fromJson(Map<String, dynamic> json) => _$LightFromJson(json);
+
   Map<String, dynamic> toJson() => _$LightToJson(this);
 }
 
@@ -100,5 +120,6 @@ class LightDetails {
   });
 
   factory LightDetails.fromJson(Map<String, dynamic> json) => _$LightDetailsFromJson(json);
+
   Map<String, dynamic> toJson() => _$LightDetailsToJson(this);
 }

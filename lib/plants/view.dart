@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
+import 'package:weedy/actions/provider.dart';
+import 'package:weedy/actions/view.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
+import 'package:weedy/plants/sheet.dart';
 
 class PlantOverview extends StatelessWidget {
   final PlantsProvider plantsProvider;
+  final EnvironmentsProvider environmentsProvider;
+  final ActionsProvider actionsProvider;
+  final GlobalKey<State<BottomNavigationBar>> bottomNavigationKey;
 
-  const PlantOverview({super.key, required this.plantsProvider});
+  const PlantOverview({
+    super.key,
+    required this.plantsProvider,
+    required this.environmentsProvider,
+    required this.actionsProvider,
+    required this.bottomNavigationKey,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: StreamBuilder<Plants>(
-          stream: plantsProvider.plants,
+      child: StreamBuilder(
+          stream: CombineLatestStream.list([
+            plantsProvider.plants,
+            environmentsProvider.environments,
+          ]),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -25,28 +41,52 @@ class PlantOverview extends StatelessWidget {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
 
-            final plants = snapshot.data!;
-            if (plants.plants.isEmpty) {
+            final plants = snapshot.data![0] as Map<String, Plant>;
+            final environments = snapshot.data![1] as Map<String, Environment>;
+            if (plants.isEmpty) {
               return Center(
                 child: Text('No plants found'),
               );
             }
             return ListView(
               shrinkWrap: true,
-              children: plants.plants
-                  .map(
-                    (plant) => Card(
-                      child: ListTile(
-                        leading: _plantLifeCycleIcon(plant.lifeCycleState),
-                        title: Text(plant.name),
-                        subtitle: Text(plant.description),
-                        onTap: () {
-                          debugPrint('Navigate to the plant detail view for ${plant.name}');
+              children: plants.values.map(
+                (plant) {
+                  final environment = environments[plant.environmentId];
+                  final plantsInEnvironment =
+                      plants.values.where((p) => p.environmentId == environment?.id).toList();
+                  return Card(
+                    child: ListTile(
+                      leading: _plantLifeCycleIcon(plant.lifeCycleState),
+                      title: Text(plant.name),
+                      subtitle: Text(plant.description),
+                      onTap: () async {
+                        debugPrint('Navigate to the plant detail view for ${plant.name}');
+                        await showPlantDetailSheet(
+                            context,
+                            plant,
+                            plantsInEnvironment,
+                            environment,
+                            plantsProvider,
+                            actionsProvider,
+                            environmentsProvider,
+                            bottomNavigationKey);
+                      },
+                      trailing: IconButton(
+                        icon: Icon(Icons.view_timeline),
+                        onPressed: () {
+                          debugPrint('Navigate to the plant timeline view for ${plant.name}');
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => PlantActionOverview(
+                                    plant: plant,
+                                    actionsProvider: actionsProvider,
+                                  )));
                         },
                       ),
                     ),
-                  )
-                  .toList(),
+                  );
+                },
+              ).toList(),
             );
           }),
     );
@@ -70,32 +110,38 @@ class PlantOverview extends StatelessWidget {
   }
 }
 
-class CreatePlantView extends StatefulWidget {
+class PlantForm extends StatefulWidget {
+  final Plant? plant;
+  final GlobalKey<FormState> formKey;
+  final String title;
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
 
-  const CreatePlantView({
+  const PlantForm({
     super.key,
+    required this.formKey,
+    required this.title,
+    required this.plant,
     required this.plantsProvider,
     required this.environmentsProvider,
   });
 
   @override
-  State<CreatePlantView> createState() => _CreatePlantViewState();
+  State<PlantForm> createState() => _PlantFormState();
 }
 
-class _CreatePlantViewState extends State<CreatePlantView> {
-  final _formKey = GlobalKey<FormState>();
+class _PlantFormState extends State<PlantForm> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
-  final List<bool> _selectedLifeCycleState = <bool>[true, false, false, false, false, false];
-  late Environment _currentEnvironment;
+  late List<bool> _selectedLifeCycleState;
+  Environment? _currentEnvironment;
 
   @override
   void initState() {
+    _nameController = TextEditingController(text: widget.plant?.name);
+    _descriptionController = TextEditingController(text: widget.plant?.description);
+    _selectedLifeCycleState = _selectedLifeCycleStateFromPlant(widget.plant);
     super.initState();
-    _nameController = TextEditingController();
-    _descriptionController = TextEditingController();
   }
 
   @override
@@ -109,13 +155,13 @@ class _CreatePlantViewState extends State<CreatePlantView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create a Plant'),
+        title: Text(widget.title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Form(
-            key: _formKey,
+            key: widget.formKey,
             child: Column(
               children: [
                 Card(
@@ -158,7 +204,7 @@ class _CreatePlantViewState extends State<CreatePlantView> {
                     child: Column(
                       children: [
                         Text('Select an environment'),
-                        StreamBuilder<Environments>(
+                        StreamBuilder<Map<String, Environment>>(
                             stream: widget.environmentsProvider.environments,
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -174,16 +220,16 @@ class _CreatePlantViewState extends State<CreatePlantView> {
                               }
 
                               final environments = snapshot.data!;
-                              if (environments.environments.isEmpty) {
+                              if (environments.isEmpty) {
                                 return Center(
                                   child: Text('No environments found'),
                                 );
                               }
-                              _currentEnvironment = environments.environments.first;
+                              _currentEnvironment = environments[environments.keys.first]!;
                               return DropdownButton<Environment>(
                                 icon: Icon(Icons.arrow_downward_sharp),
                                 isExpanded: true,
-                                items: environments.environments
+                                items: environments.values
                                     .map(
                                       (environment) => DropdownMenuItem<Environment>(
                                         child: Text(environment.name),
@@ -246,20 +292,43 @@ class _CreatePlantViewState extends State<CreatePlantView> {
                 SizedBox(height: 16.0),
                 OutlinedButton.icon(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      final plant = Plant(
-                        id: const Uuid().v4().toString(),
-                        name: _nameController.text,
-                        description: _descriptionController.text,
-                        environmentId: _currentEnvironment.id,
-                        lifeCycleState: _lifeCycleState,
-                      );
-                      await widget.plantsProvider
-                          .addPlant(plant)
-                          .whenComplete(() => Navigator.of(context).pop());
+                    if (widget.formKey.currentState!.validate()) {
+                      if (_currentEnvironment == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please select an environment'),
+                          ),
+                        );
+                        return;
+                      } else {
+                        Plant plant;
+                        if (widget.plant != null) {
+                          plant = Plant(
+                            id: widget.plant!.id,
+                            name: _nameController.text,
+                            description: _descriptionController.text,
+                            environmentId: _currentEnvironment!.id,
+                            lifeCycleState: _lifeCycleState,
+                          );
+                          await widget.plantsProvider
+                              .updatePlant(plant)
+                              .whenComplete(() => Navigator.of(context).pop(plant));
+                        } else {
+                          plant = Plant(
+                            id: const Uuid().v4().toString(),
+                            name: _nameController.text,
+                            description: _descriptionController.text,
+                            environmentId: _currentEnvironment!.id,
+                            lifeCycleState: _lifeCycleState,
+                          );
+                          await widget.plantsProvider
+                              .addPlant(plant)
+                              .whenComplete(() => Navigator.of(context).pop());
+                        }
+                      }
                     }
                   },
-                  label: Text('Create'),
+                  label: Text('Save'),
                   icon: Icon(Icons.arrow_right),
                 ),
               ],
@@ -270,7 +339,6 @@ class _CreatePlantViewState extends State<CreatePlantView> {
     );
   }
 
-  /// Returns the current lifecycle state based on the selected icons
   LifeCycleState get _lifeCycleState {
     final lastIndex = _selectedLifeCycleState.lastIndexOf(true);
     switch (lastIndex) {
@@ -289,5 +357,75 @@ class _CreatePlantViewState extends State<CreatePlantView> {
       default:
         return LifeCycleState.germination;
     }
+  }
+
+  List<bool> _selectedLifeCycleStateFromPlant(Plant? plant) {
+    if (plant == null) {
+      return <bool>[true, false, false, false, false, false];
+    }
+    switch (plant.lifeCycleState) {
+      case LifeCycleState.germination:
+        return <bool>[true, false, false, false, false, false];
+      case LifeCycleState.seedling:
+        return <bool>[true, true, false, false, false, false];
+      case LifeCycleState.vegetative:
+        return <bool>[true, true, true, false, false, false];
+      case LifeCycleState.flowering:
+        return <bool>[true, true, true, true, false, false];
+      case LifeCycleState.drying:
+        return <bool>[true, true, true, true, true, false];
+      case LifeCycleState.curing:
+        return <bool>[true, true, true, true, true, true];
+    }
+  }
+}
+
+class CreatePlantView extends StatelessWidget {
+  final PlantsProvider plantsProvider;
+  final EnvironmentsProvider environmentsProvider;
+
+  CreatePlantView({
+    super.key,
+    required this.plantsProvider,
+    required this.environmentsProvider,
+  });
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return PlantForm(
+      formKey: _formKey,
+      title: 'Create plant',
+      plant: null,
+      plantsProvider: plantsProvider,
+      environmentsProvider: environmentsProvider,
+    );
+  }
+}
+
+class EditPlantView extends StatelessWidget {
+  final Plant plant;
+  final PlantsProvider plantsProvider;
+  final EnvironmentsProvider environmentsProvider;
+
+  EditPlantView({
+    super.key,
+    required this.plant,
+    required this.plantsProvider,
+    required this.environmentsProvider,
+  });
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return PlantForm(
+      formKey: _formKey,
+      title: 'Edit ${plant.name}',
+      plant: plant,
+      plantsProvider: plantsProvider,
+      environmentsProvider: environmentsProvider,
+    );
   }
 }

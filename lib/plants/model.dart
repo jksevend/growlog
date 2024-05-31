@@ -4,7 +4,7 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Plants {
-  final List<Plant> plants;
+  List<Plant> plants;
 
   Plants({
     required this.plants,
@@ -37,7 +37,7 @@ class Plant {
   final String description;
   final LifeCycleState lifeCycleState;
 
-  final String environmentId;
+  String environmentId;
 
   Plant({
     required this.id,

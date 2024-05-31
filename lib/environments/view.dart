@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
+import 'package:weedy/actions/provider.dart';
+import 'package:weedy/actions/view.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
+import 'package:weedy/environments/sheet.dart';
+import 'package:weedy/plants/model.dart';
+import 'package:weedy/plants/provider.dart';
 
 class EnvironmentOverview extends StatefulWidget {
   final EnvironmentsProvider environmentsProvider;
+  final PlantsProvider plantsProvider;
+  final ActionsProvider actionsProvider;
 
-  const EnvironmentOverview({super.key, required this.environmentsProvider});
+  const EnvironmentOverview({
+    super.key,
+    required this.environmentsProvider,
+    required this.plantsProvider,
+    required this.actionsProvider,
+  });
 
   @override
   State<EnvironmentOverview> createState() => _EnvironmentOverviewState();
@@ -15,8 +28,11 @@ class EnvironmentOverview extends StatefulWidget {
 class _EnvironmentOverviewState extends State<EnvironmentOverview> {
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Environments>(
-      stream: widget.environmentsProvider.environments,
+    return StreamBuilder(
+      stream: CombineLatestStream.list([
+        widget.environmentsProvider.environments,
+        widget.plantsProvider.plants,
+      ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -26,44 +42,74 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
 
-        final environments = snapshot.data!;
-        if (environments.environments.isEmpty) {
+        final environments = snapshot.data![0] as Map<String, Environment>;
+        final plants = snapshot.data![1] as Map<String, Plant>;
+        if (environments.isEmpty) {
           return Center(
             child: Text('No environments created yet.'),
           );
         }
         return ListView(
           shrinkWrap: true,
-          children: environments.environments
-              .map(
-                (environment) => Card(
-                  child: ListTile(
+          children: environments.values.map(
+            (environment) {
+              final plantsInEnvironment =
+                  plants.values.where((plant) => plant.environmentId == environment.id).toList();
+              return Card(
+                child: ListTile(
+                    leading: Icon(environment.type == EnvironmentType.indoor
+                        ? Icons.house
+                        : Icons.light_mode_rounded),
                     title: Text(environment.name),
                     subtitle: Text(environment.description),
-                    onTap: () {
+                    onTap: () async {
                       debugPrint('Navigate to the environment detail view for ${environment.name}');
+                      await showEnvironmentDetailSheet(
+                          context,
+                          environment,
+                          plantsInEnvironment,
+                          widget.environmentsProvider,
+                          widget.plantsProvider,
+                          widget.actionsProvider);
                     },
-                  ),
-                ),
-              )
-              .toList(),
+                    trailing: IconButton(
+                      icon: Icon(Icons.view_timeline),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => EnvironmentActionOverview(
+                                  environment: environment,
+                                  actionsProvider: widget.actionsProvider,
+                                )));
+                      },
+                    )),
+              );
+            },
+          ).toList(),
         );
       },
     );
   }
 }
 
-class CreateEnvironmentView extends StatefulWidget {
+class EnvironmentForm extends StatefulWidget {
+  final Environment? environment;
+  final GlobalKey<FormState> formKey;
+  final String title;
   final EnvironmentsProvider environmentsProvider;
 
-  const CreateEnvironmentView({super.key, required this.environmentsProvider});
+  const EnvironmentForm({
+    super.key,
+    required this.formKey,
+    required this.title,
+    required this.environmentsProvider,
+    this.environment,
+  });
 
   @override
-  State<CreateEnvironmentView> createState() => _CreateEnvironmentViewState();
+  State<EnvironmentForm> createState() => _EnvironmentFormState();
 }
 
-class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
-  final _formKey = GlobalKey<FormState>();
+class _EnvironmentFormState extends State<EnvironmentForm> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _wattController;
@@ -72,19 +118,28 @@ class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
   late final TextEditingController _heightController;
 
   // The first element is for indoor, the second for outdoor.
-  final List<bool> _selectedEnvironmentType = <bool>[true, false];
-  double _currentLightHours = 12;
-  LightType _currentLightType = LightType.led;
+  late List<bool> _selectedEnvironmentType;
+  late double _currentLightHours;
+  late LightType _currentLightType;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController();
-    _descriptionController = TextEditingController();
-    _wattController = TextEditingController();
-    _widthController = TextEditingController();
-    _lengthController = TextEditingController();
-    _heightController = TextEditingController();
+    _nameController = TextEditingController(text: widget.environment?.name);
+    _descriptionController = TextEditingController(text: widget.environment?.description);
+    _wattController =
+        TextEditingController(text: widget.environment?.lightDetails.lights.first.watt.toString());
+    _widthController = TextEditingController(text: widget.environment?.dimension.width.toString());
+    _lengthController =
+        TextEditingController(text: widget.environment?.dimension.length.toString());
+    _heightController =
+        TextEditingController(text: widget.environment?.dimension.height.toString());
+    _selectedEnvironmentType = <bool>[
+      widget.environment?.type == EnvironmentType.indoor,
+      widget.environment?.type == EnvironmentType.outdoor,
+    ];
+    _currentLightHours = widget.environment?.lightDetails.lightHours.toDouble() ?? 12;
+    _currentLightType = widget.environment?.lightDetails.lights.first.type ?? LightType.led;
   }
 
   @override
@@ -102,14 +157,14 @@ class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create an environment'),
+        title: Text(widget.title),
         centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Form(
-            key: _formKey,
+            key: widget.formKey,
             child: Column(
               children: [
                 Card(
@@ -277,14 +332,59 @@ class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
                 SizedBox(height: 16.0),
                 OutlinedButton.icon(
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      debugPrint('Create the environment');
-                      // Environment parameters differ based on selected environment type.
-                      // TODO: Consider using a factory method to create the environment.
+                    if (widget.formKey.currentState!.validate()) {
                       Environment environment;
-                      if (_selectedEnvironmentType[0]) {
-                        environment = Environment(
-                          id: const Uuid().v4().toString(),
+                      if (widget.environment == null) {
+                        if (_selectedEnvironmentType[0]) {
+                          environment = Environment(
+                            id: const Uuid().v4().toString(),
+                            name: _nameController.text,
+                            description: _descriptionController.text,
+                            type: _selectedEnvironmentType[0]
+                                ? EnvironmentType.indoor
+                                : EnvironmentType.outdoor,
+                            lightDetails: LightDetails(
+                              lightHours: _currentLightHours.toInt(),
+                              lights: [
+                                Light(
+                                  id: const Uuid().v4().toString(),
+                                  type: _currentLightType,
+                                  watt: int.parse(_wattController.text),
+                                ),
+                              ],
+                            ),
+                            dimension: Dimension(
+                              width: double.parse(_widthController.text),
+                              length: double.parse(_lengthController.text),
+                              height: double.parse(_heightController.text),
+                            ),
+                          );
+                        } else {
+                          environment = Environment(
+                            id: const Uuid().v4().toString(),
+                            name: _nameController.text,
+                            description: _descriptionController.text,
+                            type: _selectedEnvironmentType[0]
+                                ? EnvironmentType.indoor
+                                : EnvironmentType.outdoor,
+                            lightDetails: LightDetails(
+                              lightHours: _currentLightHours.toInt(),
+                              lights: [],
+                            ),
+                            dimension: Dimension(
+                              width: 0,
+                              length: 0,
+                              height: 0,
+                            ),
+                          );
+                        }
+                        await widget.environmentsProvider
+                            .addEnvironment(environment)
+                            .whenComplete(() {
+                          Navigator.of(context).pop();
+                        });
+                      } else {
+                        environment = widget.environment!.copyWith(
                           name: _nameController.text,
                           description: _descriptionController.text,
                           type: _selectedEnvironmentType[0]
@@ -306,30 +406,12 @@ class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
                             height: double.parse(_heightController.text),
                           ),
                         );
-                      } else {
-                        environment = Environment(
-                          id: const Uuid().v4().toString(),
-                          name: _nameController.text,
-                          description: _descriptionController.text,
-                          type: _selectedEnvironmentType[0]
-                              ? EnvironmentType.indoor
-                              : EnvironmentType.outdoor,
-                          lightDetails: LightDetails(
-                            lightHours: _currentLightHours.toInt(),
-                            lights: [],
-                          ),
-                          dimension: Dimension(
-                            width: 0,
-                            length: 0,
-                            height: 0,
-                          ),
-                        );
+                        await widget.environmentsProvider
+                            .updateEnvironment(environment)
+                            .whenComplete(() {
+                          Navigator.of(context).pop(environment);
+                        });
                       }
-                      await widget.environmentsProvider
-                          .addEnvironment(environment)
-                          .whenComplete(() {
-                        Navigator.of(context).pop();
-                      });
                     }
                   },
                   label: Text('Create'),
@@ -340,6 +422,43 @@ class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class CreateEnvironmentView extends StatelessWidget {
+  final EnvironmentsProvider environmentsProvider;
+
+  CreateEnvironmentView({super.key, required this.environmentsProvider});
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return EnvironmentForm(
+      formKey: _formKey,
+      title: 'Create environment',
+      environment: null,
+      environmentsProvider: environmentsProvider,
+    );
+  }
+}
+
+class EditEnvironmentView extends StatelessWidget {
+  final Environment environment;
+  final EnvironmentsProvider environmentsProvider;
+
+  EditEnvironmentView({super.key, required this.environment, required this.environmentsProvider});
+
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return EnvironmentForm(
+      formKey: _formKey,
+      title: 'Edit environment ${environment.name}',
+      environment: environment,
+      environmentsProvider: environmentsProvider,
     );
   }
 }
