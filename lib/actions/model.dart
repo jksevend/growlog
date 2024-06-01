@@ -50,7 +50,6 @@ enum EnvironmentMeasurementType {
   humidity,
   co2,
   lightDistance,
-  other,
 }
 
 extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
@@ -64,8 +63,6 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
         return 'CO2';
       case EnvironmentMeasurementType.lightDistance:
         return 'Light distance';
-      case EnvironmentMeasurementType.other:
-        return 'Other';
     }
   }
 
@@ -79,7 +76,30 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
         return Icon(Icons.co2, size: 25);
       case EnvironmentMeasurementType.lightDistance:
         return Icon(Icons.highlight_rounded, size: 25);
-      case EnvironmentMeasurementType.other:
+    }
+  }
+}
+
+enum EnvironmentActionType {
+  measurement,
+  other,
+}
+
+extension EnvironmentActionTypeExtension on EnvironmentActionType {
+  String get name {
+    switch (this) {
+      case EnvironmentActionType.measurement:
+        return 'Measurement';
+      case EnvironmentActionType.other:
+        return 'Other';
+    }
+  }
+
+  Icon get icon {
+    switch (this) {
+      case EnvironmentActionType.measurement:
+        return Icon(Icons.analytics, size: 25);
+      case EnvironmentActionType.other:
         return Icon(Icons.miscellaneous_services, size: 25);
     }
   }
@@ -88,14 +108,14 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
 @JsonSerializable()
 class EnvironmentAction extends Action {
   final String environmentId;
-  EnvironmentMeasurement measurement;
+  final EnvironmentActionType type;
 
   EnvironmentAction({
     required super.id,
     required super.description,
     required super.createdAt,
     required this.environmentId,
-    required this.measurement,
+    required this.type,
   });
 
   factory EnvironmentAction.fromJson(Map<String, dynamic> json) =>
@@ -103,6 +123,42 @@ class EnvironmentAction extends Action {
 
   @override
   Map<String, dynamic> toJson() => _$EnvironmentActionToJson(this);
+}
+
+@JsonSerializable()
+class EnvironmentMeasurementAction extends EnvironmentAction {
+  final EnvironmentMeasurement measurement;
+  EnvironmentMeasurementAction({
+    required super.id,
+    required super.description,
+    required super.createdAt,
+    required super.environmentId,
+    required super.type,
+    required this.measurement,
+  });
+
+  factory EnvironmentMeasurementAction.fromJson(Map<String, dynamic> json) =>
+      _$EnvironmentMeasurementActionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$EnvironmentMeasurementActionToJson(this);
+}
+
+@JsonSerializable()
+class EnvironmentOtherAction extends EnvironmentAction {
+  EnvironmentOtherAction({
+    required super.id,
+    required super.description,
+    required super.createdAt,
+    required super.environmentId,
+    required super.type,
+  });
+
+  factory EnvironmentOtherAction.fromJson(Map<String, dynamic> json) =>
+      _$EnvironmentOtherActionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$EnvironmentOtherActionToJson(this);
 }
 
 @JsonSerializable()

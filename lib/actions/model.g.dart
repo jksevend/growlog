@@ -41,8 +41,7 @@ EnvironmentAction _$EnvironmentActionFromJson(Map<String, dynamic> json) =>
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       environmentId: json['environmentId'] as String,
-      measurement: EnvironmentMeasurement.fromJson(
-          json['measurement'] as Map<String, dynamic>),
+      type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
     );
 
 Map<String, dynamic> _$EnvironmentActionToJson(EnvironmentAction instance) =>
@@ -51,7 +50,55 @@ Map<String, dynamic> _$EnvironmentActionToJson(EnvironmentAction instance) =>
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
       'environmentId': instance.environmentId,
+      'type': _$EnvironmentActionTypeEnumMap[instance.type]!,
+    };
+
+const _$EnvironmentActionTypeEnumMap = {
+  EnvironmentActionType.measurement: 'measurement',
+  EnvironmentActionType.other: 'other',
+};
+
+EnvironmentMeasurementAction _$EnvironmentMeasurementActionFromJson(
+        Map<String, dynamic> json) =>
+    EnvironmentMeasurementAction(
+      id: json['id'] as String,
+      description: json['description'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      environmentId: json['environmentId'] as String,
+      type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
+      measurement: EnvironmentMeasurement.fromJson(
+          json['measurement'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$EnvironmentMeasurementActionToJson(
+        EnvironmentMeasurementAction instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'description': instance.description,
+      'createdAt': instance.createdAt.toIso8601String(),
+      'environmentId': instance.environmentId,
+      'type': _$EnvironmentActionTypeEnumMap[instance.type]!,
       'measurement': instance.measurement,
+    };
+
+EnvironmentOtherAction _$EnvironmentOtherActionFromJson(
+        Map<String, dynamic> json) =>
+    EnvironmentOtherAction(
+      id: json['id'] as String,
+      description: json['description'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
+      environmentId: json['environmentId'] as String,
+      type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
+    );
+
+Map<String, dynamic> _$EnvironmentOtherActionToJson(
+        EnvironmentOtherAction instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'description': instance.description,
+      'createdAt': instance.createdAt.toIso8601String(),
+      'environmentId': instance.environmentId,
+      'type': _$EnvironmentActionTypeEnumMap[instance.type]!,
     };
 
 EnvironmentMeasurement _$EnvironmentMeasurementFromJson(
@@ -73,7 +120,6 @@ const _$EnvironmentMeasurementTypeEnumMap = {
   EnvironmentMeasurementType.humidity: 'humidity',
   EnvironmentMeasurementType.co2: 'co2',
   EnvironmentMeasurementType.lightDistance: 'lightDistance',
-  EnvironmentMeasurementType.other: 'other',
 };
 
 LiquidAmount _$LiquidAmountFromJson(Map<String, dynamic> json) => LiquidAmount(

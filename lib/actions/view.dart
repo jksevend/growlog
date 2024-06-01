@@ -188,28 +188,27 @@ class ChooseActionView extends StatefulWidget {
 class _ChooseActionViewState extends State<ChooseActionView> {
   final List<bool> _choices = [true, false];
 
-  final GlobalKey<_EnvironmentTemperatureFormState> _environmentTemperatureFormKey = GlobalKey();
-  final GlobalKey<_EnvironmentHumidityFormState> _environmentHumidityFormKey = GlobalKey();
-  final GlobalKey<_EnvironmentLightDistanceFormState> _environmentLightDistanceFormKey =
-      GlobalKey();
-  final GlobalKey<_EnvironmentCO2FormState> _environmentCO2FormKey = GlobalKey();
+  final GlobalKey<EnvironmentTemperatureFormState> _environmentTemperatureFormKey = GlobalKey();
+  final GlobalKey<EnvironmentHumidityFormState> _environmentHumidityFormKey = GlobalKey();
+  final GlobalKey<EnvironmentLightDistanceFormState> _environmentLightDistanceFormKey = GlobalKey();
+  final GlobalKey<EnvironmentCO2FormState> _environmentCO2FormKey = GlobalKey();
 
   final GlobalKey<_PlantWateringFormState> _plantWateringFormKey = GlobalKey();
   final GlobalKey<_PlantFertilizingFormState> _plantFertilizingFormKey = GlobalKey();
   final GlobalKey<_PlantPruningFormState> _plantPruningFormKey = GlobalKey();
   final GlobalKey<_PlantHarvestingFormState> _plantHarvestingFormKey = GlobalKey();
   final GlobalKey<_PlantTrainingFormState> _plantTrainingFormKey = GlobalKey();
-  final GlobalKey<_PlantMeasuringFormState> _plantMeasuringFormKey = GlobalKey();
+  final GlobalKey<_PlantMeasurementFormState> _plantMeasuringFormKey = GlobalKey();
 
   final GlobalKey<PlantHeightMeasurementFormState> _plantHeightMeasurementFormKey = GlobalKey();
   final GlobalKey<PlantPHMeasurementFormState> _plantPHMeasurementFormKey = GlobalKey();
   final GlobalKey<PlantECMeasurementFormState> _plantECMeasurementFormKey = GlobalKey();
   final GlobalKey<PlantPPMMeasurementFormState> _plantPPMMeasurementFormKey = GlobalKey();
+  final GlobalKey<_EnvironmentMeasurementFormState> _environmentMeasurementFormKey = GlobalKey();
 
   late Plant _currentPlant;
   late PlantActionType _currentActionType = PlantActionType.watering;
-  late EnvironmentMeasurementType _currentEnvironmentMeasurementType =
-      EnvironmentMeasurementType.temperature;
+  late EnvironmentActionType _currentEnvironmentActionType = EnvironmentActionType.measurement;
   late TextEditingController _plantActionDescriptionTextController = TextEditingController();
   late TextEditingController _environmentActionDescriptionTextController = TextEditingController();
   final DateTime _plantActionDate = DateTime.now();
@@ -383,36 +382,33 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          DropdownButton<PlantActionType>(
-                            icon: Icon(Icons.arrow_downward_sharp),
-                            value: _currentActionType,
-                            isExpanded: true,
-                            items: PlantActionType.values
-                                .map(
-                                  (action) => DropdownMenuItem<PlantActionType>(
-                                child: Row(
-                                  children: [
-                                    action.icon,
-                                    const SizedBox(width: 10),
-                                    Text(action.name),
-                                  ],
+                    Column(
+                      children: [
+                        DropdownButton<PlantActionType>(
+                          icon: Icon(Icons.arrow_downward_sharp),
+                          value: _currentActionType,
+                          isExpanded: true,
+                          items: PlantActionType.values
+                              .map(
+                                (action) => DropdownMenuItem<PlantActionType>(
+                                  child: Row(
+                                    children: [
+                                      action.icon,
+                                      const SizedBox(width: 10),
+                                      Text(action.name),
+                                    ],
+                                  ),
+                                  value: action,
                                 ),
-                                value: action,
-                              ),
-                            )
-                                .toList(),
-                            onChanged: (PlantActionType? value) {
-                              setState(() {
-                                _currentActionType = value!;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
+                              )
+                              .toList(),
+                          onChanged: (PlantActionType? value) {
+                            setState(() {
+                              _currentActionType = value!;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                     _plantActionForm(),
                   ],
@@ -705,36 +701,37 @@ class _ChooseActionViewState extends State<ChooseActionView> {
               ),
             ),
           ),
+          Divider(),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  DropdownButton(
-                    isExpanded: true,
-                    value: _currentEnvironmentMeasurementType,
+                  DropdownButton<EnvironmentActionType>(
                     icon: Icon(Icons.arrow_downward_sharp),
-                    items: EnvironmentMeasurementType.values
+                    value: _currentEnvironmentActionType,
+                    isExpanded: true,
+                    items: EnvironmentActionType.values
                         .map(
-                          (type) => DropdownMenuItem(
-                        child: Row(
-                          children: [
-                            type.icon,
-                            const SizedBox(width: 10),
-                            Text(type.name),
-                          ],
-                        ),
-                        value: type,
-                      ),
-                    )
+                          (action) => DropdownMenuItem<EnvironmentActionType>(
+                            child: Row(
+                              children: [
+                                action.icon,
+                                const SizedBox(width: 10),
+                                Text(action.name),
+                              ],
+                            ),
+                            value: action,
+                          ),
+                        )
                         .toList(),
-                    onChanged: (EnvironmentMeasurementType? value) {
+                    onChanged: (EnvironmentActionType? value) {
                       setState(() {
-                        _currentEnvironmentMeasurementType = value!;
+                        _currentEnvironmentActionType = value!;
                       });
                     },
                   ),
-                  _environmentActionMeasurementForm(),
+                  _environmentActionForm(),
                 ],
               ),
             ),
@@ -743,47 +740,58 @@ class _ChooseActionViewState extends State<ChooseActionView> {
             alignment: Alignment.centerRight,
             child: OutlinedButton.icon(
               onPressed: () async {
-                EnvironmentMeasurement measurement;
 
-                if (_currentEnvironmentMeasurementType == EnvironmentMeasurementType.temperature) {
-                  final temperature = _environmentTemperatureFormKey.currentState!.temperature;
-                  measurement = EnvironmentMeasurement(
-                    type: _currentEnvironmentMeasurementType,
-                    measurement: temperature.toJson(),
+                if (_currentEnvironmentActionType == EnvironmentActionType.measurement) {
+                  EnvironmentMeasurement measurement;
+                  final currentEnvironmentMeasurementType = _environmentMeasurementFormKey.currentState!.measurementType;
+                  if (currentEnvironmentMeasurementType ==
+                      EnvironmentMeasurementType.temperature) {
+                    final temperature = _environmentTemperatureFormKey.currentState!.temperature;
+                    measurement = EnvironmentMeasurement(
+                      type: currentEnvironmentMeasurementType,
+                      measurement: temperature.toJson(),
+                    );
+                  } else if (currentEnvironmentMeasurementType ==
+                      EnvironmentMeasurementType.humidity) {
+                    final humidity = _environmentHumidityFormKey.currentState!.humidity;
+                    measurement = EnvironmentMeasurement(
+                        type: currentEnvironmentMeasurementType,
+                        measurement: Map<String, dynamic>.from({'humidity': humidity}));
+                  } else if (currentEnvironmentMeasurementType ==
+                      EnvironmentMeasurementType.lightDistance) {
+                    final distance = _environmentLightDistanceFormKey.currentState!.distance;
+                    measurement = EnvironmentMeasurement(
+                      type: currentEnvironmentMeasurementType,
+                      measurement: distance.toJson(),
+                    );
+                  } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.co2) {
+                    final co2 = _environmentCO2FormKey.currentState!.co2;
+                    measurement = EnvironmentMeasurement(
+                        type: currentEnvironmentMeasurementType,
+                        measurement: Map<String, dynamic>.from({'co2': co2}));
+                  } else {
+                    throw Exception(
+                        'Unknown environment measurement type: $currentEnvironmentMeasurementType');
+                  }
+
+                  final action = EnvironmentMeasurementAction(
+                    id: const Uuid().v4().toString(),
+                    description: _environmentActionDescriptionTextController.text,
+                    environmentId: _currentEnvironment.id,
+                    type: _currentEnvironmentActionType,
+                    measurement: measurement,
+                    createdAt: _environmentActionDate,
                   );
-                } else if (_currentEnvironmentMeasurementType ==
-                    EnvironmentMeasurementType.humidity) {
-                  final humidity = _environmentHumidityFormKey.currentState!.humidity;
-                  measurement = EnvironmentMeasurement(
-                      type: _currentEnvironmentMeasurementType,
-                      measurement: Map<String, dynamic>.from({'humidity': humidity}));
-                } else if (_currentEnvironmentMeasurementType ==
-                    EnvironmentMeasurementType.lightDistance) {
-                  final distance = _environmentLightDistanceFormKey.currentState!.distance;
-                  measurement = EnvironmentMeasurement(
-                    type: _currentEnvironmentMeasurementType,
-                    measurement: distance.toJson(),
-                  );
-                } else if (_currentEnvironmentMeasurementType == EnvironmentMeasurementType.co2) {
-                  final co2 = _environmentCO2FormKey.currentState!.co2;
-                  measurement = EnvironmentMeasurement(
-                      type: _currentEnvironmentMeasurementType,
-                      measurement: Map<String, dynamic>.from({'co2': co2}));
-                } else if (_currentEnvironmentMeasurementType == EnvironmentMeasurementType.other) {
-                  measurement = EnvironmentMeasurement(
-                    type: _currentEnvironmentMeasurementType,
-                    measurement: Map<String, dynamic>.from({}),
-                  );
-                } else {
-                  throw Exception(
-                      'Unknown environment measurement type: $_currentEnvironmentMeasurementType');
+                  await widget.actionsProvider
+                      .addEnvironmentAction(action)
+                      .whenComplete(() => Navigator.of(context).pop());
                 }
-                final action = EnvironmentAction(
+                final action = EnvironmentOtherAction(
                   id: const Uuid().v4().toString(),
                   description: _environmentActionDescriptionTextController.text,
                   environmentId: _currentEnvironment.id,
+                  type: _currentEnvironmentActionType,
                   createdAt: _environmentActionDate,
-                  measurement: measurement,
                 );
                 await widget.actionsProvider
                     .addEnvironmentAction(action)
@@ -837,7 +845,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
           key: _plantHarvestingFormKey,
         );
       case PlantActionType.measuring:
-        return PlantMeasuringForm(
+        return PlantMeasurementForm(
           key: _plantMeasuringFormKey,
           plantMeasuringFormKey: _plantHeightMeasurementFormKey,
           plantPHMeasurementFormKey: _plantPHMeasurementFormKey,
@@ -850,25 +858,17 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
   }
 
-  Widget _environmentActionMeasurementForm() {
-    switch (_currentEnvironmentMeasurementType) {
-      case EnvironmentMeasurementType.temperature:
-        return EnvironmentTemperatureForm(
-          key: _environmentTemperatureFormKey,
+  Widget _environmentActionForm() {
+    switch (_currentEnvironmentActionType) {
+      case EnvironmentActionType.measurement:
+        return EnvironmentMeasurementForm(
+          key: _environmentMeasurementFormKey,
+          environmentTemperatureFormKey: _environmentTemperatureFormKey,
+          environmentHumidityFormKey: _environmentHumidityFormKey,
+          environmentLightDistanceFormKey: _environmentLightDistanceFormKey,
+          environmentCO2FormKey: _environmentCO2FormKey,
         );
-      case EnvironmentMeasurementType.humidity:
-        return EnvironmentHumidityForm(
-          key: _environmentHumidityFormKey,
-        );
-      case EnvironmentMeasurementType.co2:
-        return EnvironmentCO2Form(
-          key: _environmentCO2FormKey,
-        );
-      case EnvironmentMeasurementType.lightDistance:
-        return EnvironmentLightDistanceForm(
-          key: _environmentLightDistanceFormKey,
-        );
-      case EnvironmentMeasurementType.other:
+      case EnvironmentActionType.other:
         return Container();
     }
   }
@@ -878,10 +878,10 @@ class EnvironmentCO2Form extends StatefulWidget {
   const EnvironmentCO2Form({super.key});
 
   @override
-  State<EnvironmentCO2Form> createState() => _EnvironmentCO2FormState();
+  State<EnvironmentCO2Form> createState() => EnvironmentCO2FormState();
 }
 
-class _EnvironmentCO2FormState extends State<EnvironmentCO2Form> {
+class EnvironmentCO2FormState extends State<EnvironmentCO2Form> {
   late TextEditingController _co2Controller;
 
   @override
@@ -918,10 +918,10 @@ class EnvironmentLightDistanceForm extends StatefulWidget {
   const EnvironmentLightDistanceForm({super.key});
 
   @override
-  State<EnvironmentLightDistanceForm> createState() => _EnvironmentLightDistanceFormState();
+  State<EnvironmentLightDistanceForm> createState() => EnvironmentLightDistanceFormState();
 }
 
-class _EnvironmentLightDistanceFormState extends State<EnvironmentLightDistanceForm> {
+class EnvironmentLightDistanceFormState extends State<EnvironmentLightDistanceForm> {
   late TextEditingController _distanceController;
   late MeasurementUnit _distanceUnit;
 
@@ -999,10 +999,10 @@ class EnvironmentHumidityForm extends StatefulWidget {
   const EnvironmentHumidityForm({super.key});
 
   @override
-  State<EnvironmentHumidityForm> createState() => _EnvironmentHumidityFormState();
+  State<EnvironmentHumidityForm> createState() => EnvironmentHumidityFormState();
 }
 
-class _EnvironmentHumidityFormState extends State<EnvironmentHumidityForm> {
+class EnvironmentHumidityFormState extends State<EnvironmentHumidityForm> {
   late TextEditingController _humidityController;
 
   @override
@@ -1042,10 +1042,10 @@ class EnvironmentTemperatureForm extends StatefulWidget {
   const EnvironmentTemperatureForm({super.key});
 
   @override
-  State<EnvironmentTemperatureForm> createState() => _EnvironmentTemperatureFormState();
+  State<EnvironmentTemperatureForm> createState() => EnvironmentTemperatureFormState();
 }
 
-class _EnvironmentTemperatureFormState extends State<EnvironmentTemperatureForm> {
+class EnvironmentTemperatureFormState extends State<EnvironmentTemperatureForm> {
   late TextEditingController _temperatureController;
   late TemperatureUnit _temperatureUnit;
 
@@ -1530,13 +1530,13 @@ class _PlantTrainingFormState extends State<PlantTrainingForm> {
   }
 }
 
-class PlantMeasuringForm extends StatefulWidget {
+class PlantMeasurementForm extends StatefulWidget {
   final GlobalKey<PlantHeightMeasurementFormState> plantMeasuringFormKey;
   final GlobalKey<PlantECMeasurementFormState> plantECMeasurementFormKey;
   final GlobalKey<PlantPHMeasurementFormState> plantPHMeasurementFormKey;
   final GlobalKey<PlantPPMMeasurementFormState> plantPPMMeasurementFormKey;
 
-  const PlantMeasuringForm({
+  const PlantMeasurementForm({
     super.key,
     required this.plantMeasuringFormKey,
     required this.plantECMeasurementFormKey,
@@ -1545,10 +1545,10 @@ class PlantMeasuringForm extends StatefulWidget {
   });
 
   @override
-  State<PlantMeasuringForm> createState() => _PlantMeasuringFormState();
+  State<PlantMeasurementForm> createState() => _PlantMeasurementFormState();
 }
 
-class _PlantMeasuringFormState extends State<PlantMeasuringForm> {
+class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
   late PlantMeasurementType _measurementType;
 
   @override
@@ -1806,5 +1806,91 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
         hintText: '500',
       ),
     );
+  }
+}
+
+class EnvironmentMeasurementForm extends StatefulWidget {
+  final GlobalKey<EnvironmentCO2FormState> environmentCO2FormKey;
+  final GlobalKey<EnvironmentHumidityFormState> environmentHumidityFormKey;
+  final GlobalKey<EnvironmentLightDistanceFormState> environmentLightDistanceFormKey;
+  final GlobalKey<EnvironmentTemperatureFormState> environmentTemperatureFormKey;
+
+  const EnvironmentMeasurementForm({
+    super.key,
+    required this.environmentCO2FormKey,
+    required this.environmentHumidityFormKey,
+    required this.environmentLightDistanceFormKey,
+    required this.environmentTemperatureFormKey,
+  });
+
+  @override
+  State<EnvironmentMeasurementForm> createState() => _EnvironmentMeasurementFormState();
+}
+
+class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm> {
+  late EnvironmentMeasurementType _measurementType;
+
+  @override
+  void initState() {
+    super.initState();
+    _measurementType = EnvironmentMeasurementType.temperature;
+  }
+
+  EnvironmentMeasurementType get measurementType {
+    return _measurementType;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        DropdownButton<EnvironmentMeasurementType>(
+          icon: Icon(Icons.arrow_downward_sharp),
+          value: _measurementType,
+          isExpanded: true,
+          items: EnvironmentMeasurementType.values
+              .map(
+                (type) => DropdownMenuItem<EnvironmentMeasurementType>(
+                  child: Row(
+                    children: [
+                      type.icon,
+                      const SizedBox(width: 10),
+                      Text(type.name),
+                    ],
+                  ),
+                  value: type,
+                ),
+              )
+              .toList(),
+          onChanged: (EnvironmentMeasurementType? value) {
+            setState(() {
+              _measurementType = value!;
+            });
+          },
+        ),
+        _environmentActionMeasurementForm(),
+      ],
+    );
+  }
+
+  Widget _environmentActionMeasurementForm() {
+    switch (_measurementType) {
+      case EnvironmentMeasurementType.temperature:
+        return EnvironmentTemperatureForm(
+          key: widget.environmentTemperatureFormKey,
+        );
+      case EnvironmentMeasurementType.humidity:
+        return EnvironmentHumidityForm(
+          key: widget.environmentHumidityFormKey,
+        );
+      case EnvironmentMeasurementType.co2:
+        return EnvironmentCO2Form(
+          key: widget.environmentCO2FormKey,
+        );
+      case EnvironmentMeasurementType.lightDistance:
+        return EnvironmentLightDistanceForm(
+          key: widget.environmentLightDistanceFormKey,
+        );
+    }
   }
 }

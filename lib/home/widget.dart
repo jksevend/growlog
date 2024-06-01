@@ -42,7 +42,7 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        leading: action.measurement.type.icon,
+        leading: action.type.icon,
         title: Text(environment.name),
         subtitle: Text(action.formattedDate),
       ),
