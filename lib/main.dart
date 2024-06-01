@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/view.dart';
 import 'package:weedy/environments/provider.dart';
@@ -27,10 +28,11 @@ class WeedyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PlantsProvider()),
         ChangeNotifierProvider(create: (_) => EnvironmentsProvider()),
         ChangeNotifierProvider(create: (_) => ActionsProvider()),
+        ChangeNotifierProvider(create: (_) => FertilizerProvider()),
       ],
-      child: Consumer4<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider>(
+      child: Consumer5<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider, FertilizerProvider>(
         builder:
-            (context, settingsProvider, plantsProvider, environmentsProvider, actionsProvider, _) {
+            (context, settingsProvider, plantsProvider, environmentsProvider, actionsProvider, fertilizerProvider,  _) {
           return MaterialApp(
             title: 'Weedy',
             theme: ThemeData.light(),
@@ -41,6 +43,7 @@ class WeedyApp extends StatelessWidget {
               plantsProvider: plantsProvider,
               environmentsProvider: environmentsProvider,
               actionsProvider: actionsProvider,
+              fertilizerProvider: fertilizerProvider,
             ),
           );
         },
@@ -54,6 +57,7 @@ class MainView extends StatefulWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const MainView({
     super.key,
@@ -61,6 +65,7 @@ class MainView extends StatefulWidget {
     required this.plantsProvider,
     required this.environmentsProvider,
     required this.actionsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -75,6 +80,7 @@ class _MainViewState extends State<MainView> {
       actionsProvider: widget.actionsProvider,
       plantsProvider: widget.plantsProvider,
       environmentsProvider: widget.environmentsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
     ),
     PlantOverview(
       plantsProvider: widget.plantsProvider,
@@ -147,6 +153,7 @@ class _MainViewState extends State<MainView> {
                     plantsProvider: widget.plantsProvider,
                     environmentsProvider: widget.environmentsProvider,
                     actionsProvider: widget.actionsProvider,
+                    fertilizerProvider: widget.fertilizerProvider,
                   )));
         },
         tooltip: 'Aktion ausführen',

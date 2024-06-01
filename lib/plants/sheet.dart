@@ -46,11 +46,15 @@ Future<void> showPlantDetailSheet(
                     trailing: IconButton(
                         icon: Icon(Icons.arrow_right_alt),
                         onPressed: () async {
-                          Navigator.of(context).pop();
                           var navigationBar =
                               bottomNavigationBarKey.currentWidget as BottomNavigationBar;
+                          await Future.delayed(const Duration(milliseconds: 500));
+                          if (!context.mounted) {
+                            return;
+                          }
+                          Navigator.of(context).pop();
                           navigationBar.onTap!(2);
-                          showEnvironmentDetailSheet(context, plantEnvironment, plants,
+                          await showEnvironmentDetailSheet(context, plantEnvironment, plants,
                               environmentsProvider, plantsProvider, actionsProvider);
                         }),
                   ),

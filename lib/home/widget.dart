@@ -18,12 +18,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        leading: Column(
-          children: [
-            action.type.icon,
-            Text(action.type.name),
-          ],
-        ),
+        leading: action.type.icon,
         title: Text(plant.name),
         subtitle: Text(action.formattedDate),
       ),
@@ -46,8 +41,9 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        title: Text(environment.name),
-        subtitle: Text(action.formattedDate),
+          leading: action.measurement.type.icon,
+          title: Text(environment.name),
+          subtitle: Text(action.formattedDate),
       ),
     );
   }

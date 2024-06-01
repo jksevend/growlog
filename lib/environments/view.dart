@@ -49,42 +49,45 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
             child: Text('No environments created yet.'),
           );
         }
-        return ListView(
-          shrinkWrap: true,
-          children: environments.values.map(
-            (environment) {
-              final plantsInEnvironment =
-                  plants.values.where((plant) => plant.environmentId == environment.id).toList();
-              return Card(
-                child: ListTile(
-                    leading: Icon(environment.type == EnvironmentType.indoor
-                        ? Icons.house
-                        : Icons.light_mode_rounded),
-                    title: Text(environment.name),
-                    subtitle: Text(environment.description),
-                    onTap: () async {
-                      debugPrint('Navigate to the environment detail view for ${environment.name}');
-                      await showEnvironmentDetailSheet(
-                          context,
-                          environment,
-                          plantsInEnvironment,
-                          widget.environmentsProvider,
-                          widget.plantsProvider,
-                          widget.actionsProvider);
-                    },
-                    trailing: IconButton(
-                      icon: Icon(Icons.view_timeline),
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => EnvironmentActionOverview(
-                                  environment: environment,
-                                  actionsProvider: widget.actionsProvider,
-                                )));
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView(
+            shrinkWrap: true,
+            children: environments.values.map(
+              (environment) {
+                final plantsInEnvironment =
+                    plants.values.where((plant) => plant.environmentId == environment.id).toList();
+                return Card(
+                  child: ListTile(
+                      leading: Icon(environment.type == EnvironmentType.indoor
+                          ? Icons.house
+                          : Icons.light_mode_rounded),
+                      title: Text(environment.name),
+                      subtitle: Text(environment.description),
+                      onTap: () async {
+                        debugPrint('Navigate to the environment detail view for ${environment.name}');
+                        await showEnvironmentDetailSheet(
+                            context,
+                            environment,
+                            plantsInEnvironment,
+                            widget.environmentsProvider,
+                            widget.plantsProvider,
+                            widget.actionsProvider);
                       },
-                    )),
-              );
-            },
-          ).toList(),
+                      trailing: IconButton(
+                        icon: Icon(Icons.view_timeline),
+                        onPressed: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>   EnvironmentActionOverview(
+                                    environment: environment,
+                                    actionsProvider: widget.actionsProvider,
+                                  )));
+                        },
+                      )),
+                );
+              },
+            ).toList(),
+          ),
         );
       },
     );
@@ -134,9 +137,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
         TextEditingController(text: widget.environment?.dimension.length.toString());
     _heightController =
         TextEditingController(text: widget.environment?.dimension.height.toString());
-    _selectedEnvironmentType = <bool>[
-      widget.environment?.type == EnvironmentType.indoor,
-      widget.environment?.type == EnvironmentType.outdoor,
+    _selectedEnvironmentType = widget.environment == null ? [true, false] : [
+      widget.environment!.type == EnvironmentType.indoor,
+      widget.environment!.type == EnvironmentType.outdoor
     ];
     _currentLightHours = widget.environment?.lightDetails.lightHours.toDouble() ?? 12;
     _currentLightType = widget.environment?.lightDetails.lights.first.type ?? LightType.led;
@@ -414,7 +417,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                       }
                     }
                   },
-                  label: Text('Create'),
+                  label: Text('Save'),
                   icon: Icon(Icons.arrow_right),
                 ),
               ],

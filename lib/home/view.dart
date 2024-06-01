@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/streams.dart';
+import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/environments/model.dart';
@@ -8,16 +9,19 @@ import 'package:weedy/home/widget.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 
+/// Home view that displays the actions performed today.
 class HomeView extends StatefulWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const HomeView({
     super.key,
     required this.actionsProvider,
     required this.plantsProvider,
     required this.environmentsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -44,17 +48,19 @@ class _HomeViewState extends State<HomeView> {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
+
+          // Extract data
           var plants = snapshot.data![0] as Map<String, Plant>;
           var environments = snapshot.data![1] as Map<String, Environment>;
           var plantActions = snapshot.data![2] as List<PlantAction>;
           var environmentActions = snapshot.data![3] as List<EnvironmentAction>;
 
+          // Filter actions performed today
           var todayPlantActions =
               plantActions.where((action) => action.createdAt.day == DateTime.now().day).toList();
           var todayEnvironmentActions = environmentActions
               .where((action) => action.createdAt.day == DateTime.now().day)
               .toList();
-
           var todayPlantActionsPerformed = todayPlantActions.length;
           var todayEnvironmentActionsPerformed = todayEnvironmentActions.length;
 
@@ -70,7 +76,15 @@ class _HomeViewState extends State<HomeView> {
                         padding: EdgeInsets.all(8.0),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text('Actions today', style: TextStyle(fontSize: 18),),
+                          child: Row(
+                            children: [
+                              Icon(Icons.bolt_outlined),
+                              Text(
+                                'Actions today',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       Divider(),
@@ -97,8 +111,12 @@ class _HomeViewState extends State<HomeView> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(
                                         children: todayPlantActions
-                                            .map((action) => PlantActionLogHomeWidget(
-                                                plant: plants[action.plantId]!, action: action))
+                                            .map(
+                                              (action) => PlantActionLogHomeWidget(
+                                                plant: plants[action.plantId]!,
+                                                action: action,
+                                              ),
+                                            )
                                             .toList(),
                                       ),
                                     ),
