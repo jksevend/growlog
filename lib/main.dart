@@ -107,6 +107,9 @@ class _MainViewState extends State<MainView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Weedy'),
+      ),
       body: _pages[_selectedIndex],
       floatingActionButton: _floatingActionButton(),
       floatingActionButtonLocation: _floatingActionButtonLocation(),

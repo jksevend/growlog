@@ -6,6 +6,23 @@ part of 'model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+Recurring _$RecurringFromJson(Map<String, dynamic> json) => Recurring(
+      interval: (json['interval'] as num).toInt(),
+      unit: $enumDecode(_$RecurringUnitEnumMap, json['unit']),
+    );
+
+Map<String, dynamic> _$RecurringToJson(Recurring instance) => <String, dynamic>{
+      'interval': instance.interval,
+      'unit': _$RecurringUnitEnumMap[instance.unit]!,
+    };
+
+const _$RecurringUnitEnumMap = {
+  RecurringUnit.hour: 'hour',
+  RecurringUnit.day: 'day',
+  RecurringUnit.week: 'week',
+  RecurringUnit.month: 'month',
+};
+
 Action _$ActionFromJson(Map<String, dynamic> json) => Action(
       id: json['id'] as String,
       description: json['description'] as String,

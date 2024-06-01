@@ -4,6 +4,28 @@ import 'package:timeago/timeago.dart' as timeago;
 
 part 'model.g.dart';
 
+enum RecurringUnit {
+  hour,
+  day,
+  week,
+  month,
+}
+
+@JsonSerializable()
+class Recurring {
+  final int interval;
+  final RecurringUnit unit;
+
+  Recurring({
+    required this.interval,
+    required this.unit,
+  });
+
+  factory Recurring.fromJson(Map<String, dynamic> json) => _$RecurringFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RecurringToJson(this);
+}
+
 @JsonSerializable()
 class Action {
   final String id;

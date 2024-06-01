@@ -28,12 +28,50 @@ Future<void> showPlantDetailSheet(
               leading: Icon(Icons.info),
               title: Text(plant.name),
               subtitle: Text(plant.description),
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.eco, color: Colors.green),
-              title: Text('Plant actions'),
-              subtitle: Text('Performed today: 0'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    onPressed: () async {
+                      final confirmed = await confirmDeletionOfPlantDialog(
+                          context, plant, plantsProvider, actionsProvider);
+                      if (confirmed == true) {
+                        if (!context.mounted) {
+                          return;
+                        }
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${plant.name} has been deleted'),
+                          ),
+                        );
+                      }
+                    },
+                    icon: Icon(
+                      Icons.delete_forever,
+                      color: Colors.red,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      final updatedPlant = await Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => EditPlantView(
+                              plant: plant,
+                              plantsProvider: plantsProvider,
+                              environmentsProvider: environmentsProvider)));
+                      setState(() {
+                        if (updatedPlant != null) {
+                          plant = updatedPlant;
+                        }
+                      });
+                    },
+                    icon: Icon(
+                      Icons.edit,
+                      color: Colors.amber ,
+                    ),
+                  ),
+                ],
+              ),
             ),
             Divider(),
             // Information about the plants' environment
@@ -58,67 +96,6 @@ Future<void> showPlantDetailSheet(
                               environmentsProvider, plantsProvider, actionsProvider);
                         }),
                   ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Icon(Icons.edit, color: Colors.blue),
-                  TextButton(
-                    onPressed: () async {
-                      final updatedPlant = await Navigator.of(context)
-                          .push(MaterialPageRoute(
-                              builder: (context) => EditPlantView(
-                                  plant: plant,
-                                  plantsProvider: plantsProvider,
-                                  environmentsProvider: environmentsProvider)));
-                      setState(() {
-                        if (updatedPlant != null) {
-                          plant = updatedPlant;
-                        }
-                      });
-                    },
-                    child: Text('Edit plant '),
-                  ),
-                ],
-              ),
-            ),
-            Spacer(),
-            Text('Danger zone', style: TextStyle(color: Colors.red, fontSize: 20)),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Divider(),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.delete_forever,
-                        color: Colors.red,
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final confirmed = await confirmDeletionOfPlantDialog(
-                              context, plant, plantsProvider, actionsProvider);
-                          if (confirmed == true) {
-                            if (!context.mounted) {
-                              return;
-                            }
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${plant.name} has been deleted'),
-                              ),
-                            );
-                          }
-                        },
-                        child: Text('Delete'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            )
           ],
         );
       });

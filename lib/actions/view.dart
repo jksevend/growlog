@@ -238,64 +238,62 @@ class _ChooseActionViewState extends State<ChooseActionView> {
         title: const Text('Choose Action'),
         centerTitle: true,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Text('What do you want to do?'),
-                          SizedBox(height: 10),
-                          ToggleButtons(
-                            constraints: BoxConstraints(minWidth: 100),
-                            children: [
-                              Column(
-                                children: [
-                                  Icon(
-                                    Icons.eco,
-                                    size: 50,
-                                    color: Colors.green[900],
-                                  ),
-                                  Text('Plant')
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  Icon(
-                                    Icons.lightbulb,
-                                    size: 50,
-                                    color: Colors.yellow[900],
-                                  ),
-                                  Text('Environment')
-                                ],
-                              )
-                            ],
-                            isSelected: _choices,
-                            onPressed: (int index) {
-                              setState(() {
-                                // The button that is tapped is set to true, and the others to false.
-                                for (int i = 0; i < _choices.length; i++) {
-                                  _choices[i] = i == index;
-                                }
-                              });
-                            },
-                          ),
-                        ],
-                      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Text('What do you want to do?'),
+                        SizedBox(height: 10),
+                        ToggleButtons(
+                          constraints: BoxConstraints(minWidth: 100),
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.eco,
+                                  size: 50,
+                                  color: Colors.green[900],
+                                ),
+                                Text('Plant')
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.lightbulb,
+                                  size: 50,
+                                  color: Colors.yellow[900],
+                                ),
+                                Text('Environment')
+                              ],
+                            )
+                          ],
+                          isSelected: _choices,
+                          onPressed: (int index) {
+                            setState(() {
+                              // The button that is tapped is set to true, and the others to false.
+                              for (int i = 0; i < _choices.length; i++) {
+                                _choices[i] = i == index;
+                              }
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                Divider(),
-                _actionForm(context),
-              ],
-            ),
+              ),
+              Divider(),
+              _actionForm(context),
+            ],
           ),
         ),
       ),
@@ -385,38 +383,40 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    DropdownButton<PlantActionType>(
-                      icon: Icon(Icons.arrow_downward_sharp),
-                      value: _currentActionType,
-                      isExpanded: true,
-                      items: PlantActionType.values
-                          .map(
-                            (action) => DropdownMenuItem<PlantActionType>(
-                              child: Row(
-                                children: [
-                                  action.icon,
-                                  const SizedBox(width: 10),
-                                  Text(action.name),
-                                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          DropdownButton<PlantActionType>(
+                            icon: Icon(Icons.arrow_downward_sharp),
+                            value: _currentActionType,
+                            isExpanded: true,
+                            items: PlantActionType.values
+                                .map(
+                                  (action) => DropdownMenuItem<PlantActionType>(
+                                child: Row(
+                                  children: [
+                                    action.icon,
+                                    const SizedBox(width: 10),
+                                    Text(action.name),
+                                  ],
+                                ),
+                                value: action,
                               ),
-                              value: action,
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (PlantActionType? value) {
-                        setState(() {
-                          _currentActionType = value!;
-                        });
-                      },
+                            )
+                                .toList(),
+                            onChanged: (PlantActionType? value) {
+                              setState(() {
+                                _currentActionType = value!;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
                     ),
+                    _plantActionForm(),
                   ],
                 ),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _plantActionForm(),
               ),
             ),
             Align(
@@ -701,34 +701,40 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                       hintText: 'Enter a description of the plant',
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: DropdownButton(
-                      value: _currentEnvironmentMeasurementType,
-                      icon: Icon(Icons.arrow_downward_sharp),
-                      items: EnvironmentMeasurementType.values
-                          .map(
-                            (type) => DropdownMenuItem(
-                              child: Row(
-                                children: [
-                                  type.icon,
-                                  const SizedBox(width: 10),
-                                  Text(type.name),
-                                ],
-                              ),
-                              value: type,
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (EnvironmentMeasurementType? value) {
-                        setState(() {
-                          _currentEnvironmentMeasurementType = value!;
-                        });
-                      },
-                    ),
+                ],
+              ),
+            ),
+          ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  DropdownButton(
+                    isExpanded: true,
+                    value: _currentEnvironmentMeasurementType,
+                    icon: Icon(Icons.arrow_downward_sharp),
+                    items: EnvironmentMeasurementType.values
+                        .map(
+                          (type) => DropdownMenuItem(
+                        child: Row(
+                          children: [
+                            type.icon,
+                            const SizedBox(width: 10),
+                            Text(type.name),
+                          ],
+                        ),
+                        value: type,
+                      ),
+                    )
+                        .toList(),
+                    onChanged: (EnvironmentMeasurementType? value) {
+                      setState(() {
+                        _currentEnvironmentMeasurementType = value!;
+                      });
+                    },
                   ),
-                  Divider(),
-                  _environmentActionMeasurementForm()
+                  _environmentActionMeasurementForm(),
                 ],
               ),
             ),
@@ -941,45 +947,50 @@ class _EnvironmentLightDistanceFormState extends State<EnvironmentLightDistanceF
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextFormField(
-            controller: _distanceController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              suffixIcon: Icon(Icons.highlight_rounded),
-              labelText: 'Distance',
-              hintText: '50',
+    return SizedBox(
+      height: 75,
+      width: double.infinity,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: _distanceController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                suffixIcon: Icon(Icons.highlight_rounded),
+                labelText: 'Distance',
+                hintText: '50',
+              ),
             ),
           ),
-        ),
-        SizedBox(width: 10),
-        VerticalDivider(),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Unit:'),
-            DropdownButton<MeasurementUnit>(
-              value: _distanceUnit,
-              icon: Icon(Icons.arrow_downward_sharp),
-              items: MeasurementUnit.values
-                  .map(
-                    (unit) => DropdownMenuItem(
-                      child: Text(unit.name),
-                      value: unit,
-                    ),
-                  )
-                  .toList(),
-              onChanged: (MeasurementUnit? value) {
-                setState(() {
-                  _distanceUnit = value!;
-                });
-              },
-            ),
-          ],
-        ),
-      ],
+          SizedBox(width: 50),
+          VerticalDivider(),
+          SizedBox(width: 20),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Unit:'),
+              DropdownButton<MeasurementUnit>(
+                value: _distanceUnit,
+                icon: Icon(Icons.arrow_downward_sharp),
+                items: MeasurementUnit.values
+                    .map(
+                      (unit) => DropdownMenuItem(
+                        child: Text(unit.name),
+                        value: unit,
+                      ),
+                    )
+                    .toList(),
+                onChanged: (MeasurementUnit? value) {
+                  setState(() {
+                    _distanceUnit = value!;
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1062,7 +1073,7 @@ class _EnvironmentTemperatureFormState extends State<EnvironmentTemperatureForm>
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 100,
+      height: 75,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1077,8 +1088,9 @@ class _EnvironmentTemperatureFormState extends State<EnvironmentTemperatureForm>
               ),
             ),
           ),
-          SizedBox(width: 10), // Add some space between the text field and the dropdown button
+          SizedBox(width: 50),
           VerticalDivider(),
+          SizedBox(width: 20),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -1143,7 +1155,9 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
+      height: 75,
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Expanded(
             child: TextFormField(
@@ -1156,8 +1170,9 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
               ),
             ),
           ),
-          SizedBox(width: 10),
+          SizedBox(width: 50),
           VerticalDivider(),
+          SizedBox(width: 20),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -1287,45 +1302,50 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
             },
           ),
           Divider(),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: _fertilizerAmountController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    suffixIcon: Icon(Icons.eco),
-                    labelText: 'Amount',
-                    hintText: '50',
+          SizedBox(
+            height: 75,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Flexible(
+                  child: TextFormField(
+                    controller: _fertilizerAmountController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      suffixIcon: Icon(Icons.eco),
+                      labelText: 'Amount',
+                      hintText: '50',
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: 10),
-              VerticalDivider(),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Unit:'),
-                  DropdownButton<LiquidUnit>(
-                    value: _liquidUnit,
-                    icon: Icon(Icons.arrow_downward_sharp),
-                    items: LiquidUnit.values
-                        .map(
-                          (unit) => DropdownMenuItem(
-                            child: Text(unit.name),
-                            value: unit,
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (LiquidUnit? value) {
-                      setState(() {
-                        _liquidUnit = value!;
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ],
+                SizedBox(width: 50),
+                VerticalDivider(),
+                SizedBox(width: 20),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Unit:'),
+                    DropdownButton<LiquidUnit>(
+                      value: _liquidUnit,
+                      icon: Icon(Icons.arrow_downward_sharp),
+                      items: LiquidUnit.values
+                          .map(
+                            (unit) => DropdownMenuItem(
+                              child: Text(unit.name),
+                              value: unit,
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (LiquidUnit? value) {
+                        setState(() {
+                          _liquidUnit = value!;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -1420,10 +1440,11 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
+      height: 75,
       width: double.infinity,
       child: Row(
         children: [
-          Expanded(
+          Flexible(
             child: TextFormField(
               controller: _harvestAmountController,
               keyboardType: TextInputType.number,
@@ -1434,8 +1455,9 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
               ),
             ),
           ),
-          SizedBox(width: 10),
+          SizedBox(width: 50),
           VerticalDivider(),
+          SizedBox(width: 20),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -1488,6 +1510,7 @@ class _PlantTrainingFormState extends State<PlantTrainingForm> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<TrainingType>(
+      isExpanded: true,
       value: _trainingType,
       icon: Icon(Icons.arrow_downward_sharp),
       items: TrainingType.values
@@ -1543,6 +1566,7 @@ class _PlantMeasuringFormState extends State<PlantMeasuringForm> {
     return Column(
       children: [
         DropdownButton<PlantMeasurementType>(
+          isExpanded: true,
           value: _measurementType,
           icon: Icon(Icons.arrow_downward_sharp),
           items: PlantMeasurementType.values
@@ -1626,6 +1650,7 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
+      height: 75,
       width: double.infinity,
       child: Row(
         children: [
@@ -1639,8 +1664,9 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
               ),
             ),
           ),
-          SizedBox(width: 10),
+          SizedBox(width: 50),
           VerticalDivider(),
+          SizedBox(width: 20),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

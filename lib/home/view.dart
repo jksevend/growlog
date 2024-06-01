@@ -70,6 +70,9 @@ class _HomeViewState extends State<HomeView> {
               shrinkWrap: true,
               children: [
                 Card(
+                  child: WeekAndMonthView(),
+                ),
+                Card(
                   child: Column(
                     children: [
                       const Padding(
