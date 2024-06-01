@@ -785,6 +785,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                   await widget.actionsProvider
                       .addEnvironmentAction(action)
                       .whenComplete(() => Navigator.of(context).pop());
+                  return;
                 }
                 final action = EnvironmentOtherAction(
                   id: const Uuid().v4().toString(),
