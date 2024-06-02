@@ -57,7 +57,7 @@ const _$EnvironmentTypeEnumMap = {
 Light _$LightFromJson(Map<String, dynamic> json) => Light(
       id: json['id'] as String,
       type: $enumDecode(_$LightTypeEnumMap, json['type']),
-      watt: (json['watt'] as num).toInt(),
+      watt: (json['watt'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$LightToJson(Light instance) => <String, dynamic>{

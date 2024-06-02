@@ -96,7 +96,7 @@ enum LightType {
 class Light {
   final String id;
   final LightType type;
-  final int watt;
+  final double watt;
 
   Light({
     required this.id,

@@ -108,6 +108,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
           padding: const EdgeInsets.only(left: 16),
           child: Row(
             children: [
+              Spacer(),
               Text(_currentMonthName()),
               _buildHeader(),
             ],

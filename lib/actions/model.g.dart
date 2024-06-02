@@ -8,30 +8,34 @@ part of 'model.dart';
 
 Recurring _$RecurringFromJson(Map<String, dynamic> json) => Recurring(
       interval: (json['interval'] as num).toInt(),
-      unit: $enumDecode(_$RecurringUnitEnumMap, json['unit']),
+      unit: $enumDecode(_$IntervalUnitEnumMap, json['unit']),
     );
 
 Map<String, dynamic> _$RecurringToJson(Recurring instance) => <String, dynamic>{
       'interval': instance.interval,
-      'unit': _$RecurringUnitEnumMap[instance.unit]!,
+      'unit': _$IntervalUnitEnumMap[instance.unit]!,
     };
 
-const _$RecurringUnitEnumMap = {
-  RecurringUnit.hour: 'hour',
-  RecurringUnit.day: 'day',
-  RecurringUnit.week: 'week',
-  RecurringUnit.month: 'month',
+const _$IntervalUnitEnumMap = {
+  IntervalUnit.hour: 'hour',
+  IntervalUnit.day: 'day',
+  IntervalUnit.week: 'week',
+  IntervalUnit.month: 'month',
 };
 
 Action _$ActionFromJson(Map<String, dynamic> json) => Action(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$ActionToJson(Action instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
     };
 
@@ -39,6 +43,9 @@ EnvironmentAction _$EnvironmentActionFromJson(Map<String, dynamic> json) =>
     EnvironmentAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       environmentId: json['environmentId'] as String,
       type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
@@ -48,6 +55,7 @@ Map<String, dynamic> _$EnvironmentActionToJson(EnvironmentAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'environmentId': instance.environmentId,
       'type': _$EnvironmentActionTypeEnumMap[instance.type]!,
@@ -63,6 +71,9 @@ EnvironmentMeasurementAction _$EnvironmentMeasurementActionFromJson(
     EnvironmentMeasurementAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       environmentId: json['environmentId'] as String,
       type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
@@ -75,6 +86,7 @@ Map<String, dynamic> _$EnvironmentMeasurementActionToJson(
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'environmentId': instance.environmentId,
       'type': _$EnvironmentActionTypeEnumMap[instance.type]!,
@@ -86,6 +98,9 @@ EnvironmentOtherAction _$EnvironmentOtherActionFromJson(
     EnvironmentOtherAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       environmentId: json['environmentId'] as String,
       type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
@@ -96,6 +111,7 @@ Map<String, dynamic> _$EnvironmentOtherActionToJson(
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'environmentId': instance.environmentId,
       'type': _$EnvironmentActionTypeEnumMap[instance.type]!,
@@ -141,6 +157,9 @@ const _$LiquidUnitEnumMap = {
 PlantAction _$PlantActionFromJson(Map<String, dynamic> json) => PlantAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -150,6 +169,7 @@ Map<String, dynamic> _$PlantActionToJson(PlantAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -190,6 +210,9 @@ PlantWateringAction _$PlantWateringActionFromJson(Map<String, dynamic> json) =>
     PlantWateringAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -201,6 +224,7 @@ Map<String, dynamic> _$PlantWateringActionToJson(
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -224,6 +248,9 @@ PlantFertilizingAction _$PlantFertilizingActionFromJson(
     PlantFertilizingAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -236,6 +263,7 @@ Map<String, dynamic> _$PlantFertilizingActionToJson(
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -246,6 +274,9 @@ PlantPruningAction _$PlantPruningActionFromJson(Map<String, dynamic> json) =>
     PlantPruningAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -256,6 +287,7 @@ Map<String, dynamic> _$PlantPruningActionToJson(PlantPruningAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -289,6 +321,9 @@ PlantHarvestingAction _$PlantHarvestingActionFromJson(
     PlantHarvestingAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -300,6 +335,7 @@ Map<String, dynamic> _$PlantHarvestingActionToJson(
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -311,6 +347,9 @@ PlantReplantingAction _$PlantReplantingActionFromJson(
     PlantReplantingAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -321,6 +360,7 @@ Map<String, dynamic> _$PlantReplantingActionToJson(
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -330,6 +370,9 @@ PlantTrainingAction _$PlantTrainingActionFromJson(Map<String, dynamic> json) =>
     PlantTrainingAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -341,6 +384,7 @@ Map<String, dynamic> _$PlantTrainingActionToJson(
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -357,6 +401,9 @@ PlantMeasuringAction _$PlantMeasuringActionFromJson(
     PlantMeasuringAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -369,6 +416,7 @@ Map<String, dynamic> _$PlantMeasuringActionToJson(
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -379,6 +427,9 @@ PlantDeathAction _$PlantDeathActionFromJson(Map<String, dynamic> json) =>
     PlantDeathAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -388,6 +439,7 @@ Map<String, dynamic> _$PlantDeathActionToJson(PlantDeathAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,
@@ -397,6 +449,9 @@ PlantOtherAction _$PlantOtherActionFromJson(Map<String, dynamic> json) =>
     PlantOtherAction(
       id: json['id'] as String,
       description: json['description'] as String,
+      recurring: json['recurring'] == null
+          ? null
+          : Recurring.fromJson(json['recurring'] as Map<String, dynamic>),
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
@@ -406,6 +461,7 @@ Map<String, dynamic> _$PlantOtherActionToJson(PlantOtherAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
+      'recurring': instance.recurring,
       'createdAt': instance.createdAt.toIso8601String(),
       'plantId': instance.plantId,
       'type': _$PlantActionTypeEnumMap[instance.type]!,

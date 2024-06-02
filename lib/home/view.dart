@@ -106,8 +106,11 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                                 children: [
                                   if (todayPlantActions.isEmpty)
-                                    Center(
-                                      child: Text('No plant actions performed today.'),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: Text('No plant actions performed today.'),
+                                      ),
                                     )
                                   else
                                     Padding(
@@ -149,8 +152,11 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                                 children: [
                                   if (todayEnvironmentActions.isEmpty)
-                                    Center(
-                                      child: Text('No environment actions performed today.'),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Center(
+                                        child: Text('No environment actions performed today.'),
+                                      ),
                                     )
                                   else
                                     Padding(

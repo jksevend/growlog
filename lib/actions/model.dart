@@ -4,7 +4,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 part 'model.g.dart';
 
-enum RecurringUnit {
+enum IntervalUnit {
   hour,
   day,
   week,
@@ -14,7 +14,7 @@ enum RecurringUnit {
 @JsonSerializable()
 class Recurring {
   final int interval;
-  final RecurringUnit unit;
+  final IntervalUnit unit;
 
   Recurring({
     required this.interval,
@@ -30,11 +30,13 @@ class Recurring {
 class Action {
   final String id;
   final String description;
+  final Recurring? recurring;
   final DateTime createdAt;
 
   Action({
     required this.id,
     required this.description,
+    required this.recurring,
     required this.createdAt,
   });
 
@@ -113,6 +115,7 @@ class EnvironmentAction extends Action {
   EnvironmentAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required this.environmentId,
     required this.type,
@@ -128,9 +131,11 @@ class EnvironmentAction extends Action {
 @JsonSerializable()
 class EnvironmentMeasurementAction extends EnvironmentAction {
   final EnvironmentMeasurement measurement;
+
   EnvironmentMeasurementAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.environmentId,
     required super.type,
@@ -149,6 +154,7 @@ class EnvironmentOtherAction extends EnvironmentAction {
   EnvironmentOtherAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.environmentId,
     required super.type,
@@ -277,6 +283,7 @@ class PlantAction extends Action {
   PlantAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required this.plantId,
     required this.type,
@@ -310,6 +317,7 @@ class PlantWateringAction extends PlantAction {
   PlantWateringAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -346,6 +354,7 @@ class PlantFertilizingAction extends PlantAction {
   PlantFertilizingAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -372,6 +381,7 @@ class PlantPruningAction extends PlantAction {
   PlantPruningAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -423,6 +433,7 @@ class PlantHarvestingAction extends PlantAction {
   PlantHarvestingAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -441,6 +452,7 @@ class PlantReplantingAction extends PlantAction {
   PlantReplantingAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -465,6 +477,7 @@ class PlantTrainingAction extends PlantAction {
   PlantTrainingAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -520,6 +533,7 @@ class PlantMeasuringAction extends PlantAction {
   PlantMeasuringAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -538,6 +552,7 @@ class PlantDeathAction extends PlantAction {
   PlantDeathAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -554,6 +569,7 @@ class PlantOtherAction extends PlantAction {
   PlantOtherAction({
     required super.id,
     required super.description,
+    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,

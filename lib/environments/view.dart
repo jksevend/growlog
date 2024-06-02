@@ -65,7 +65,8 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                       title: Text(environment.name),
                       subtitle: Text(environment.description),
                       onTap: () async {
-                        debugPrint('Navigate to the environment detail view for ${environment.name}');
+                        debugPrint(
+                            'Navigate to the environment detail view for ${environment.name}');
                         await showEnvironmentDetailSheet(
                             context,
                             environment,
@@ -78,7 +79,7 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                         icon: Icon(Icons.view_timeline),
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) =>   EnvironmentActionOverview(
+                              builder: (context) => EnvironmentActionOverview(
                                     environment: environment,
                                     actionsProvider: widget.actionsProvider,
                                   )));
@@ -113,6 +114,11 @@ class EnvironmentForm extends StatefulWidget {
 }
 
 class _EnvironmentFormState extends State<EnvironmentForm> {
+  final _wattFormKey = GlobalKey<FormState>();
+  final _dimensionFormKey = GlobalKey<FormState>();
+
+  final _nameFocus = FocusNode();
+
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _wattController;
@@ -130,17 +136,22 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
     super.initState();
     _nameController = TextEditingController(text: widget.environment?.name);
     _descriptionController = TextEditingController(text: widget.environment?.description);
-    _wattController =
-        TextEditingController(text: widget.environment?.lightDetails.lights.first.watt.toString());
-    _widthController = TextEditingController(text: widget.environment?.dimension.width.toString());
-    _lengthController =
-        TextEditingController(text: widget.environment?.dimension.length.toString());
-    _heightController =
-        TextEditingController(text: widget.environment?.dimension.height.toString());
-    _selectedEnvironmentType = widget.environment == null ? [true, false] : [
-      widget.environment!.type == EnvironmentType.indoor,
-      widget.environment!.type == EnvironmentType.outdoor
-    ];
+    _wattController = TextEditingController(
+        text: widget.environment != null && widget.environment!.lightDetails.lights.isNotEmpty
+            ? widget.environment!.lightDetails.lights.first.watt.toString()
+            : '0.0');
+    _widthController = TextEditingController(
+        text: widget.environment != null ? widget.environment!.dimension.width.toString() : '0.0');
+    _lengthController = TextEditingController(
+        text: widget.environment != null ? widget.environment!.dimension.length.toString() : '0.0');
+    _heightController = TextEditingController(
+        text: widget.environment != null ? widget.environment!.dimension.height.toString() : '0.0');
+    _selectedEnvironmentType = widget.environment == null
+        ? [true, false]
+        : [
+            widget.environment!.type == EnvironmentType.indoor,
+            widget.environment!.type == EnvironmentType.outdoor
+          ];
     _currentLightHours = widget.environment?.lightDetails.lightHours.toDouble() ?? 12;
     _currentLightType = widget.environment?.lightDetails.lights.first.type ?? LightType.led;
   }
@@ -181,8 +192,10 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                             labelText: 'Name',
                             hintText: 'Enter the name of the environment',
                           ),
+                          focusNode: _nameFocus,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
+                              FocusScope.of(context).requestFocus(_nameFocus);
                               return 'Please enter a name';
                             }
                             return null;
@@ -278,13 +291,23 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 value: _currentLightType,
                               ),
                               SizedBox(height: 16.0),
-                              TextFormField(
-                                controller: _wattController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
+                              Form(
+                                key: _wattFormKey,
+                                child: TextFormField(
+                                  controller: _wattController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
                                     labelText: 'Watt',
                                     hintText: 'Enter the watt of the light',
-                                    suffixIcon: Icon(Icons.electrical_services)),
+                                    suffixIcon: Icon(Icons.electrical_services),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter a watt';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                             ],
                           ),
@@ -295,37 +318,58 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                       Card(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Text('Enter the dimension:'),
-                              SizedBox(height: 16.0),
-                              TextFormField(
-                                controller: _widthController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  labelText: 'Width',
-                                  hintText: 'Enter the width of the environment',
+                          child: Form(
+                            key: _dimensionFormKey,
+                            child: Column(
+                              children: [
+                                Text('Enter the dimension:'),
+                                SizedBox(height: 16.0),
+                                TextFormField(
+                                  controller: _widthController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Width',
+                                    hintText: 'Enter the width of the environment',
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter a width';
+                                    }
+                                    return null;
+                                  },
                                 ),
-                              ),
-                              SizedBox(height: 16.0),
-                              TextFormField(
-                                controller: _lengthController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  labelText: 'Length',
-                                  hintText: 'Enter the length of the environment',
+                                SizedBox(height: 16.0),
+                                TextFormField(
+                                  controller: _lengthController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Length',
+                                    hintText: 'Enter the length of the environment',
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter a length';
+                                    }
+                                    return null;
+                                  },
                                 ),
-                              ),
-                              SizedBox(height: 16.0),
-                              TextFormField(
-                                controller: _heightController,
-                                keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(
-                                  labelText: 'Height',
-                                  hintText: 'Enter the height of the environment',
+                                SizedBox(height: 16.0),
+                                TextFormField(
+                                  controller: _heightController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Height',
+                                    hintText: 'Enter the height of the environment',
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter a height';
+                                    }
+                                    return null;
+                                  },
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -339,29 +383,34 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                       Environment environment;
                       if (widget.environment == null) {
                         if (_selectedEnvironmentType[0]) {
-                          environment = Environment(
-                            id: const Uuid().v4().toString(),
-                            name: _nameController.text,
-                            description: _descriptionController.text,
-                            type: _selectedEnvironmentType[0]
-                                ? EnvironmentType.indoor
-                                : EnvironmentType.outdoor,
-                            lightDetails: LightDetails(
-                              lightHours: _currentLightHours.toInt(),
-                              lights: [
-                                Light(
-                                  id: const Uuid().v4().toString(),
-                                  type: _currentLightType,
-                                  watt: int.parse(_wattController.text),
-                                ),
-                              ],
-                            ),
-                            dimension: Dimension(
-                              width: double.parse(_widthController.text),
-                              length: double.parse(_lengthController.text),
-                              height: double.parse(_heightController.text),
-                            ),
-                          );
+                          if (_wattFormKey.currentState!.validate() &&
+                              _dimensionFormKey.currentState!.validate()) {
+                            environment = Environment(
+                              id: const Uuid().v4().toString(),
+                              name: _nameController.text,
+                              description: _descriptionController.text,
+                              type: _selectedEnvironmentType[0]
+                                  ? EnvironmentType.indoor
+                                  : EnvironmentType.outdoor,
+                              lightDetails: LightDetails(
+                                lightHours: _currentLightHours.toInt(),
+                                lights: [
+                                  Light(
+                                    id: const Uuid().v4().toString(),
+                                    type: _currentLightType,
+                                    watt: double.parse(_wattController.text),
+                                  ),
+                                ],
+                              ),
+                              dimension: Dimension(
+                                width: double.parse(_widthController.text),
+                                length: double.parse(_lengthController.text),
+                                height: double.parse(_heightController.text),
+                              ),
+                            );
+                          } else {
+                            return;
+                          }
                         } else {
                           environment = Environment(
                             id: const Uuid().v4().toString(),
@@ -399,7 +448,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                               Light(
                                 id: const Uuid().v4().toString(),
                                 type: _currentLightType,
-                                watt: int.parse(_wattController.text),
+                                watt: double.parse(_wattController.text),
                               ),
                             ],
                           ),
