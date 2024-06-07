@@ -26,8 +26,20 @@ Future<void> showPlantDetailSheet(
           children: [
             ListTile(
               leading: Icon(Icons.info),
-              title: Text(plant.name),
-              subtitle: Text(plant.description),
+              title: Row(
+                children: [
+                  Text(plant.name),
+                  SizedBox(width: 8.0),
+                  Text(plant.lifeCycleState.icon),
+                ],
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(plant.medium.name, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic,),),
+                  Text(plant.description),
+                ],
+              ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -96,6 +108,8 @@ Future<void> showPlantDetailSheet(
                               environmentsProvider, plantsProvider, actionsProvider);
                         }),
                   ),
+            Divider(),
+
           ],
         );
       });

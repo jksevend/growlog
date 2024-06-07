@@ -68,16 +68,16 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
     }
   }
 
-  Icon get icon {
+  String get icon {
     switch (this) {
       case EnvironmentMeasurementType.temperature:
-        return Icon(Icons.thermostat, size: 25);
+        return '🌡️';
       case EnvironmentMeasurementType.humidity:
-        return Icon(Icons.water_damage, size: 25);
+        return '☔';
       case EnvironmentMeasurementType.co2:
-        return Icon(Icons.co2, size: 25);
+        return '🏭';
       case EnvironmentMeasurementType.lightDistance:
-        return Icon(Icons.highlight_rounded, size: 25);
+        return '📏';
     }
   }
 }
@@ -97,12 +97,12 @@ extension EnvironmentActionTypeExtension on EnvironmentActionType {
     }
   }
 
-  Icon get icon {
+  String get icon {
     switch (this) {
       case EnvironmentActionType.measurement:
-        return Icon(Icons.analytics, size: 25);
+        return '📐';
       case EnvironmentActionType.other:
-        return Icon(Icons.miscellaneous_services, size: 25);
+        return '❓';
     }
   }
 }
@@ -251,26 +251,26 @@ extension PlantActionTypeExtension on PlantActionType {
     }
   }
 
-  Icon get icon {
+  String get icon {
     switch (this) {
       case PlantActionType.watering:
-        return Icon(Icons.water_drop, size: 25);
+        return '💧';
       case PlantActionType.fertilizing:
-        return Icon(Icons.emoji_nature, size: 25);
+        return '🧪';
       case PlantActionType.pruning:
-        return Icon(Icons.content_cut, size: 25);
+        return '✂️';
       case PlantActionType.harvesting:
-        return Icon(Icons.agriculture, size: 25);
+        return '🧺';
       case PlantActionType.replanting:
-        return Icon(Icons.eco, size: 25);
+        return '🔄';
       case PlantActionType.training:
-        return Icon(Icons.insights, size: 25);
+        return '🏋️‍♂️';
       case PlantActionType.measuring:
-        return Icon(Icons.analytics, size: 25);
+        return '📐';
       case PlantActionType.death:
-        return Icon(Icons.warning_amber_outlined, size: 25);
+        return '🪦';
       case PlantActionType.other:
-        return Icon(Icons.miscellaneous_services, size: 25);
+        return '❓';
     }
   }
 }
@@ -512,16 +512,16 @@ extension PlantMeasurementTypeExtension on PlantMeasurementType {
     }
   }
 
-  Icon get icon {
+  String get icon {
     switch (this) {
       case PlantMeasurementType.height:
-        return Icon(Icons.height, size: 25);
+        return '📏';
       case PlantMeasurementType.pH:
-        return Icon(Icons.ac_unit, size: 25);
+        return '📈';
       case PlantMeasurementType.ec:
-        return Icon(Icons.water_damage, size: 25);
+        return '🔬';
       case PlantMeasurementType.ppm:
-        return Icon(Icons.water_damage, size: 25);
+        return '🔢';
     }
   }
 }

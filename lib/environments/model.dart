@@ -26,6 +26,26 @@ enum EnvironmentType {
   outdoor,
 }
 
+extension EnvironmentTypeExtension on EnvironmentType {
+  String get name {
+    switch (this) {
+      case EnvironmentType.indoor:
+        return 'Indoor';
+      case EnvironmentType.outdoor:
+        return 'Outdoor';
+    }
+  }
+
+  String get icon {
+    switch (this) {
+      case EnvironmentType.indoor:
+        return '🏠';
+      case EnvironmentType.outdoor:
+        return '🌻';
+    }
+  }
+}
+
 @JsonSerializable()
 class Dimension {
   final double width;

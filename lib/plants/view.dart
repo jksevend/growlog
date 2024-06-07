@@ -57,7 +57,10 @@ class PlantOverview extends StatelessWidget {
                       plants.values.where((p) => p.environmentId == environment?.id).toList();
                   return Card(
                     child: ListTile(
-                      leading: _plantLifeCycleIcon(plant.lifeCycleState),
+                      leading: Text(
+                        plant.lifeCycleState.icon,
+                        style: const TextStyle(fontSize: 22.0),
+                      ),
                       title: Text(plant.name),
                       subtitle: Text(plant.description),
                       onTap: () async {
@@ -73,7 +76,7 @@ class PlantOverview extends StatelessWidget {
                             bottomNavigationKey);
                       },
                       trailing: IconButton(
-                        icon: Icon(Icons.view_timeline),
+                        icon: Icon(Icons.timeline),
                         onPressed: () {
                           debugPrint('Navigate to the plant timeline view for ${plant.name}');
                           Navigator.of(context).push(MaterialPageRoute(
@@ -90,23 +93,6 @@ class PlantOverview extends StatelessWidget {
             );
           }),
     );
-  }
-
-  Icon _plantLifeCycleIcon(LifeCycleState lifeCycleState) {
-    switch (lifeCycleState) {
-      case LifeCycleState.germination:
-        return const Icon(Icons.spa, color: Colors.brown);
-      case LifeCycleState.seedling:
-        return Icon(Icons.grass, color: Colors.green[900]);
-      case LifeCycleState.vegetative:
-        return Icon(Icons.nature, color: Colors.green[700]);
-      case LifeCycleState.flowering:
-        return Icon(Icons.local_florist, color: Colors.green[200]);
-      case LifeCycleState.drying:
-        return Icon(Icons.hourglass_empty, color: Colors.orange[600]);
-      case LifeCycleState.curing:
-        return Icon(Icons.check_circle_outline, color: Colors.red[600]);
-    }
   }
 }
 
@@ -134,14 +120,16 @@ class _PlantFormState extends State<PlantForm> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late List<bool> _selectedLifeCycleState;
+  late Medium _selectedMedium;
   Environment? _currentEnvironment;
 
   @override
   void initState() {
+    super.initState();
     _nameController = TextEditingController(text: widget.plant?.name);
     _descriptionController = TextEditingController(text: widget.plant?.description);
     _selectedLifeCycleState = _selectedLifeCycleStateFromPlant(widget.plant);
-    super.initState();
+    _selectedMedium = widget.plant?.medium ?? Medium.soil;
   }
 
   @override
@@ -271,14 +259,14 @@ class _PlantFormState extends State<PlantForm> {
                                 }
                               });
                             },
-                            children: [
-                              Icon(Icons.spa, color: Colors.brown),
-                              Icon(Icons.grass, color: Colors.green[900]),
-                              Icon(Icons.nature, color: Colors.green[700]),
-                              Icon(Icons.local_florist, color: Colors.green[200]),
-                              Icon(Icons.hourglass_empty, color: Colors.orange[600]),
-                              Icon(Icons.check_circle_outline, color: Colors.red[600]),
-                            ],
+                            children: LifeCycleState.values
+                                .map(
+                                  (state) => Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(state.icon, style: const TextStyle(fontSize: 18.0)),
+                                  ),
+                                )
+                                .toList(),
                           ),
                           Divider(),
                           Text(_lifeCycleState.name),
@@ -287,7 +275,29 @@ class _PlantFormState extends State<PlantForm> {
                     ),
                   ),
                 ),
-
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: DropdownButton<Medium>(
+                      icon: Icon(Icons.arrow_downward_sharp),
+                      isExpanded: true,
+                      items: Medium.values
+                          .map(
+                            (medium) => DropdownMenuItem<Medium>(
+                              child: Text(medium.name),
+                              value: medium,
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (Medium? value) {
+                        setState(() {
+                          _selectedMedium = value!;
+                        });
+                      },
+                      value: _selectedMedium,
+                    ),
+                  ),
+                ),
                 // Submit button
                 SizedBox(height: 16.0),
                 OutlinedButton.icon(
@@ -308,6 +318,7 @@ class _PlantFormState extends State<PlantForm> {
                             name: _nameController.text,
                             description: _descriptionController.text,
                             environmentId: _currentEnvironment!.id,
+                            medium: _selectedMedium,
                             lifeCycleState: _lifeCycleState,
                           );
                           await widget.plantsProvider
@@ -320,6 +331,7 @@ class _PlantFormState extends State<PlantForm> {
                             description: _descriptionController.text,
                             environmentId: _currentEnvironment!.id,
                             lifeCycleState: _lifeCycleState,
+                            medium: _selectedMedium,
                           );
                           await widget.plantsProvider
                               .addPlant(plant)

@@ -59,32 +59,30 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                     plants.values.where((plant) => plant.environmentId == environment.id).toList();
                 return Card(
                   child: ListTile(
-                      leading: Icon(environment.type == EnvironmentType.indoor
-                          ? Icons.house
-                          : Icons.light_mode_rounded),
-                      title: Text(environment.name),
-                      subtitle: Text(environment.description),
-                      onTap: () async {
-                        debugPrint(
-                            'Navigate to the environment detail view for ${environment.name}');
-                        await showEnvironmentDetailSheet(
-                            context,
-                            environment,
-                            plantsInEnvironment,
-                            widget.environmentsProvider,
-                            widget.plantsProvider,
-                            widget.actionsProvider);
+                    leading: Text(environment.type.icon, style: const TextStyle(fontSize: 22.0)),
+                    title: Text(environment.name),
+                    subtitle: Text(environment.description),
+                    onTap: () async {
+                      debugPrint('Navigate to the environment detail view for ${environment.name}');
+                      await showEnvironmentDetailSheet(
+                          context,
+                          environment,
+                          plantsInEnvironment,
+                          widget.environmentsProvider,
+                          widget.plantsProvider,
+                          widget.actionsProvider);
+                    },
+                    trailing: IconButton(
+                      icon: Icon(Icons.timeline),
+                      onPressed: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => EnvironmentActionOverview(
+                                  environment: environment,
+                                  actionsProvider: widget.actionsProvider,
+                                )));
                       },
-                      trailing: IconButton(
-                        icon: Icon(Icons.view_timeline),
-                        onPressed: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => EnvironmentActionOverview(
-                                    environment: environment,
-                                    actionsProvider: widget.actionsProvider,
-                                  )));
-                        },
-                      )),
+                    ),
+                  ),
                 );
               },
             ).toList(),
@@ -220,17 +218,29 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                     (_selectedEnvironmentType[0] ? 'Indoor' : 'Outdoor')),
                 SizedBox(height: 16.0),
                 ToggleButtons(
-                  isSelected: _selectedEnvironmentType,
-                  onPressed: (int index) {
-                    setState(() {
-                      // The button that is tapped is set to true, and the others to false.
-                      for (int i = 0; i < _selectedEnvironmentType.length; i++) {
-                        _selectedEnvironmentType[i] = i == index;
-                      }
-                    });
-                  },
-                  children: const [Icon(Icons.house), Icon(Icons.light_mode_rounded)],
-                ),
+                    isSelected: _selectedEnvironmentType,
+                    onPressed: (int index) {
+                      setState(() {
+                        // The button that is tapped is set to true, and the others to false.
+                        for (int i = 0; i < _selectedEnvironmentType.length; i++) {
+                          _selectedEnvironmentType[i] = i == index;
+                        }
+                      });
+                    },
+                    children: EnvironmentType.values
+                        .map(
+                          (e) => Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Text(e.icon),
+                                SizedBox(width: 8.0),
+                                Text(e.name),
+                              ],
+                            ),
+                          ),
+                        )
+                        .toList()),
                 SizedBox(height: 16.0),
                 Card(
                   child: Padding(

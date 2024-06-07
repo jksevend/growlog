@@ -81,7 +81,8 @@ class _HomeViewState extends State<HomeView> {
                           alignment: Alignment.centerLeft,
                           child: Row(
                             children: [
-                              Icon(Icons.bolt_outlined),
+                              Text('⚡️', style: TextStyle(fontSize: 22)),
+                              SizedBox(width: 8),
                               Text(
                                 'Actions today',
                                 style: TextStyle(fontSize: 18),

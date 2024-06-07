@@ -397,14 +397,14 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                           items: PlantActionType.values
                               .map(
                                 (action) => DropdownMenuItem<PlantActionType>(
+                                  value: action,
                                   child: Row(
                                     children: [
-                                      action.icon,
+                                      Text(action.icon),
                                       const SizedBox(width: 10),
                                       Text(action.name),
                                     ],
                                   ),
-                                  value: action,
                                 ),
                               )
                               .toList(),
@@ -796,7 +796,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                           (action) => DropdownMenuItem<EnvironmentActionType>(
                             child: Row(
                               children: [
-                                action.icon,
+                               Text( action.icon,),
                                 const SizedBox(width: 10),
                                 Text(action.name),
                               ],
@@ -1848,7 +1848,8 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
                 (type) => DropdownMenuItem(
                   child: Row(
                     children: [
-                      type.icon,
+                      Text(type.icon,),
+                      const SizedBox(width: 10),
                       Text(type.name),
                     ],
                   ),
@@ -2191,7 +2192,7 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
                 (type) => DropdownMenuItem<EnvironmentMeasurementType>(
                   child: Row(
                     children: [
-                      type.icon,
+                      Text(type.icon),
                       const SizedBox(width: 10),
                       Text(type.name),
                     ],

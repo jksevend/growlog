@@ -36,18 +36,6 @@ class _SettingsViewState extends State<SettingsView> {
                   textAlign: TextAlign.center,
                 ),
                 Divider(),
-
-                /// Notifications
-                SwitchListTile(
-                  value: settings.notification.enabled,
-                  onChanged: (value) async {
-                    settings.notification.enabled = value;
-                    await widget.settingsProvider.setSettings(settings);
-                  },
-                  title: const Text('Notifications'),
-                  subtitle: const Text('Enable or disable notifications'),
-                ),
-
                 /// About the app
                 ListTile(
                     title: const Text('About'),
