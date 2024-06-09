@@ -16,6 +16,18 @@ class Fertilizer {
 
   factory Fertilizer.fromJson(Map<String, dynamic> json) => _$FertilizerFromJson(json);
 
+  Fertilizer copyWith({
+    String? id,
+    String? name,
+    String? description,
+  }) {
+    return Fertilizer(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+    );
+  }
+
   Map<String, dynamic> toJson() => _$FertilizerToJson(this);
 }
 

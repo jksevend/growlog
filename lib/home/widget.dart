@@ -6,7 +6,6 @@ import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/plants/model.dart';
-import 'dart:math';
 
 
 class PlantActionLogHomeWidget extends StatelessWidget {
@@ -255,11 +254,12 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     return isToday
         ? Center(
       child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.blue),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right: 8),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.blue, width: 1.5),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -268,7 +268,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                     ),
                     Wrap(
                       children: [
-                        ...List.generate(min(2, plantActionCountToday), (index) {
+                        ...List.generate(plantActionCountToday, (index) {
                           return Container(
                             width: 8,
                             height: 8,
@@ -278,7 +278,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                             ),
                           );
                         }),
-                        ...List.generate(min(2, environmentActionCountToday), (index) {
+                        ...List.generate(environmentActionCountToday, (index) {
                           return Container(
                             width: 8,
                             height: 8,

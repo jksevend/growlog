@@ -16,6 +16,15 @@ extension TemperatureUnitExtension on TemperatureUnit {
         return 'Fahrenheit';
     }
   }
+
+  String get symbol {
+    switch (this) {
+      case TemperatureUnit.celsius:
+        return '°C';
+      case TemperatureUnit.fahrenheit:
+        return '°F';
+    }
+  }
 }
 
 @JsonSerializable()

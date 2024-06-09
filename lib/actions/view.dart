@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/dialog.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
+import 'package:weedy/actions/fertilizer/sheet.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/widget.dart';
@@ -191,10 +192,11 @@ class ChooseActionView extends StatefulWidget {
 class _ChooseActionViewState extends State<ChooseActionView> {
   final List<bool> _choices = [true, false];
 
-  final GlobalKey<EnvironmentTemperatureFormState> _environmentTemperatureFormKey = GlobalKey();
-  final GlobalKey<EnvironmentHumidityFormState> _environmentHumidityFormKey = GlobalKey();
-  final GlobalKey<EnvironmentLightDistanceFormState> _environmentLightDistanceFormKey = GlobalKey();
-  final GlobalKey<EnvironmentCO2FormState> _environmentCO2FormKey = GlobalKey();
+  final GlobalKey<EnvironmentTemperatureFormState> _environmentTemperatureWidgetKey = GlobalKey();
+  final GlobalKey<EnvironmentHumidityFormState> _environmentHumidityWidgetKey = GlobalKey();
+  final GlobalKey<EnvironmentLightDistanceFormState> _environmentLightDistanceWidgetKey =
+      GlobalKey();
+  final GlobalKey<EnvironmentCO2FormState> _environmentCO2WidgetKey = GlobalKey();
 
   final GlobalKey<_PlantWateringFormState> _plantWateringWidgetKey = GlobalKey();
 
@@ -245,59 +247,61 @@ class _ChooseActionViewState extends State<ChooseActionView> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: [
-                      Text('What do you want to do?'),
-                      SizedBox(height: 10),
-                      ToggleButtons(
-                        constraints: BoxConstraints(minWidth: 100),
-                        children: [
-                          Column(
-                            children: [
-                              Icon(
-                                Icons.eco,
-                                size: 50,
-                                color: Colors.green[900],
-                              ),
-                              Text('Plant')
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Icon(
-                                Icons.lightbulb,
-                                size: 50,
-                                color: Colors.yellow[900],
-                              ),
-                              Text('Environment')
-                            ],
-                          )
-                        ],
-                        isSelected: _choices,
-                        onPressed: (int index) {
-                          setState(() {
-                            // The button that is tapped is set to true, and the others to false.
-                            for (int i = 0; i < _choices.length; i++) {
-                              _choices[i] = i == index;
-                            }
-                          });
-                        },
-                      ),
-                    ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Text('What do you want to do?'),
+                        SizedBox(height: 10),
+                        ToggleButtons(
+                          constraints: BoxConstraints(minWidth: 100),
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.eco,
+                                  size: 50,
+                                  color: Colors.green[900],
+                                ),
+                                Text('Plant')
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.lightbulb,
+                                  size: 50,
+                                  color: Colors.yellow[900],
+                                ),
+                                Text('Environment')
+                              ],
+                            )
+                          ],
+                          isSelected: _choices,
+                          onPressed: (int index) {
+                            setState(() {
+                              // The button that is tapped is set to true, and the others to false.
+                              for (int i = 0; i < _choices.length; i++) {
+                                _choices[i] = i == index;
+                              }
+                            });
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Divider(),
-            _actionForm(context),
-          ],
+              Divider(),
+              _actionForm(context),
+            ],
+          ),
         ),
       ),
     );
@@ -471,6 +475,33 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     return;
                   }
                   if (_currentPlantActionType == PlantActionType.fertilizing) {
+                    final hasFertilizer = _plantFertilizingFormKey.currentState!.hasFertilizers;
+                    if (!hasFertilizer) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                ),
+                              ),
+                              Text(
+                                'Add fertilizers before saving the action',
+                              ),
+                            ],
+                          ),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
+                      return;
+                    }
+                    final isValid = _plantFertilizingFormKey.currentState!.isValid;
+                    if (!isValid) {
+                      return;
+                    }
                     final fertilization = _plantFertilizingFormKey.currentState!.fertilization;
                     action = PlantFertilizingAction(
                       id: const Uuid().v4().toString(),
@@ -502,6 +533,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                   }
 
                   if (_currentPlantActionType == PlantActionType.harvesting) {
+                    final isValid = _plantHarvestingFormKey.currentState!.isValid;
+                    if (!isValid) {
+                      return;
+                    }
                     final harvesting = _plantHarvestingFormKey.currentState!.harvest;
                     action = PlantHarvestingAction(
                       id: const Uuid().v4().toString(),
@@ -840,26 +875,42 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                   final currentEnvironmentMeasurementType =
                       _environmentMeasurementWidgetKey.currentState!.measurementType;
                   if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.temperature) {
-                    final temperature = _environmentTemperatureFormKey.currentState!.temperature;
+                    final isValid = _environmentTemperatureWidgetKey.currentState!.isValid;
+                    if (!isValid) {
+                      return;
+                    }
+                    final temperature = _environmentTemperatureWidgetKey.currentState!.temperature;
                     measurement = EnvironmentMeasurement(
                       type: currentEnvironmentMeasurementType,
                       measurement: temperature.toJson(),
                     );
                   } else if (currentEnvironmentMeasurementType ==
                       EnvironmentMeasurementType.humidity) {
-                    final humidity = _environmentHumidityFormKey.currentState!.humidity;
+                    final isValid = _environmentHumidityWidgetKey.currentState!.isValid;
+                    if (!isValid) {
+                      return;
+                    }
+                    final humidity = _environmentHumidityWidgetKey.currentState!.humidity;
                     measurement = EnvironmentMeasurement(
                         type: currentEnvironmentMeasurementType,
                         measurement: Map<String, dynamic>.from({'humidity': humidity}));
                   } else if (currentEnvironmentMeasurementType ==
                       EnvironmentMeasurementType.lightDistance) {
-                    final distance = _environmentLightDistanceFormKey.currentState!.distance;
+                    final isValid = _environmentLightDistanceWidgetKey.currentState!.isValid;
+                    if (!isValid) {
+                      return;
+                    }
+                    final distance = _environmentLightDistanceWidgetKey.currentState!.distance;
                     measurement = EnvironmentMeasurement(
                       type: currentEnvironmentMeasurementType,
                       measurement: distance.toJson(),
                     );
                   } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.co2) {
-                    final co2 = _environmentCO2FormKey.currentState!.co2;
+                    final isValid = _environmentCO2WidgetKey.currentState!.isValid;
+                    if (!isValid) {
+                      return;
+                    }
+                    final co2 = _environmentCO2WidgetKey.currentState!.co2;
                     measurement = EnvironmentMeasurement(
                         type: currentEnvironmentMeasurementType,
                         measurement: Map<String, dynamic>.from({'co2': co2}));
@@ -933,10 +984,12 @@ class _ChooseActionViewState extends State<ChooseActionView> {
       case PlantActionType.watering:
         return PlantWateringForm(
           key: _plantWateringWidgetKey,
+          formKey: GlobalKey<FormState>(),
         );
       case PlantActionType.fertilizing:
         return PlantFertilizingForm(
           key: _plantFertilizingFormKey,
+          formKey: GlobalKey<FormState>(),
           fertilizerProvider: widget.fertilizerProvider,
         );
       case PlantActionType.pruning:
@@ -952,6 +1005,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
       case PlantActionType.harvesting:
         return PlantHarvestingForm(
           key: _plantHarvestingFormKey,
+          formKey: GlobalKey<FormState>(),
         );
       case PlantActionType.measuring:
         return PlantMeasurementForm(
@@ -977,10 +1031,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
       case EnvironmentActionType.measurement:
         return EnvironmentMeasurementForm(
           key: _environmentMeasurementWidgetKey,
-          environmentTemperatureFormKey: _environmentTemperatureFormKey,
-          environmentHumidityFormKey: _environmentHumidityFormKey,
-          environmentLightDistanceFormKey: _environmentLightDistanceFormKey,
-          environmentCO2FormKey: _environmentCO2FormKey,
+          environmentTemperatureFormKey: _environmentTemperatureWidgetKey,
+          environmentHumidityFormKey: _environmentHumidityWidgetKey,
+          environmentLightDistanceFormKey: _environmentLightDistanceWidgetKey,
+          environmentCO2FormKey: _environmentCO2WidgetKey,
         );
       case EnvironmentActionType.picture:
         return PictureForm(
@@ -994,7 +1048,9 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 }
 
 class EnvironmentCO2Form extends StatefulWidget {
-  const EnvironmentCO2Form({super.key});
+  final GlobalKey<FormState> formKey;
+
+  const EnvironmentCO2Form({super.key, required this.formKey});
 
   @override
   State<EnvironmentCO2Form> createState() => EnvironmentCO2FormState();
@@ -1019,22 +1075,41 @@ class EnvironmentCO2FormState extends State<EnvironmentCO2Form> {
     return double.parse(_co2Controller.text);
   }
 
+  bool get isValid {
+    return widget.formKey.currentState!.validate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: _co2Controller,
-      keyboardType: TextInputType.number,
-      decoration: InputDecoration(
-        suffixIcon: Icon(Icons.co2),
-        labelText: 'CO2',
-        hintText: '50',
+    return Form(
+      key: widget.formKey,
+      child: TextFormField(
+        controller: _co2Controller,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          suffixIcon: Icon(Icons.co2),
+          labelText: 'CO2',
+          hintText: '50',
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a value';
+          }
+          // Check if it is a double
+          if (double.tryParse(value) == null) {
+            return 'Please enter a valid number';
+          }
+          return null;
+        },
       ),
     );
   }
 }
 
 class EnvironmentLightDistanceForm extends StatefulWidget {
-  const EnvironmentLightDistanceForm({super.key});
+  final GlobalKey<FormState> formKey;
+
+  const EnvironmentLightDistanceForm({super.key, required this.formKey});
 
   @override
   State<EnvironmentLightDistanceForm> createState() => EnvironmentLightDistanceFormState();
@@ -1064,58 +1139,77 @@ class EnvironmentLightDistanceFormState extends State<EnvironmentLightDistanceFo
     );
   }
 
+  bool get isValid {
+    return widget.formKey.currentState!.validate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 75,
-      width: double.infinity,
-      child: Row(
-        children: [
-          Expanded(
-            child: TextFormField(
-              controller: _distanceController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                suffixIcon: Icon(Icons.highlight_rounded),
-                labelText: 'Distance',
-                hintText: '50',
-              ),
-            ),
-          ),
-          SizedBox(width: 50),
-          VerticalDivider(),
-          SizedBox(width: 20),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Unit:'),
-              DropdownButton<MeasurementUnit>(
-                value: _distanceUnit,
-                icon: Icon(Icons.arrow_downward_sharp),
-                items: MeasurementUnit.values
-                    .map(
-                      (unit) => DropdownMenuItem(
-                        child: Text(unit.name),
-                        value: unit,
-                      ),
-                    )
-                    .toList(),
-                onChanged: (MeasurementUnit? value) {
-                  setState(() {
-                    _distanceUnit = value!;
-                  });
+    return Form(
+      key: widget.formKey,
+      child: SizedBox(
+        height: 75,
+        width: double.infinity,
+        child: Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _distanceController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  suffixIcon: Icon(Icons.highlight_rounded),
+                  labelText: 'Distance',
+                  hintText: '50',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a value';
+                  }
+                  // Check if it is a double
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
                 },
               ),
-            ],
-          ),
-        ],
+            ),
+            SizedBox(width: 50),
+            VerticalDivider(),
+            SizedBox(width: 20),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Unit:'),
+                DropdownButton<MeasurementUnit>(
+                  value: _distanceUnit,
+                  icon: Icon(Icons.arrow_downward_sharp),
+                  items: MeasurementUnit.values
+                      .map(
+                        (unit) => DropdownMenuItem(
+                          child: Text(unit.symbol),
+                          value: unit,
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (MeasurementUnit? value) {
+                    setState(() {
+                      _distanceUnit = value!;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class EnvironmentHumidityForm extends StatefulWidget {
-  const EnvironmentHumidityForm({super.key});
+  final GlobalKey<FormState> formKey;
+
+  const EnvironmentHumidityForm({super.key, required this.formKey});
 
   @override
   State<EnvironmentHumidityForm> createState() => EnvironmentHumidityFormState();
@@ -1140,17 +1234,34 @@ class EnvironmentHumidityFormState extends State<EnvironmentHumidityForm> {
     return double.parse(_humidityController.text);
   }
 
+  bool get isValid {
+    return widget.formKey.currentState!.validate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: TextFormField(
-        controller: _humidityController,
-        keyboardType: TextInputType.number,
-        decoration: InputDecoration(
-          suffixIcon: Icon(Icons.water_damage),
-          labelText: 'Humidity',
-          hintText: '50',
+    return Form(
+      key: widget.formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextFormField(
+          controller: _humidityController,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            suffixIcon: Icon(Icons.water_damage),
+            labelText: 'Humidity',
+            hintText: '50',
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a value';
+            }
+            // Check if it is a double
+            if (double.tryParse(value) == null) {
+              return 'Please enter a valid number';
+            }
+            return null;
+          },
         ),
       ),
     );
@@ -1158,7 +1269,9 @@ class EnvironmentHumidityFormState extends State<EnvironmentHumidityForm> {
 }
 
 class EnvironmentTemperatureForm extends StatefulWidget {
-  const EnvironmentTemperatureForm({super.key});
+  final GlobalKey<FormState> formKey;
+
+  const EnvironmentTemperatureForm({super.key, required this.formKey});
 
   @override
   State<EnvironmentTemperatureForm> createState() => EnvironmentTemperatureFormState();
@@ -1188,67 +1301,84 @@ class EnvironmentTemperatureFormState extends State<EnvironmentTemperatureForm> 
     );
   }
 
+  bool get isValid {
+    return widget.formKey.currentState!.validate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 75,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Expanded(
-            child: TextFormField(
-              controller: _temperatureController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                suffixIcon: Icon(Icons.thermostat),
-                labelText: 'Temperature',
-                hintText: '25',
-              ),
-            ),
-          ),
-          SizedBox(width: 50),
-          VerticalDivider(),
-          SizedBox(width: 20),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Unit:'),
-              DropdownButton<TemperatureUnit>(
-                value: _temperatureUnit,
-                icon: Icon(Icons.arrow_downward_sharp),
-                items: TemperatureUnit.values
-                    .map(
-                      (unit) => DropdownMenuItem(
-                        child: Text(unit.name),
-                        value: unit,
-                      ),
-                    )
-                    .toList(),
-                onChanged: (TemperatureUnit? value) {
-                  setState(() {
-                    _temperatureUnit = value!;
-                  });
+    return Form(
+      key: widget.formKey,
+      child: SizedBox(
+        width: double.infinity,
+        height: 75,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _temperatureController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  suffixIcon: Icon(Icons.thermostat),
+                  labelText: 'Temperature',
+                  hintText: '25',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a value';
+                  }
+                  // Check if it is a double
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
                 },
               ),
-            ],
-          ),
-        ],
+            ),
+            SizedBox(width: 50),
+            VerticalDivider(),
+            SizedBox(width: 20),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Unit:'),
+                DropdownButton<TemperatureUnit>(
+                  value: _temperatureUnit,
+                  icon: Icon(Icons.arrow_downward_sharp),
+                  items: TemperatureUnit.values
+                      .map(
+                        (unit) => DropdownMenuItem(
+                          child: Text(unit.name),
+                          value: unit,
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (TemperatureUnit? value) {
+                    setState(() {
+                      _temperatureUnit = value!;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class PlantWateringForm extends StatefulWidget {
-  const PlantWateringForm({super.key});
+  final GlobalKey<FormState> formKey;
+
+  const PlantWateringForm({super.key, required this.formKey});
 
   @override
   State<PlantWateringForm> createState() => _PlantWateringFormState();
 }
 
 class _PlantWateringFormState extends State<PlantWateringForm> {
-  final GlobalKey<FormState> _plantWateringFormKey = GlobalKey<FormState>();
-
   late TextEditingController _waterAmountController;
   late LiquidUnit _waterAmountUnit;
 
@@ -1273,13 +1403,13 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
   }
 
   bool get isValid {
-    return _plantWateringFormKey.currentState!.validate();
+    return widget.formKey.currentState!.validate();
   }
 
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: _plantWateringFormKey,
+      key: widget.formKey,
       child: SizedBox(
         width: double.infinity,
         height: 75,
@@ -1337,10 +1467,12 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
 }
 
 class PlantFertilizingForm extends StatefulWidget {
+  final GlobalKey<FormState> formKey;
   final FertilizerProvider fertilizerProvider;
 
   const PlantFertilizingForm({
     super.key,
+    required this.formKey,
     required this.fertilizerProvider,
   });
 
@@ -1351,7 +1483,7 @@ class PlantFertilizingForm extends StatefulWidget {
 class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
   late TextEditingController _fertilizerAmountController;
   late LiquidUnit _liquidUnit;
-  late Fertilizer _currentFertilizer;
+  Fertilizer? _currentFertilizer;
 
   @override
   void initState() {
@@ -1367,8 +1499,11 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
   }
 
   PlantFertilization get fertilization {
+    if (_currentFertilizer == null) {
+      throw Exception('No fertilizer selected');
+    }
     return PlantFertilization(
-      fertilizerId: _currentFertilizer.id,
+      fertilizerId: _currentFertilizer!.id,
       amount: LiquidAmount(
         unit: _liquidUnit,
         amount: double.parse(_fertilizerAmountController.text),
@@ -1376,112 +1511,144 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
     );
   }
 
+  bool get isValid {
+    return widget.formKey.currentState!.validate();
+  }
+
+  bool get hasFertilizers {
+    return _currentFertilizer != null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        children: [
-          StreamBuilder<Map<String, Fertilizer>>(
-            stream: widget.fertilizerProvider.fertilizers,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+    return Form(
+      key: widget.formKey,
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          children: [
+            StreamBuilder<Map<String, Fertilizer>>(
+              stream: widget.fertilizerProvider.fertilizers,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
 
-              final fertilizers = snapshot.data!.values;
-              if (fertilizers.isEmpty) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text('No fertilizers created yet.'),
-                    _addFertilizerButton(),
-                  ],
+                final fertilizers = snapshot.data!;
+                if (fertilizers.isEmpty) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text('No fertilizers created yet.'),
+                      _addFertilizerButton(),
+                    ],
+                  );
+                }
+
+                _currentFertilizer = fertilizers.entries.first.value;
+                return SizedBox(
+                  height: 50,
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      DropdownButton<Fertilizer>(
+                        icon: Icon(Icons.arrow_downward_sharp),
+                        items: fertilizers.entries
+                            .map(
+                              (fertilizer) => DropdownMenuItem<Fertilizer>(
+                                child: Text(fertilizer.value.name),
+                                value: fertilizer.value,
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (Fertilizer? value) {
+                          setState(() {
+                            _currentFertilizer = value!;
+                          });
+                        },
+                        value: _currentFertilizer,
+                      ),
+                      VerticalDivider(),
+                      Row(
+                        children: [
+                          _addFertilizerButton(),
+                          const SizedBox(width: 10),
+                          IconButton(
+                              onPressed: () async {
+                                await showFertilizerDetailSheet(
+                                    context, widget.fertilizerProvider, fertilizers);
+                              },
+                              icon: Icon(Icons.list)),
+                        ],
+                      ),
+                    ],
+                  ),
                 );
-              }
-
-              _currentFertilizer = fertilizers.first;
-              return SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    DropdownButton<Fertilizer>(
-                      icon: Icon(Icons.arrow_downward_sharp),
-                      items: fertilizers
-                          .map(
-                            (fertilizer) => DropdownMenuItem<Fertilizer>(
-                              child: Text(fertilizer.name),
-                              value: fertilizer,
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (Fertilizer? value) {
-                        setState(() {
-                          _currentFertilizer = value!;
-                        });
+              },
+            ),
+            Divider(),
+            SizedBox(
+              height: 75,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Flexible(
+                    child: TextFormField(
+                      controller: _fertilizerAmountController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        suffixIcon: Icon(Icons.eco),
+                        labelText: 'Amount',
+                        hintText: '50',
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a value';
+                        }
+                        // Check if it is a double
+                        if (double.tryParse(value) == null) {
+                          return 'Please enter a valid number';
+                        }
+                        return null;
                       },
-                      value: _currentFertilizer,
-                    ),
-                    VerticalDivider(),
-                    _addFertilizerButton(),
-                  ],
-                ),
-              );
-            },
-          ),
-          Divider(),
-          SizedBox(
-            height: 75,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Flexible(
-                  child: TextFormField(
-                    controller: _fertilizerAmountController,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      suffixIcon: Icon(Icons.eco),
-                      labelText: 'Amount',
-                      hintText: '50',
                     ),
                   ),
-                ),
-                SizedBox(width: 50),
-                VerticalDivider(),
-                SizedBox(width: 20),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Unit:'),
-                    DropdownButton<LiquidUnit>(
-                      value: _liquidUnit,
-                      icon: Icon(Icons.arrow_downward_sharp),
-                      items: LiquidUnit.values
-                          .map(
-                            (unit) => DropdownMenuItem(
-                              child: Text(unit.name),
-                              value: unit,
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (LiquidUnit? value) {
-                        setState(() {
-                          _liquidUnit = value!;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-              ],
+                  SizedBox(width: 50),
+                  VerticalDivider(),
+                  SizedBox(width: 20),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Unit:'),
+                      DropdownButton<LiquidUnit>(
+                        value: _liquidUnit,
+                        icon: Icon(Icons.arrow_downward_sharp),
+                        items: LiquidUnit.values
+                            .map(
+                              (unit) => DropdownMenuItem(
+                                child: Text(unit.name),
+                                value: unit,
+                              ),
+                            )
+                            .toList(),
+                        onChanged: (LiquidUnit? value) {
+                          setState(() {
+                            _liquidUnit = value!;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1489,7 +1656,7 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
   Widget _addFertilizerButton() {
     return OutlinedButton.icon(
       onPressed: () async {
-        await showCreateFertilizerDialog(context, widget.fertilizerProvider);
+        await showFertilizerForm(context, widget.fertilizerProvider, null);
       },
       icon: Icon(Icons.add),
       label: Text('Add'),
@@ -1541,7 +1708,9 @@ class _PlantPruningFormState extends State<PlantPruningForm> {
 }
 
 class PlantHarvestingForm extends StatefulWidget {
-  const PlantHarvestingForm({super.key});
+  final GlobalKey<FormState> formKey;
+
+  const PlantHarvestingForm({super.key, required this.formKey});
 
   @override
   State<PlantHarvestingForm> createState() => _PlantHarvestingFormState();
@@ -1571,51 +1740,68 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
     );
   }
 
+  bool get isValid {
+    return widget.formKey.currentState!.validate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 75,
-      width: double.infinity,
-      child: Row(
-        children: [
-          Flexible(
-            child: TextFormField(
-              controller: _harvestAmountController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                suffixIcon: Icon(Icons.eco),
-                labelText: 'Amount',
-                hintText: '50',
-              ),
-            ),
-          ),
-          SizedBox(width: 50),
-          VerticalDivider(),
-          SizedBox(width: 20),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Unit:'),
-              DropdownButton<WeightUnit>(
-                value: _weightUnit,
-                icon: Icon(Icons.arrow_downward_sharp),
-                items: WeightUnit.values
-                    .map(
-                      (unit) => DropdownMenuItem(
-                        child: Text(unit.name),
-                        value: unit,
-                      ),
-                    )
-                    .toList(),
-                onChanged: (WeightUnit? value) {
-                  setState(() {
-                    _weightUnit = value!;
-                  });
+    return Form(
+      key: widget.formKey,
+      child: SizedBox(
+        height: 75,
+        width: double.infinity,
+        child: Row(
+          children: [
+            Flexible(
+              child: TextFormField(
+                controller: _harvestAmountController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  suffixIcon: Icon(Icons.eco),
+                  labelText: 'Amount',
+                  hintText: '50',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a value';
+                  }
+                  // Check if it is a double
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
                 },
               ),
-            ],
-          ),
-        ],
+            ),
+            SizedBox(width: 50),
+            VerticalDivider(),
+            SizedBox(width: 20),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Unit:'),
+                DropdownButton<WeightUnit>(
+                  value: _weightUnit,
+                  icon: Icon(Icons.arrow_downward_sharp),
+                  items: WeightUnit.values
+                      .map(
+                        (unit) => DropdownMenuItem(
+                          child: Text(unit.name),
+                          value: unit,
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (WeightUnit? value) {
+                    setState(() {
+                      _weightUnit = value!;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2207,18 +2393,22 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
       case EnvironmentMeasurementType.temperature:
         return EnvironmentTemperatureForm(
           key: widget.environmentTemperatureFormKey,
+          formKey: GlobalKey<FormState>(),
         );
       case EnvironmentMeasurementType.humidity:
         return EnvironmentHumidityForm(
           key: widget.environmentHumidityFormKey,
+          formKey: GlobalKey<FormState>(),
         );
       case EnvironmentMeasurementType.co2:
         return EnvironmentCO2Form(
           key: widget.environmentCO2FormKey,
+          formKey: GlobalKey<FormState>(),
         );
       case EnvironmentMeasurementType.lightDistance:
         return EnvironmentLightDistanceForm(
           key: widget.environmentLightDistanceFormKey,
+          formKey: GlobalKey<FormState>(),
         );
     }
   }

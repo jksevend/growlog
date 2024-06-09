@@ -18,9 +18,9 @@ Map<String, dynamic> _$EnvironmentsToJson(Environments instance) =>
     };
 
 Dimension _$DimensionFromJson(Map<String, dynamic> json) => Dimension(
-      width: (json['width'] as num).toDouble(),
-      length: (json['length'] as num).toDouble(),
-      height: (json['height'] as num).toDouble(),
+      width: MeasurementAmount.fromJson(json['width'] as Map<String, dynamic>),
+      length: MeasurementAmount.fromJson(json['length'] as Map<String, dynamic>),
+      height: MeasurementAmount.fromJson(json['height'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DimensionToJson(Dimension instance) => <String, dynamic>{

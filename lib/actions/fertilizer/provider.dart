@@ -48,4 +48,16 @@ class FertilizerProvider extends ChangeNotifier {
     fertilizers.remove(fertilizerId);
     await setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()));
   }
+
+  Future<void> deleteFertilizer(String id) async {
+    final fertilizers = await _fertilizersMap.first;
+    fertilizers.remove(id);
+    await setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()));
+  }
+
+  Future<void> updateFertilizer(Fertilizer fertilizer) async {
+    final fertilizers = await _fertilizersMap.first;
+    fertilizers[fertilizer.id] = fertilizer;
+    await setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()));
+  }
 }

@@ -5,6 +5,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/view.dart';
+import 'package:weedy/common/measurement.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/environments/sheet.dart';
@@ -449,10 +450,18 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 ],
                               ),
                               dimension: Dimension(
-                                width: double.parse(_widthController.text),
-                                length: double.parse(_lengthController.text),
-                                height: double.parse(_heightController.text),
-                              ),
+                                  width: MeasurementAmount(
+                                    value: double.parse(_widthController.text),
+                                    unit: MeasurementUnit.cm,
+                                  ),
+                                  length: MeasurementAmount(
+                                    value: double.parse(_lengthController.text),
+                                    unit: MeasurementUnit.cm,
+                                  ),
+                                  height: MeasurementAmount(
+                                    value: double.parse(_heightController.text),
+                                    unit: MeasurementUnit.cm,
+                                  )),
                               bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
                                   ? ''
                                   : _pictureFormKey.currentState!.images.first,
@@ -473,10 +482,18 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                               lights: [],
                             ),
                             dimension: Dimension(
-                              width: 0,
-                              length: 0,
-                              height: 0,
-                            ),
+                                width: MeasurementAmount(
+                                  value: 0,
+                                  unit: MeasurementUnit.cm,
+                                ),
+                                length: MeasurementAmount(
+                                  value: 0,
+                                  unit: MeasurementUnit.cm,
+                                ),
+                                height: MeasurementAmount(
+                                  value: 0,
+                                  unit: MeasurementUnit.cm,
+                                )),
                             bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
                                 ? ''
                                 : _pictureFormKey.currentState!.images.first,
@@ -505,10 +522,18 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                             ],
                           ),
                           dimension: Dimension(
-                            width: double.parse(_widthController.text),
-                            length: double.parse(_lengthController.text),
-                            height: double.parse(_heightController.text),
-                          ),
+                              width: MeasurementAmount(
+                                value: double.parse(_widthController.text),
+                                unit: MeasurementUnit.cm,
+                              ),
+                              length: MeasurementAmount(
+                                value: double.parse(_lengthController.text),
+                                unit: MeasurementUnit.cm,
+                              ),
+                              height: MeasurementAmount(
+                                value: double.parse(_heightController.text),
+                                unit: MeasurementUnit.cm,
+                              )),
                           bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
                               ? ''
                               : _pictureFormKey.currentState!.images.first,

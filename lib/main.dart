@@ -11,6 +11,8 @@ import 'package:weedy/plants/view.dart';
 import 'package:weedy/settings/provider.dart';
 import 'package:weedy/settings/view.dart';
 
+import 'statistics/view.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -95,9 +97,7 @@ class _MainViewState extends State<MainView> {
       plantsProvider: widget.plantsProvider,
       actionsProvider: widget.actionsProvider,
     ),
-    SettingsView(
-      settingsProvider: widget.settingsProvider,
-    ),
+    StatisticsView(),
   ];
 
   void _onItemTapped(int index) {
@@ -111,6 +111,17 @@ class _MainViewState extends State<MainView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Weedy'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => SettingsView(
+                        settingsProvider: widget.settingsProvider,
+                      )));
+            },
+          ),
+        ],
       ),
       body: _pages[_selectedIndex],
       floatingActionButton: _floatingActionButton(),
@@ -134,10 +145,9 @@ class _MainViewState extends State<MainView> {
             label: 'Environments',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            activeIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
+            icon: Icon(Icons.bar_chart_outlined),
+            label: 'Statistics',
+          )
         ],
         elevation: 10.0,
         backgroundColor:

@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:weedy/common/measurement.dart';
 
 part 'model.g.dart';
 
@@ -48,9 +49,9 @@ extension EnvironmentTypeExtension on EnvironmentType {
 
 @JsonSerializable()
 class Dimension {
-  final double width;
-  final double length;
-  final double height;
+  final MeasurementAmount width;
+  final MeasurementAmount length;
+  final MeasurementAmount height;
 
   Dimension({
     required this.width,

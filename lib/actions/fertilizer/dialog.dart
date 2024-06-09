@@ -3,10 +3,17 @@ import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
 
-Future<void> showCreateFertilizerDialog(BuildContext context,
-    FertilizerProvider fertilizerProvider) async {
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController descriptionController = TextEditingController();
+Future<void> showFertilizerForm(
+  BuildContext context,
+  FertilizerProvider fertilizerProvider,
+  Fertilizer? fertilizer,
+) async {
+  final TextEditingController nameController = TextEditingController(
+    text: fertilizer == null ? '' : fertilizer.name,
+  );
+  final TextEditingController descriptionController = TextEditingController(
+    text: fertilizer == null ? '' : fertilizer.description,
+  );
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
@@ -14,8 +21,8 @@ Future<void> showCreateFertilizerDialog(BuildContext context,
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text(
-          'Create fertilizer',
+        title: Text(
+          fertilizer == null ? 'Add Fertilizer' : 'Edit Fertilizer',
         ),
         content: Form(
           key: formKey,
@@ -55,19 +62,28 @@ Future<void> showCreateFertilizerDialog(BuildContext context,
           TextButton(
             onPressed: () async {
               if (formKey.currentState!.validate()) {
-                final fertilizer = Fertilizer(
+                if (fertilizer != null) {
+                  final updatedFertilizer = fertilizer.copyWith(
+                    id: fertilizer.id,
+                    name: nameController.text,
+                    description: descriptionController.text,
+                  );
+                  await fertilizerProvider.updateFertilizer(updatedFertilizer);
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                  return;
+                }
+                final newFertilizer = Fertilizer(
                   id: const Uuid().v4().toString(),
                   name: nameController.text,
                   description: descriptionController.text,
                 );
-                await fertilizerProvider.addFertilizer(fertilizer);
-                if (!context.mounted) {
-                  return;
-                }
+                await fertilizerProvider.addFertilizer(newFertilizer);
+                if (!context.mounted) return;
                 Navigator.of(context).pop();
               }
             },
-            child: const Text('Create'),
+            child: const Text('Save'),
           ),
         ],
       );

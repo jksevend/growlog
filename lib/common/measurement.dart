@@ -7,6 +7,26 @@ enum MeasurementUnit {
   m,
 }
 
+extension MeasurementUnitExtension on MeasurementUnit {
+  String get name {
+    switch (this) {
+      case MeasurementUnit.cm:
+        return 'Centimeters';
+      case MeasurementUnit.m:
+        return 'Meters';
+    }
+  }
+
+  String get symbol {
+    switch (this) {
+      case MeasurementUnit.cm:
+        return 'cm';
+      case MeasurementUnit.m:
+        return 'm';
+    }
+  }
+}
+
 @JsonSerializable()
 class MeasurementAmount {
   final double value;
