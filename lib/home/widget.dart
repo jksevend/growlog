@@ -267,11 +267,12 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                       _formatDate(date),
                     ),
                     Wrap(
+                      clipBehavior: Clip.hardEdge,
                       children: [
                         ...List.generate(plantActionCountToday, (index) {
                           return Container(
-                            width: 8,
-                            height: 8,
+                            width: 5,
+                            height: 5,
                             decoration: const BoxDecoration(
                               color: Colors.green,
                               shape: BoxShape.circle,
@@ -280,8 +281,8 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                         }),
                         ...List.generate(environmentActionCountToday, (index) {
                           return Container(
-                            width: 8,
-                            height: 8,
+                            width: 5,
+                            height: 5,
                             decoration: BoxDecoration(
                               color: Colors.yellow[900],
                               shape: BoxShape.circle,

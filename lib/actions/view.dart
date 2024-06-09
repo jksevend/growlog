@@ -172,6 +172,8 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                 itemBuilder: (context, index) {
                   final action = specificPlantActions.elementAt(index);
                   return PlantActionLogItem(
+                    actionsProvider: widget.actionsProvider,
+                    plant: widget.plant,
                     action: action,
                     isFirst: index == 0,
                     isLast: index == specificPlantActions.length - 1,

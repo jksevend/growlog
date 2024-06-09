@@ -25,6 +25,7 @@ Plant _$PlantFromJson(Map<String, dynamic> json) => Plant(
       medium: $enumDecode(_$MediumEnumMap, json['medium']),
       environmentId: json['environmentId'] as String,
       bannerImagePath: json['bannerImagePath'] as String,
+      createdAt: DateTime.parse(json['createdAt'] as String),
     );
 
 Map<String, dynamic> _$PlantToJson(Plant instance) => <String, dynamic>{

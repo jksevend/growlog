@@ -5,6 +5,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/view.dart';
+import 'package:weedy/common/date_utils.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
@@ -62,11 +63,33 @@ class PlantOverview extends StatelessWidget {
                       return Card(
                         child: Column(
                           children: [
-                            Image.file(
-                              File(plant.bannerImagePath),
-                              width: constraints.maxWidth,
-                              height: constraints.maxWidth / 2,
-                              fit: BoxFit.cover,
+                            GestureDetector(
+                              child: Image.file(
+                                File(plant.bannerImagePath),
+                                width: constraints.maxWidth,
+                                height: constraints.maxWidth / 2,
+                                fit: BoxFit.cover,
+                              ),
+                              onTap: () async {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Dialog(
+                                      child: InteractiveViewer(
+                                        panEnabled: false,
+                                        // Set it to false
+                                        boundaryMargin: const EdgeInsets.all(100),
+                                        minScale: 1,
+                                        maxScale: 2,
+                                        child: Image.file(
+                                          alignment: Alignment.center,
+                                          File(plant.bannerImagePath),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
                             ),
                             ListTile(
                               leading: Text(
@@ -74,7 +97,8 @@ class PlantOverview extends StatelessWidget {
                                 style: const TextStyle(fontSize: 22.0),
                               ),
                               title: Text(plant.name),
-                              subtitle: Text(plant.description),
+                              subtitle: Text(
+                                  '${daysSince(plant.createdAt)} days (W${weeksSince(plant.createdAt)})'),
                               onTap: () async {
                                 debugPrint('Navigate to the plant detail view for ${plant.name}');
                                 await showPlantDetailSheet(
@@ -356,6 +380,7 @@ class _PlantFormState extends State<PlantForm> {
                             medium: _selectedMedium,
                             lifeCycleState: _lifeCycleState,
                             bannerImagePath: _pictureFormKey.currentState!.images.first,
+                            createdAt: widget.plant!.createdAt,
                           );
                           await widget.plantsProvider
                               .updatePlant(plant)
@@ -369,6 +394,7 @@ class _PlantFormState extends State<PlantForm> {
                             lifeCycleState: _lifeCycleState,
                             medium: _selectedMedium,
                             bannerImagePath: _pictureFormKey.currentState!.images.first,
+                            createdAt: DateTime.now(),
                           );
                           await widget.plantsProvider
                               .addPlant(plant)

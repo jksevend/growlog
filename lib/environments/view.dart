@@ -65,13 +65,34 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                     return Card(
                       child: Column(
                         children: [
-                          Image.file(
+                        GestureDetector(
+                          child: Image.file(
                             height: constraints.maxWidth / 2,
                             width: constraints.maxWidth,
                             fit: BoxFit.fitWidth,
                             File(environment.bannerImagePath),
                           ),
-                          ListTile(
+                          onTap: () async {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Dialog(
+                                    child: InteractiveViewer(
+                                      panEnabled: false,
+                                      // Set it to false
+                                      boundaryMargin: const EdgeInsets.all(100),
+                                      minScale: 1,
+                                      maxScale: 2,
+                                      child: Image.file(
+                                        alignment: Alignment.center,
+                                        File(environment.bannerImagePath),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          },
+                        ),
+                        ListTile(
                             leading: Text(
                               environment.type.icon,
                               style: const TextStyle(fontSize: 22.0),

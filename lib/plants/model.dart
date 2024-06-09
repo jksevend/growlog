@@ -93,6 +93,7 @@ class Plant {
   final LifeCycleState lifeCycleState;
   final Medium medium;
   final String bannerImagePath;
+  final DateTime createdAt;
 
   String environmentId;
 
@@ -104,6 +105,7 @@ class Plant {
     required this.medium,
     required this.environmentId,
     required this.bannerImagePath,
+    required this.createdAt,
   });
 
   factory Plant.fromJson(Map<String, dynamic> json) => _$PlantFromJson(json);

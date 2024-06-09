@@ -8,14 +8,19 @@ import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/common/measurement.dart';
 import 'package:weedy/common/temperature.dart';
 import 'package:weedy/environments/model.dart';
+import 'package:weedy/plants/model.dart';
 
 class PlantActionLogItem extends StatelessWidget {
+  final ActionsProvider actionsProvider;
+  final Plant plant;
   final PlantAction action;
   final bool isFirst;
   final bool isLast;
 
   const PlantActionLogItem({
     super.key,
+    required this.actionsProvider,
+    required this.plant,
     required this.action,
     required this.isFirst,
     required this.isLast,
@@ -27,19 +32,16 @@ class PlantActionLogItem extends StatelessWidget {
       elevation: 3.0,
       child: Padding(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              action.id,
-              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 5.0),
-            Text(
-              action.type.name,
-              style: const TextStyle(fontSize: 14.0, color: Colors.grey),
-            ),
-          ],
+        child: ListTile(
+          leading: Text(action.type.icon, style: const TextStyle(fontSize: 18)),
+          title: Text(action.type.name),
+          subtitle: Text(
+            action.description,
+            style: const TextStyle(fontStyle: FontStyle.italic),
+          ),
+          onTap: () async {
+            await showPlantActionDetailSheet(context, action, plant, actionsProvider);
+          },
         ),
       ),
     );
