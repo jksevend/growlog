@@ -17,8 +17,8 @@ Future<void> showFertilizerDetailSheet(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Fertilizers', style: TextStyle(fontSize: 20)),
-              Divider(),
+              const Text('Fertilizers', style: TextStyle(fontSize: 20)),
+              const Divider(),
               ...fertilizers.entries.map(
                 (fertilizer) {
                   return ListTile(
@@ -28,7 +28,7 @@ Future<void> showFertilizerDetailSheet(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.edit, color: Colors.blue),
+                          icon: const Icon(Icons.edit, color: Colors.blue),
                           onPressed: () async {
                             await showFertilizerForm(
                               context,
@@ -40,7 +40,7 @@ Future<void> showFertilizerDetailSheet(
                           },
                         ),
                         IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () async {
                             await fertilizerProvider.deleteFertilizer(fertilizer.value.id);
                             if (!context.mounted) return;

@@ -25,18 +25,24 @@ Future<void> showPlantDetailSheet(
         return Column(
           children: [
             ListTile(
-              leading: Icon(Icons.info),
+              leading: const Icon(Icons.info),
               title: Row(
                 children: [
                   Text(plant.name),
-                  SizedBox(width: 8.0),
+                  const SizedBox(width: 8.0),
                   Text(plant.lifeCycleState.icon),
                 ],
               ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(plant.medium.name, style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic,),),
+                  Text(
+                    plant.medium.name,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
                   Text(plant.description),
                 ],
               ),
@@ -59,7 +65,7 @@ Future<void> showPlantDetailSheet(
                         );
                       }
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.delete_forever,
                       color: Colors.red,
                     ),
@@ -77,7 +83,7 @@ Future<void> showPlantDetailSheet(
                         }
                       });
                     },
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.edit,
                       color: Colors.amber ,
                     ),
@@ -85,16 +91,16 @@ Future<void> showPlantDetailSheet(
                 ],
               ),
             ),
-            Divider(),
+            const Divider(),
             // Information about the plants' environment
             plantEnvironment == null
-                ? Text('No environment')
+                ? const Text('No environment')
                 : ListTile(
-                    leading: Icon(Icons.lightbulb, color: Colors.yellow),
-                    title: Text('Environment'),
+                    leading: const Icon(Icons.lightbulb, color: Colors.yellow),
+                    title: const Text('Environment'),
                     subtitle: Text(plantEnvironment.name),
                     trailing: IconButton(
-                        icon: Icon(Icons.arrow_right_alt),
+                        icon: const Icon(Icons.arrow_right_alt),
                         onPressed: () async {
                           var navigationBar =
                               bottomNavigationBarKey.currentWidget as BottomNavigationBar;
@@ -108,8 +114,7 @@ Future<void> showPlantDetailSheet(
                               environmentsProvider, plantsProvider, actionsProvider);
                         }),
                   ),
-            Divider(),
-
+            const Divider(),
           ],
         );
       });

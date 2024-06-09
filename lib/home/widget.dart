@@ -25,7 +25,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        leading: Text(action.type.icon, style: TextStyle(fontSize: 14)),
+        leading: Text(action.type.icon, style: const TextStyle(fontSize: 14)),
         title: Text(plant.name),
         subtitle: Text(action.formattedDate),
         onTap: () async {
@@ -53,7 +53,7 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        leading: Text(action.type.icon, style: TextStyle(fontSize: 14)),
+        leading: Text(action.type.icon, style: const TextStyle(fontSize: 14)),
         title: Text(environment.name),
         subtitle: Text(action.formattedDate),
         onTap: () async {
@@ -131,7 +131,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
           padding: const EdgeInsets.only(left: 16),
           child: Row(
             children: [
-              Spacer(),
+              const Spacer(),
               Text(_currentMonthName()),
               _buildHeader(),
             ],
@@ -145,7 +145,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
             ]),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
+                return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
@@ -191,7 +191,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
         GridView.count(
           crossAxisCount: 7,
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           children: _currentWeek.map((date) {
             bool isToday = date.day == DateTime.now().day &&
                 date.month == DateTime.now().month &&
@@ -272,7 +272,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                           return Container(
                             width: 8,
                             height: 8,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Colors.green,
                               shape: BoxShape.circle,
                             ),
@@ -283,7 +283,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: Colors.yellow[900],
                               shape: BoxShape.circle,
                             ),
                           );

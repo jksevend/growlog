@@ -24,7 +24,7 @@ Future <void> showEnvironmentDetailSheet(
             child: Column(
               children: [
                 ListTile(
-                  leading: Icon(Icons.info),
+                  leading: const Icon(Icons.info),
                   title: Text(environment.name),
                   subtitle: Text(environment.description),
                   trailing: Row(
@@ -46,7 +46,7 @@ Future <void> showEnvironmentDetailSheet(
                             );
                           }
                         },
-                        icon: Icon(Icons.delete_forever, color: Colors.red),
+                        icon: const Icon(Icons.delete_forever, color: Colors.red),
                       ),
                       IconButton(
                         onPressed: () async {
@@ -61,22 +61,22 @@ Future <void> showEnvironmentDetailSheet(
                             }
                           });
                         },
-                        icon: Icon(Icons.edit, color: Colors.amber),
+                        icon: const Icon(Icons.edit, color: Colors.amber),
                       ),
                     ],
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 ListTile(
-                  leading: Icon(Icons.eco, color: Colors.green),
-                  title: Text('Plants in this environment'),
+                  leading: const Icon(Icons.eco, color: Colors.green),
+                  title: const Text('Plants in this environment'),
                   subtitle: Text(plants.length.toString()),
                 ),
-                Divider(),
+                const Divider(),
                 ListTile(
                   isThreeLine: true,
-                  leading: Icon(Icons.light_mode, color: Colors.yellow),
-                  title: Text('Light'),
+                  leading: const Icon(Icons.light_mode, color: Colors.yellow),
+                  title: const Text('Light'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -86,11 +86,11 @@ Future <void> showEnvironmentDetailSheet(
                     ],
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 ListTile(
                   isThreeLine: true,
-                  leading: Icon(Icons.rectangle_outlined, color: Colors.amber),
-                  title: Text('Dimensions'),
+                  leading: const Icon(Icons.rectangle_outlined, color: Colors.amber),
+                  title: const Text('Dimensions'),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

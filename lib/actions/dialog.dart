@@ -12,13 +12,13 @@ Future<bool> confirmDeletionOfPlantActionDialog(
     builder: (context) {
       return AlertDialog(
         title: Text('Delete ${plantAction.type.name}?'),
-        content: Text('Are you sure you want to delete this action?'),
+        content: const Text('Are you sure you want to delete this action?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(false);
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -28,7 +28,7 @@ Future<bool> confirmDeletionOfPlantActionDialog(
               }
               Navigator.of(context).pop(true);
             },
-            child: Text('Delete'),
+            child: const Text('Delete'),
           ),
         ],
       );
@@ -48,13 +48,13 @@ Future<bool> confirmDeletionOfEnvironmentActionDialog(
     builder: (context) {
       return AlertDialog(
         title: Text('Delete ${environmentAction.type.name}?'),
-        content: Text('Are you sure you want to delete this action?'),
+        content: const Text('Are you sure you want to delete this action?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(false);
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -64,7 +64,7 @@ Future<bool> confirmDeletionOfEnvironmentActionDialog(
               }
               Navigator.of(context).pop(true);
             },
-            child: Text('Delete'),
+            child: const Text('Delete'),
           ),
         ],
       );

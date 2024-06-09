@@ -15,14 +15,14 @@ Future<bool> confirmDeletionOfEnvironmentDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Delete environment'),
+        title: const Text('Delete environment'),
         content: Text('Are you sure you want to delete ${environment.name}?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(false);
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -34,7 +34,7 @@ Future<bool> confirmDeletionOfEnvironmentDialog(
               }
               Navigator.of(context).pop(true);
             },
-            child: Text('Delete'),
+            child: const Text('Delete'),
           ),
         ],
       );

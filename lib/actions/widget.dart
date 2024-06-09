@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:weedy/actions/dialog.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
+import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/common/measurement.dart';
 import 'package:weedy/common/temperature.dart';
 import 'package:weedy/environments/model.dart';
@@ -25,18 +26,18 @@ class PlantActionLogItem extends StatelessWidget {
     return Card(
       elevation: 3.0,
       child: Padding(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               action.id,
-              style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 5.0),
+            const SizedBox(height: 5.0),
             Text(
               action.type.name,
-              style: TextStyle(fontSize: 14.0, color: Colors.grey),
+              style: const TextStyle(fontSize: 14.0, color: Colors.grey),
             ),
           ],
         ),
@@ -46,12 +47,16 @@ class PlantActionLogItem extends StatelessWidget {
 }
 
 class EnvironmentActionLogItem extends StatelessWidget {
+  final ActionsProvider actionsProvider;
+  final Environment environment;
   final EnvironmentAction action;
   final bool isFirst;
   final bool isLast;
 
   const EnvironmentActionLogItem({
     super.key,
+    required this.actionsProvider,
+    required this.environment,
     required this.action,
     required this.isFirst,
     required this.isLast,
@@ -59,7 +64,23 @@ class EnvironmentActionLogItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Card(
+      elevation: 3.0,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: ListTile(
+          leading: Text(action.type.icon, style: const TextStyle(fontSize: 18)),
+          title: Text(action.type.name),
+          subtitle: Text(
+            action.description,
+            style: const TextStyle(fontStyle: FontStyle.italic),
+          ),
+          onTap: () async {
+            await showEnvironmentActionDetailSheet(context, action, environment, actionsProvider);
+          },
+        ),
+      ),
+    );
   }
 }
 
@@ -85,10 +106,10 @@ class _EnvironmentMeasurementActionSheetWidgetState
   @override
   Widget build(BuildContext context) {
     return _BaseEnvironmentActionSheetWidget(
-      child: _measurementWidget(),
       environment: widget.environment,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
+      child: _measurementWidget(),
     );
   }
 
@@ -96,8 +117,8 @@ class _EnvironmentMeasurementActionSheetWidgetState
     if (widget.action.measurement.type == EnvironmentMeasurementType.temperature) {
       final temperature = Temperature.fromJson(widget.action.measurement.measurement);
       return ListTile(
-        leading: Text(widget.action.measurement.type.icon, style: TextStyle(fontSize: 20)),
-        title: Text('Temperature'),
+        leading: Text(widget.action.measurement.type.icon, style: const TextStyle(fontSize: 20)),
+        title: const Text('Temperature'),
         subtitle: Text('${temperature.value} ${temperature.unit.symbol}'),
       );
     }
@@ -105,8 +126,8 @@ class _EnvironmentMeasurementActionSheetWidgetState
     if (widget.action.measurement.type == EnvironmentMeasurementType.humidity) {
       final humidity = widget.action.measurement.measurement['humidity'] as double;
       return ListTile(
-        leading: Text(widget.action.measurement.type.icon, style: TextStyle(fontSize: 20)),
-        title: Text('Humidity'),
+        leading: Text(widget.action.measurement.type.icon, style: const TextStyle(fontSize: 20)),
+        title: const Text('Humidity'),
         subtitle: Text('$humidity %'),
       );
     }
@@ -114,8 +135,8 @@ class _EnvironmentMeasurementActionSheetWidgetState
     if (widget.action.measurement.type == EnvironmentMeasurementType.co2) {
       final co2 = widget.action.measurement.measurement['co2'] as double;
       return ListTile(
-        leading: Text(widget.action.measurement.type.icon, style: TextStyle(fontSize: 20)),
-        title: Text('CO2'),
+        leading: Text(widget.action.measurement.type.icon, style: const TextStyle(fontSize: 20)),
+        title: const Text('CO2'),
         subtitle: Text('$co2 ppm'),
       );
     }
@@ -123,8 +144,8 @@ class _EnvironmentMeasurementActionSheetWidgetState
     if (widget.action.measurement.type == EnvironmentMeasurementType.lightDistance) {
       final amount = MeasurementAmount.fromJson(widget.action.measurement.measurement);
       return ListTile(
-        leading: Text(widget.action.measurement.type.icon, style: TextStyle(fontSize: 20)),
-        title: Text('Light distance'),
+        leading: Text(widget.action.measurement.type.icon, style: const TextStyle(fontSize: 20)),
+        title: const Text('Light distance'),
         subtitle: Text('${amount.value}${amount.unit.symbol}'),
       );
     }
@@ -154,10 +175,10 @@ class _EnvironmentOtherActionSheetWidgetState extends State<EnvironmentOtherActi
   @override
   Widget build(BuildContext context) {
     return _BaseEnvironmentActionSheetWidget(
-      child: Container(),
       environment: widget.environment,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
+      child: Container(),
     );
   }
 }
@@ -202,7 +223,7 @@ class _EnvironmentPictureActionSheetWidgetState extends State<EnvironmentPicture
                       child: InteractiveViewer(
                         panEnabled: false,
                         // Set it to false
-                        boundaryMargin: EdgeInsets.all(100),
+                        boundaryMargin: const EdgeInsets.all(100),
                         minScale: 1,
                         maxScale: 2,
                         child: Image.file(
@@ -235,7 +256,6 @@ class _BaseEnvironmentActionSheetWidget extends StatefulWidget {
   final Widget child;
 
   const _BaseEnvironmentActionSheetWidget({
-    super.key,
     required this.child,
     required this.environment,
     required this.action,
@@ -253,14 +273,14 @@ class _BaseEnvironmentActionSheetWidgetState extends State<_BaseEnvironmentActio
     return Column(
       children: [
         ListTile(
-          leading: Text(widget.action.type.icon, style: TextStyle(fontSize: 18)),
+          leading: Text(widget.action.type.icon, style: const TextStyle(fontSize: 18)),
           title: Text(widget.action.type.name),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 widget.environment.name,
-                style: TextStyle(fontStyle: FontStyle.italic),
+                style: const TextStyle(fontStyle: FontStyle.italic),
               ),
               Text(widget.action.formattedDate),
             ],
@@ -284,14 +304,14 @@ class _BaseEnvironmentActionSheetWidgetState extends State<_BaseEnvironmentActio
                     );
                   }
                 },
-                icon: Icon(Icons.delete_forever, color: Colors.red),
+                icon: const Icon(Icons.delete_forever, color: Colors.red),
               ),
             ],
           ),
         ),
-        Divider(),
+        const Divider(),
         Text(widget.action.description == '' ? 'No description' : widget.action.description),
-        Divider(),
+        const Divider(),
         widget.child,
       ],
     );

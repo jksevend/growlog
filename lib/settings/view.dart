@@ -30,7 +30,6 @@ class _SettingsViewState extends State<SettingsView> {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
 
-            final settings = snapshot.data!;
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: ListView(

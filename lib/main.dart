@@ -111,7 +111,7 @@ class _MainViewState extends State<MainView> {
       plantsProvider: widget.plantsProvider,
       actionsProvider: widget.actionsProvider,
     ),
-    StatisticsView(),
+    const StatisticsView(),
   ];
 
   void _onItemTapped(int index) {
@@ -187,7 +187,7 @@ class _MainViewState extends State<MainView> {
                   )));
         },
         tooltip: 'Aktion ausführen',
-        child: Stack(
+        child: const Stack(
           children: <Widget>[
             Icon(Icons.bolt, size: 36),
             Positioned(
@@ -211,7 +211,7 @@ class _MainViewState extends State<MainView> {
                   )));
         },
         tooltip: 'Pflanze hinzufügen',
-        child: Stack(
+        child: const Stack(
           children: <Widget>[
             Icon(Icons.eco, size: 36),
             Positioned(
@@ -234,7 +234,7 @@ class _MainViewState extends State<MainView> {
                   )));
         },
         tooltip: 'Umgebung hinzufügen',
-        child: Stack(
+        child: const Stack(
           children: <Widget>[
             Icon(Icons.lightbulb, size: 36),
             Positioned(

@@ -13,14 +13,14 @@ Future<bool> confirmDeletionOfPlantDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Delete plant'),
+        title: const Text('Delete plant'),
         content: Text('Are you sure you want to delete ${plant.name}?'),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.of(context).pop(false);
             },
-            child: Text('Cancel'),
+            child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () async {
@@ -31,7 +31,7 @@ Future<bool> confirmDeletionOfPlantDialog(
               }
               Navigator.of(context).pop(true);
             },
-            child: Text('Delete'),
+            child: const Text('Delete'),
           ),
         ],
       );

@@ -48,7 +48,7 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
         final environments = snapshot.data![0] as Map<String, Environment>;
         final plants = snapshot.data![1] as Map<String, Plant>;
         if (environments.isEmpty) {
-          return Center(
+          return const Center(
             child: Text('No environments created yet.'),
           );
         }
@@ -90,9 +90,9 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                                   widget.actionsProvider);
                             },
                             trailing: IconButton(
-                              icon: Icon(Icons.timeline),
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
+                            icon: const Icon(Icons.timeline),
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => EnvironmentActionOverview(
                                       environment: environment,
                                       actionsProvider: widget.actionsProvider,
@@ -222,7 +222,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         TextFormField(
                           controller: _descriptionController,
                           maxLines: null,
@@ -236,10 +236,10 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                     ),
                   ),
                 ),
-                SizedBox(height: 16.0),
-                Text('Choose an environment type: ' +
-                    (_selectedEnvironmentType[0] ? 'Indoor' : 'Outdoor')),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
+                Text(
+                    'Choose an environment type: ${_selectedEnvironmentType[0] ? 'Indoor' : 'Outdoor'}'),
+                const SizedBox(height: 16.0),
                 ToggleButtons(
                     isSelected: _selectedEnvironmentType,
                     onPressed: (int index) {
@@ -257,14 +257,14 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                             child: Row(
                               children: [
                                 Text(e.icon),
-                                SizedBox(width: 8.0),
+                                const SizedBox(width: 8.0),
                                 Text(e.name),
                               ],
                             ),
                           ),
                         )
                         .toList()),
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -273,7 +273,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                         Text('Choose the amount of light hours: ${_currentLightHours.round()}'),
                         Row(
                           children: [
-                            Icon(Icons.nightlight_round_outlined),
+                            const Icon(Icons.nightlight_round_outlined),
                             Expanded(
                               child: Slider(
                                 max: 24,
@@ -287,7 +287,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 },
                               ),
                             ),
-                            Icon(Icons.wb_sunny),
+                            const Icon(Icons.wb_sunny),
                           ],
                         ),
                       ],
@@ -299,7 +299,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Text('Banner image'),
+                        const Text('Banner image'),
                         PictureForm(
                           key: _pictureFormKey,
                           allowMultiple: false,
@@ -311,22 +311,22 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                 if (_selectedEnvironmentType[0])
                   Column(
                     children: [
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                       Card(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              Text('Choose the light details:'),
-                              SizedBox(height: 16.0),
+                              const Text('Choose the light details:'),
+                              const SizedBox(height: 16.0),
                               DropdownButton<LightType>(
-                                icon: Icon(Icons.arrow_downward_sharp),
+                                icon: const Icon(Icons.arrow_downward_sharp),
                                 isExpanded: true,
                                 items: LightType.values
                                     .map(
                                       (e) => DropdownMenuItem<LightType>(
-                                        child: Text(e.name),
                                         value: e,
+                                        child: Text(e.name),
                                       ),
                                     )
                                     .toList(),
@@ -337,7 +337,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 },
                                 value: _currentLightType,
                               ),
-                              SizedBox(height: 16.0),
+                              const SizedBox(height: 16.0),
                               Form(
                                 key: _wattFormKey,
                                 child: TextFormField(
@@ -361,7 +361,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                         ),
                       ),
                       // Dimension
-                      SizedBox(height: 16.0),
+                      const SizedBox(height: 16.0),
                       Card(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -369,8 +369,8 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                             key: _dimensionFormKey,
                             child: Column(
                               children: [
-                                Text('Enter the dimension:'),
-                                SizedBox(height: 16.0),
+                                const Text('Enter the dimension:'),
+                                const SizedBox(height: 16.0),
                                 TextFormField(
                                   controller: _widthController,
                                   keyboardType: TextInputType.number,
@@ -385,7 +385,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     return null;
                                   },
                                 ),
-                                SizedBox(height: 16.0),
+                                const SizedBox(height: 16.0),
                                 TextFormField(
                                   controller: _lengthController,
                                   keyboardType: TextInputType.number,
@@ -400,7 +400,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     return null;
                                   },
                                 ),
-                                SizedBox(height: 16.0),
+                                const SizedBox(height: 16.0),
                                 TextFormField(
                                   controller: _heightController,
                                   keyboardType: TextInputType.number,
@@ -423,7 +423,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                     ],
                   ),
                 // Submit button
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 OutlinedButton.icon(
                   onPressed: () async {
                     if (widget.formKey.currentState!.validate()) {
@@ -546,8 +546,8 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                       }
                     }
                   },
-                  label: Text('Save'),
-                  icon: Icon(Icons.arrow_right),
+                  label: const Text('Save'),
+                  icon: const Icon(Icons.arrow_right),
                 ),
               ],
             ),

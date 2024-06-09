@@ -19,7 +19,7 @@ Future<void> showPlantActionDetailSheet(
         return Column(
           children: [
             ListTile(
-              leading: Icon(Icons.info),
+              leading: const Icon(Icons.info),
               title: Text(plantAction.type.name),
               subtitle: Text(plantAction.description),
               trailing: Row(
@@ -41,7 +41,7 @@ Future<void> showPlantActionDetailSheet(
                         );
                       }
                     },
-                    icon: Icon(Icons.delete_forever, color: Colors.red),
+                    icon: const Icon(Icons.delete_forever, color: Colors.red),
                   ),
                 ],
               ),
@@ -86,7 +86,7 @@ Future<void> showEnvironmentActionDetailSheet(
         );
       }
 
-      throw Exception(environmentAction.type.name + ' is not supported');
+      throw UnimplementedError('Unknown environment action type: ${environmentAction.toJson()}');
     },
   );
 }

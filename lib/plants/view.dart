@@ -46,7 +46,7 @@ class PlantOverview extends StatelessWidget {
             final plants = snapshot.data![0] as Map<String, Plant>;
             final environments = snapshot.data![1] as Map<String, Environment>;
             if (plants.isEmpty) {
-              return Center(
+              return const Center(
                 child: Text('No plants found'),
               );
             }
@@ -88,7 +88,7 @@ class PlantOverview extends StatelessWidget {
                                     bottomNavigationKey);
                               },
                               trailing: IconButton(
-                                icon: Icon(Icons.timeline),
+                                icon: const Icon(Icons.timeline),
                                 onPressed: () {
                                   debugPrint(
                                       'Navigate to the plant timeline view for ${plant.name}');
@@ -175,10 +175,10 @@ class _PlantFormState extends State<PlantForm> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Text('Plant details'),
+                        const Text('Plant details'),
                         TextFormField(
                           controller: _nameController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Name',
                             hintText: 'Enter the name of the plant',
                           ),
@@ -189,12 +189,12 @@ class _PlantFormState extends State<PlantForm> {
                             return null;
                           },
                         ),
-                        SizedBox(height: 16.0),
+                        const SizedBox(height: 16.0),
                         TextFormField(
                           controller: _descriptionController,
                           maxLines: null,
                           minLines: 5,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Description',
                             hintText: 'Enter a description of the plant',
                           ),
@@ -209,7 +209,7 @@ class _PlantFormState extends State<PlantForm> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Text('Select an environment'),
+                        const Text('Select an environment'),
                         StreamBuilder<Map<String, Environment>>(
                             stream: widget.environmentsProvider.environments,
                             builder: (context, snapshot) {
@@ -227,19 +227,19 @@ class _PlantFormState extends State<PlantForm> {
 
                               final environments = snapshot.data!;
                               if (environments.isEmpty) {
-                                return Center(
+                                return const Center(
                                   child: Text('No environments found'),
                                 );
                               }
                               _currentEnvironment = environments[environments.keys.first]!;
                               return DropdownButton<Environment>(
-                                icon: Icon(Icons.arrow_downward_sharp),
+                                icon: const Icon(Icons.arrow_downward_sharp),
                                 isExpanded: true,
                                 items: environments.values
                                     .map(
                                       (environment) => DropdownMenuItem<Environment>(
-                                        child: Text(environment.name),
                                         value: environment,
+                                        child: Text(environment.name),
                                       ),
                                     )
                                     .toList(),
@@ -263,8 +263,8 @@ class _PlantFormState extends State<PlantForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          Text('Current lifecycle state'),
-                          SizedBox(height: 8.0),
+                          const Text('Current lifecycle state'),
+                          const SizedBox(height: 8.0),
                           ToggleButtons(
                             isSelected: _selectedLifeCycleState,
                             onPressed: (index) {
@@ -286,7 +286,7 @@ class _PlantFormState extends State<PlantForm> {
                                 )
                                 .toList(),
                           ),
-                          Divider(),
+                          const Divider(),
                           Text(_lifeCycleState.name),
                         ],
                       ),
@@ -297,13 +297,13 @@ class _PlantFormState extends State<PlantForm> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: DropdownButton<Medium>(
-                      icon: Icon(Icons.arrow_downward_sharp),
+                      icon: const Icon(Icons.arrow_downward_sharp),
                       isExpanded: true,
                       items: Medium.values
                           .map(
                             (medium) => DropdownMenuItem<Medium>(
-                              child: Text(medium.name),
                               value: medium,
+                              child: Text(medium.name),
                             ),
                           )
                           .toList(),
@@ -323,7 +323,7 @@ class _PlantFormState extends State<PlantForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          Text('Banner image'),
+                          const Text('Banner image'),
                           PictureForm(
                             key: _pictureFormKey,
                             allowMultiple: false,
@@ -334,7 +334,7 @@ class _PlantFormState extends State<PlantForm> {
                   ),
                 ),
                 // Submit button
-                SizedBox(height: 16.0),
+                const SizedBox(height: 16.0),
                 OutlinedButton.icon(
                   onPressed: () async {
                     if (widget.formKey.currentState!.validate()) {
@@ -377,8 +377,8 @@ class _PlantFormState extends State<PlantForm> {
                       }
                     }
                   },
-                  label: Text('Save'),
-                  icon: Icon(Icons.arrow_right),
+                  label: const Text('Save'),
+                  icon: const Icon(Icons.arrow_right),
                 ),
               ],
             ),

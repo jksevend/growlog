@@ -14,13 +14,14 @@ class StatisticsView extends StatelessWidget {
         RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
-            style: TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16),
             children: <TextSpan>[
-              TextSpan(text: '🚧 '),
-              TextSpan(text: 'The statistics feature is in development. Check out the progress '),
+              const TextSpan(text: '🚧 '),
+              const TextSpan(
+                  text: 'The statistics feature is in development. Check out the progress '),
               TextSpan(
                 text: 'here',
-                style: TextStyle(color: Colors.blue),
+                style: const TextStyle(color: Colors.blue),
                 recognizer: TapGestureRecognizer()
                   ..onTap = () async {
                     const url = 'https://github.com/jksevend/weedy';
@@ -31,7 +32,7 @@ class StatisticsView extends StatelessWidget {
                     }
                   },
               ),
-              TextSpan(text: ' 🚧'),
+              const TextSpan(text: ' 🚧'),
             ],
           ),
         ),

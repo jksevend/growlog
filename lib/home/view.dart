@@ -93,7 +93,7 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ),
                       ),
-                      Divider(),
+                      const Divider(),
                       Card(
                         elevation: 20,
                         child: Padding(
@@ -101,16 +101,16 @@ class _HomeViewState extends State<HomeView> {
                           child: Column(
                             children: [
                               ExpansionTile(
-                                title: Text('Plant actions'),
+                                title: const Text('Plant actions'),
                                 subtitle: Text('Performed today: $todayPlantActionsPerformed'),
-                                leading: Icon(
+                                leading: const Icon(
                                   Icons.eco,
                                   color: Colors.green,
                                 ),
                                 children: [
                                   if (todayPlantActions.isEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                    const Padding(
+                                      padding: EdgeInsets.all(8.0),
                                       child: Center(
                                         child: Text('No plant actions performed today.'),
                                       ),
@@ -136,8 +136,8 @@ class _HomeViewState extends State<HomeView> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Divider(),
                       ),
                       Card(
@@ -147,7 +147,7 @@ class _HomeViewState extends State<HomeView> {
                           child: Column(
                             children: [
                               ExpansionTile(
-                                title: Text('Environment actions'),
+                                title: const Text('Environment actions'),
                                 subtitle:
                                     Text('Performed today: $todayEnvironmentActionsPerformed'),
                                 leading: Icon(
@@ -156,8 +156,8 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                                 children: [
                                   if (todayEnvironmentActions.isEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                    const Padding(
+                                      padding: EdgeInsets.all(8.0),
                                       child: Center(
                                         child: Text('No environment actions performed today.'),
                                       ),

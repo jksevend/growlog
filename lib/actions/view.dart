@@ -47,7 +47,7 @@ class EnvironmentActionOverview extends StatelessWidget {
 
           final environmentActions = snapshot.data!;
           if (environmentActions.isEmpty) {
-            return Center(
+            return const Center(
               child: Text('No environment actions created yet.'),
             );
           }
@@ -56,20 +56,51 @@ class EnvironmentActionOverview extends StatelessWidget {
               environmentActions.where((action) => action.environmentId == environment.id).toList();
 
           if (specificEnvironmentActions.isEmpty) {
-            return Center(
+            return const Center(
               child: Text('No actions for this environment.'),
             );
           }
 
-          return ListView.builder(
-            itemCount: specificEnvironmentActions.length,
-            itemBuilder: (context, index) {
-              final action = specificEnvironmentActions.elementAt(index);
-              return ListTile(
-                title: Text(action.description),
-                subtitle: Text(action.formattedDate),
-              );
-            },
+          return Stack(
+            alignment: Alignment.center,
+            children: [
+              const Positioned(
+                child: VerticalDivider(
+                  thickness: 2.0,
+                  color: Colors.grey,
+                ),
+              ),
+              ListView.separated(
+                padding: const EdgeInsets.all(8.0),
+                itemCount: specificEnvironmentActions.length,
+                itemBuilder: (context, index) {
+                  final action = specificEnvironmentActions.elementAt(index);
+                  return EnvironmentActionLogItem(
+                    actionsProvider: actionsProvider,
+                    environment: environment,
+                    action: action,
+                    isFirst: index == 0,
+                    isLast: index == specificEnvironmentActions.length - 1,
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Container(
+                        width: 35,
+                        height: 35,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  );
+                },
+              ),
+            ],
           );
         },
       ),
@@ -112,7 +143,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
 
           final plantActions = snapshot.data!;
           if (plantActions.isEmpty) {
-            return Center(
+            return const Center(
               child: Text('No plant actions created yet.'),
             );
           }
@@ -121,7 +152,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
               plantActions.where((action) => action.plantId == widget.plant.id).toList();
 
           if (specificPlantActions.isEmpty) {
-            return Center(
+            return const Center(
               child: Text('No actions for this plant.'),
             );
           }
@@ -129,7 +160,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
           return Stack(
             alignment: Alignment.center,
             children: [
-              Positioned(
+              const Positioned(
                 child: VerticalDivider(
                   thickness: 2.0,
                   color: Colors.grey,
@@ -149,16 +180,16 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                 separatorBuilder: (BuildContext context, int index) {
                   return Column(
                     children: [
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Container(
                         width: 35,
                         height: 35,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.grey,
                         ),
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                     ],
                   );
                 },
@@ -257,32 +288,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Text('What do you want to do?'),
-                        SizedBox(height: 10),
+                        const Text('What do you want to do?'),
+                        const SizedBox(height: 10),
                         ToggleButtons(
-                          constraints: BoxConstraints(minWidth: 100),
-                          children: [
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.eco,
-                                  size: 50,
-                                  color: Colors.green[900],
-                                ),
-                                Text('Plant')
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.lightbulb,
-                                  size: 50,
-                                  color: Colors.yellow[900],
-                                ),
-                                Text('Environment')
-                              ],
-                            )
-                          ],
+                          constraints: const BoxConstraints(minWidth: 100),
                           isSelected: _choices,
                           onPressed: (int index) {
                             setState(() {
@@ -292,13 +301,35 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                               }
                             });
                           },
+                          children: [
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.eco,
+                                  size: 50,
+                                  color: Colors.green[900],
+                                ),
+                                const Text('Plant')
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Icon(
+                                  Icons.lightbulb,
+                                  size: 50,
+                                  color: Colors.yellow[900],
+                                ),
+                                const Text('Environment')
+                              ],
+                            )
+                          ],
                         ),
                       ],
                     ),
                   ),
                 ),
               ),
-              Divider(),
+              const Divider(),
               _actionForm(context),
             ],
           ),
@@ -319,7 +350,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    Text('Choose a plant:'),
+                    const Text('Choose a plant:'),
                     StreamBuilder<Map<String, Plant>>(
                         stream: widget.plantsProvider.plants,
                         builder: (context, snapshot) {
@@ -333,8 +364,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 
                           final plants = snapshot.data!;
                           if (plants.isEmpty) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
+                            return const Padding(
+                              padding: EdgeInsets.all(8.0),
                               child: Center(
                                 child: Text('No plants created yet.'),
                               ),
@@ -342,13 +373,13 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                           }
                           _currentPlant = plants[plants.keys.first]!;
                           return DropdownButton<Plant>(
-                            icon: Icon(Icons.arrow_downward_sharp),
+                            icon: const Icon(Icons.arrow_downward_sharp),
                             isExpanded: true,
                             items: plants.values
                                 .map(
                                   (plant) => DropdownMenuItem<Plant>(
-                                    child: Text(plant.name),
                                     value: plant,
+                                    child: Text(plant.name),
                                   ),
                                 )
                                 .toList(),
@@ -363,8 +394,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Icon(Icons.calendar_month),
-                        Text('Select date: '),
+                        const Icon(Icons.calendar_month),
+                        const Text('Select date: '),
                         TextButton(
                           onPressed: () => _selectDate(context, _plantActionDate),
                           child: Text(
@@ -373,12 +404,12 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                         ),
                       ],
                     ),
-                    Divider(),
+                    const Divider(),
                     TextFormField(
                       controller: _plantActionDescriptionTextController,
                       maxLines: null,
                       minLines: 5,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Description',
                         hintText: 'Enter a description of the plant',
                       ),
@@ -387,7 +418,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                 ),
               ),
             ),
-            Divider(),
+            const Divider(),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -396,7 +427,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     Column(
                       children: [
                         DropdownButton<PlantActionType>(
-                          icon: Icon(Icons.arrow_downward_sharp),
+                          icon: const Icon(Icons.arrow_downward_sharp),
                           value: _currentPlantActionType,
                           isExpanded: true,
                           items: PlantActionType.values
@@ -432,7 +463,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                 onPressed: () async {
                   if (_currentPlant == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                      const SnackBar(
                         content: Row(
                           children: [
                             Padding(
@@ -478,7 +509,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     final hasFertilizer = _plantFertilizingFormKey.currentState!.hasFertilizers;
                     if (!hasFertilizer) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Row(
                             children: [
                               Padding(
@@ -720,8 +751,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 
                   throw Exception('Unknown action type: $_currentPlantActionType');
                 },
-                label: Text('Save'),
-                icon: Icon(Icons.save),
+                label: const Text('Save'),
+                icon: const Icon(Icons.save),
               ),
             ),
           ],
@@ -736,7 +767,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  Text('Choose an environment:'),
+                  const Text('Choose an environment:'),
                   StreamBuilder<Map<String, Environment>>(
                     stream: widget.environmentsProvider.environments,
                     builder: (builder, snapshot) {
@@ -750,8 +781,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 
                       final environments = snapshot.data!;
                       if (environments.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
+                        return const Padding(
+                          padding: EdgeInsets.all(8.0),
                           child: Center(
                             child: Text('No environments created yet.'),
                           ),
@@ -759,13 +790,13 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                       }
                       _currentEnvironment = environments[environments.keys.first]!;
                       return DropdownButton<Environment>(
-                        icon: Icon(Icons.arrow_downward_sharp),
+                        icon: const Icon(Icons.arrow_downward_sharp),
                         isExpanded: true,
                         items: environments.values
                             .map(
                               (e) => DropdownMenuItem<Environment>(
-                                child: Text(e.name),
                                 value: e,
+                                child: Text(e.name),
                               ),
                             )
                             .toList(),
@@ -781,8 +812,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Icon(Icons.calendar_month),
-                      Text('Select date: '),
+                      const Icon(Icons.calendar_month),
+                      const Text('Select date: '),
                       TextButton(
                         onPressed: () => _selectDate(context, _environmentActionDate),
                         child: Text(
@@ -791,12 +822,12 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                       ),
                     ],
                   ),
-                  Divider(),
+                  const Divider(),
                   TextFormField(
                     controller: _environmentActionDescriptionTextController,
                     maxLines: null,
                     minLines: 5,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Description',
                       hintText: 'Enter a description of the plant',
                     ),
@@ -805,19 +836,20 @@ class _ChooseActionViewState extends State<ChooseActionView> {
               ),
             ),
           ),
-          Divider(),
+          const Divider(),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
                   DropdownButton<EnvironmentActionType>(
-                    icon: Icon(Icons.arrow_downward_sharp),
+                    icon: const Icon(Icons.arrow_downward_sharp),
                     value: _currentEnvironmentActionType,
                     isExpanded: true,
                     items: EnvironmentActionType.values
                         .map(
                           (action) => DropdownMenuItem<EnvironmentActionType>(
+                            value: action,
                             child: Row(
                               children: [
                                 Text(
@@ -827,7 +859,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                                 Text(action.name),
                               ],
                             ),
-                            value: action,
                           ),
                         )
                         .toList(),
@@ -842,14 +873,14 @@ class _ChooseActionViewState extends State<ChooseActionView> {
               ),
             ),
           ),
-          Divider(),
+          const Divider(),
           Align(
             alignment: Alignment.centerRight,
             child: OutlinedButton.icon(
               onPressed: () async {
                 if (_currentEnvironment == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Row(
                         children: [
                           Padding(
@@ -957,8 +988,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     .addEnvironmentAction(action)
                     .whenComplete(() => Navigator.of(context).pop());
               },
-              label: Text('Save'),
-              icon: Icon(Icons.save),
+              label: const Text('Save'),
+              icon: const Icon(Icons.save),
             ),
           ),
         ],
@@ -1086,7 +1117,7 @@ class EnvironmentCO2FormState extends State<EnvironmentCO2Form> {
       child: TextFormField(
         controller: _co2Controller,
         keyboardType: TextInputType.number,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           suffixIcon: Icon(Icons.co2),
           labelText: 'CO2',
           hintText: '50',
@@ -1156,7 +1187,7 @@ class EnvironmentLightDistanceFormState extends State<EnvironmentLightDistanceFo
               child: TextFormField(
                 controller: _distanceController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   suffixIcon: Icon(Icons.highlight_rounded),
                   labelText: 'Distance',
                   hintText: '50',
@@ -1173,21 +1204,21 @@ class EnvironmentLightDistanceFormState extends State<EnvironmentLightDistanceFo
                 },
               ),
             ),
-            SizedBox(width: 50),
-            VerticalDivider(),
-            SizedBox(width: 20),
+            const SizedBox(width: 50),
+            const VerticalDivider(),
+            const SizedBox(width: 20),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Unit:'),
+                const Text('Unit:'),
                 DropdownButton<MeasurementUnit>(
                   value: _distanceUnit,
-                  icon: Icon(Icons.arrow_downward_sharp),
+                  icon: const Icon(Icons.arrow_downward_sharp),
                   items: MeasurementUnit.values
                       .map(
                         (unit) => DropdownMenuItem(
-                          child: Text(unit.symbol),
                           value: unit,
+                          child: Text(unit.symbol),
                         ),
                       )
                       .toList(),
@@ -1247,7 +1278,7 @@ class EnvironmentHumidityFormState extends State<EnvironmentHumidityForm> {
         child: TextFormField(
           controller: _humidityController,
           keyboardType: TextInputType.number,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             suffixIcon: Icon(Icons.water_damage),
             labelText: 'Humidity',
             hintText: '50',
@@ -1319,7 +1350,7 @@ class EnvironmentTemperatureFormState extends State<EnvironmentTemperatureForm> 
               child: TextFormField(
                 controller: _temperatureController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   suffixIcon: Icon(Icons.thermostat),
                   labelText: 'Temperature',
                   hintText: '25',
@@ -1336,21 +1367,21 @@ class EnvironmentTemperatureFormState extends State<EnvironmentTemperatureForm> 
                 },
               ),
             ),
-            SizedBox(width: 50),
-            VerticalDivider(),
-            SizedBox(width: 20),
+            const SizedBox(width: 50),
+            const VerticalDivider(),
+            const SizedBox(width: 20),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Unit:'),
+                const Text('Unit:'),
                 DropdownButton<TemperatureUnit>(
                   value: _temperatureUnit,
-                  icon: Icon(Icons.arrow_downward_sharp),
+                  icon: const Icon(Icons.arrow_downward_sharp),
                   items: TemperatureUnit.values
                       .map(
                         (unit) => DropdownMenuItem(
-                          child: Text(unit.name),
                           value: unit,
+                          child: Text(unit.name),
                         ),
                       )
                       .toList(),
@@ -1420,7 +1451,7 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
               child: TextFormField(
                 controller: _waterAmountController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   suffixIcon: Icon(Icons.water_drop_outlined),
                   labelText: 'Amount',
                   hintText: '50',
@@ -1433,21 +1464,21 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
                 },
               ),
             ),
-            SizedBox(width: 50),
-            VerticalDivider(),
-            SizedBox(width: 20),
+            const SizedBox(width: 50),
+            const VerticalDivider(),
+            const SizedBox(width: 20),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Unit:'),
+                const Text('Unit:'),
                 DropdownButton<LiquidUnit>(
                   value: _waterAmountUnit,
-                  icon: Icon(Icons.arrow_downward_sharp),
+                  icon: const Icon(Icons.arrow_downward_sharp),
                   items: LiquidUnit.values
                       .map(
                         (unit) => DropdownMenuItem(
-                          child: Text(unit.name),
                           value: unit,
+                          child: Text(unit.name),
                         ),
                       )
                       .toList(),
@@ -1543,7 +1574,7 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Text('No fertilizers created yet.'),
+                      const Text('No fertilizers created yet.'),
                       _addFertilizerButton(),
                     ],
                   );
@@ -1557,12 +1588,12 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       DropdownButton<Fertilizer>(
-                        icon: Icon(Icons.arrow_downward_sharp),
+                        icon: const Icon(Icons.arrow_downward_sharp),
                         items: fertilizers.entries
                             .map(
                               (fertilizer) => DropdownMenuItem<Fertilizer>(
-                                child: Text(fertilizer.value.name),
                                 value: fertilizer.value,
+                                child: Text(fertilizer.value.name),
                               ),
                             )
                             .toList(),
@@ -1573,7 +1604,7 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                         },
                         value: _currentFertilizer,
                       ),
-                      VerticalDivider(),
+                      const VerticalDivider(),
                       Row(
                         children: [
                           _addFertilizerButton(),
@@ -1583,7 +1614,7 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                                 await showFertilizerDetailSheet(
                                     context, widget.fertilizerProvider, fertilizers);
                               },
-                              icon: Icon(Icons.list)),
+                              icon: const Icon(Icons.list)),
                         ],
                       ),
                     ],
@@ -1591,7 +1622,7 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                 );
               },
             ),
-            Divider(),
+            const Divider(),
             SizedBox(
               height: 75,
               child: Row(
@@ -1601,7 +1632,7 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                     child: TextFormField(
                       controller: _fertilizerAmountController,
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         suffixIcon: Icon(Icons.eco),
                         labelText: 'Amount',
                         hintText: '50',
@@ -1618,21 +1649,21 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                       },
                     ),
                   ),
-                  SizedBox(width: 50),
-                  VerticalDivider(),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 50),
+                  const VerticalDivider(),
+                  const SizedBox(width: 20),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Unit:'),
+                      const Text('Unit:'),
                       DropdownButton<LiquidUnit>(
                         value: _liquidUnit,
-                        icon: Icon(Icons.arrow_downward_sharp),
+                        icon: const Icon(Icons.arrow_downward_sharp),
                         items: LiquidUnit.values
                             .map(
                               (unit) => DropdownMenuItem(
-                                child: Text(unit.name),
                                 value: unit,
+                                child: Text(unit.name),
                               ),
                             )
                             .toList(),
@@ -1658,8 +1689,8 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
       onPressed: () async {
         await showFertilizerForm(context, widget.fertilizerProvider, null);
       },
-      icon: Icon(Icons.add),
-      label: Text('Add'),
+      icon: const Icon(Icons.add),
+      label: const Text('Add'),
     );
   }
 }
@@ -1689,12 +1720,12 @@ class _PlantPruningFormState extends State<PlantPruningForm> {
     return DropdownButton<PruningType>(
       isExpanded: true,
       value: _pruningType,
-      icon: Icon(Icons.arrow_downward_sharp),
+      icon: const Icon(Icons.arrow_downward_sharp),
       items: PruningType.values
           .map(
             (type) => DropdownMenuItem(
-              child: Text(type.name),
               value: type,
+              child: Text(type.name),
             ),
           )
           .toList(),
@@ -1757,7 +1788,7 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
               child: TextFormField(
                 controller: _harvestAmountController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   suffixIcon: Icon(Icons.eco),
                   labelText: 'Amount',
                   hintText: '50',
@@ -1774,21 +1805,21 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
                 },
               ),
             ),
-            SizedBox(width: 50),
-            VerticalDivider(),
-            SizedBox(width: 20),
+            const SizedBox(width: 50),
+            const VerticalDivider(),
+            const SizedBox(width: 20),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Unit:'),
+                const Text('Unit:'),
                 DropdownButton<WeightUnit>(
                   value: _weightUnit,
-                  icon: Icon(Icons.arrow_downward_sharp),
+                  icon: const Icon(Icons.arrow_downward_sharp),
                   items: WeightUnit.values
                       .map(
                         (unit) => DropdownMenuItem(
-                          child: Text(unit.name),
                           value: unit,
+                          child: Text(unit.name),
                         ),
                       )
                       .toList(),
@@ -1832,12 +1863,12 @@ class _PlantTrainingFormState extends State<PlantTrainingForm> {
     return DropdownButton<TrainingType>(
       isExpanded: true,
       value: _trainingType,
-      icon: Icon(Icons.arrow_downward_sharp),
+      icon: const Icon(Icons.arrow_downward_sharp),
       items: TrainingType.values
           .map(
             (type) => DropdownMenuItem(
-              child: Text(type.name),
               value: type,
+              child: Text(type.name),
             ),
           )
           .toList(),
@@ -1889,10 +1920,11 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
         DropdownButton<PlantMeasurementType>(
           isExpanded: true,
           value: _measurementType,
-          icon: Icon(Icons.arrow_downward_sharp),
+          icon: const Icon(Icons.arrow_downward_sharp),
           items: PlantMeasurementType.values
               .map(
                 (type) => DropdownMenuItem(
+                  value: type,
                   child: Row(
                     children: [
                       Text(
@@ -1902,7 +1934,6 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
                       Text(type.name),
                     ],
                   ),
-                  value: type,
                 ),
               )
               .toList(),
@@ -1912,7 +1943,7 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
             });
           },
         ),
-        Divider(),
+        const Divider(),
         _measurementForm(),
       ],
     );
@@ -1994,7 +2025,7 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
               child: TextFormField(
                 controller: _heightController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Height',
                   hintText: '50',
                 ),
@@ -2006,21 +2037,21 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
                 },
               ),
             ),
-            SizedBox(width: 50),
-            VerticalDivider(),
-            SizedBox(width: 20),
+            const SizedBox(width: 50),
+            const VerticalDivider(),
+            const SizedBox(width: 20),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Unit:'),
+                const Text('Unit:'),
                 DropdownButton<MeasurementUnit>(
                   value: MeasurementUnit.cm,
-                  icon: Icon(Icons.arrow_downward_sharp),
+                  icon: const Icon(Icons.arrow_downward_sharp),
                   items: MeasurementUnit.values
                       .map(
                         (unit) => DropdownMenuItem(
-                          child: Text(unit.name),
                           value: unit,
+                          child: Text(unit.name),
                         ),
                       )
                       .toList(),
@@ -2074,7 +2105,7 @@ class PlantPHMeasurementFormState extends State<PlantPHMeasurementForm> {
       child: TextFormField(
         controller: _phController,
         keyboardType: TextInputType.number,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'pH',
           hintText: '7.0',
         ),
@@ -2128,7 +2159,7 @@ class PlantECMeasurementFormState extends State<PlantECMeasurementForm> {
       child: TextFormField(
         controller: _ecController,
         keyboardType: TextInputType.number,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'EC',
           hintText: '1.5',
         ),
@@ -2182,7 +2213,7 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
       child: TextFormField(
         controller: _ppmController,
         keyboardType: TextInputType.number,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'PPM',
           hintText: '500',
         ),
@@ -2230,7 +2261,9 @@ class PictureFormState extends State<PictureForm> {
             ? SizedBox(
                 child: Row(
                   children: [
-                    widget.allowMultiple ? Text('No images selected') : Text('No image selected'),
+                    widget.allowMultiple
+                        ? const Text('No images selected')
+                        : const Text('No image selected'),
                     _addImageButton(),
                   ],
                 ),
@@ -2254,7 +2287,7 @@ class PictureFormState extends State<PictureForm> {
                                   _images.removeAt(index);
                                 });
                               },
-                              icon: Icon(Icons.clear, color: Colors.red),
+                              icon: const Icon(Icons.clear, color: Colors.red),
                             ),
                             Image.file(
                               image,
@@ -2265,9 +2298,8 @@ class PictureFormState extends State<PictureForm> {
                         );
                       },
                     ),
-                    if (widget.allowMultiple)
-                      VerticalDivider(),
-                      _addImageButton(),
+                    if (widget.allowMultiple) const VerticalDivider(),
+                    _addImageButton(),
                   ],
                 ),
               ),
@@ -2285,8 +2317,8 @@ class PictureFormState extends State<PictureForm> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
-                  leading: Icon(Icons.camera_alt),
-                  title: Text('Take one with camera'),
+                  leading: const Icon(Icons.camera_alt),
+                  title: const Text('Take one with camera'),
                   onTap: () async {
                     final file = await getImage(ImageSource.camera);
                     if (!context.mounted) return;
@@ -2294,8 +2326,8 @@ class PictureFormState extends State<PictureForm> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.photo),
-                  title: Text('Select from gallery'),
+                  leading: const Icon(Icons.photo),
+                  title: const Text('Select from gallery'),
                   onTap: () async {
                     final file = await getImage(ImageSource.gallery);
                     if (!context.mounted) return;
@@ -2313,7 +2345,7 @@ class PictureFormState extends State<PictureForm> {
           _images.add(image);
         });
       },
-      icon: Icon(Icons.add_a_photo),
+      icon: const Icon(Icons.add_a_photo),
     );
   }
 
@@ -2360,12 +2392,13 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
     return Column(
       children: [
         DropdownButton<EnvironmentMeasurementType>(
-          icon: Icon(Icons.arrow_downward_sharp),
+          icon: const Icon(Icons.arrow_downward_sharp),
           value: _measurementType,
           isExpanded: true,
           items: EnvironmentMeasurementType.values
               .map(
                 (type) => DropdownMenuItem<EnvironmentMeasurementType>(
+                  value: type,
                   child: Row(
                     children: [
                       Text(type.icon),
@@ -2373,7 +2406,6 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
                       Text(type.name),
                     ],
                   ),
-                  value: type,
                 ),
               )
               .toList(),
