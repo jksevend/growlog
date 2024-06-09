@@ -37,6 +37,7 @@ Environment _$EnvironmentFromJson(Map<String, dynamic> json) => Environment(
       lightDetails:
           LightDetails.fromJson(json['lightDetails'] as Map<String, dynamic>),
       dimension: Dimension.fromJson(json['dimension'] as Map<String, dynamic>),
+      bannerImagePath: json['bannerImagePath'] as String,
     );
 
 Map<String, dynamic> _$EnvironmentToJson(Environment instance) =>
@@ -47,6 +48,7 @@ Map<String, dynamic> _$EnvironmentToJson(Environment instance) =>
       'type': _$EnvironmentTypeEnumMap[instance.type]!,
       'lightDetails': instance.lightDetails,
       'dimension': instance.dimension,
+      'bannerImagePath': instance.bannerImagePath,
     };
 
 const _$EnvironmentTypeEnumMap = {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
@@ -57,32 +59,50 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
               (environment) {
                 final plantsInEnvironment =
                     plants.values.where((plant) => plant.environmentId == environment.id).toList();
-                return Card(
-                  child: ListTile(
-                    leading: Text(environment.type.icon, style: const TextStyle(fontSize: 22.0)),
-                    title: Text(environment.name),
-                    subtitle: Text(environment.description),
-                    onTap: () async {
-                      debugPrint('Navigate to the environment detail view for ${environment.name}');
-                      await showEnvironmentDetailSheet(
-                          context,
-                          environment,
-                          plantsInEnvironment,
-                          widget.environmentsProvider,
-                          widget.plantsProvider,
-                          widget.actionsProvider);
-                    },
-                    trailing: IconButton(
-                      icon: Icon(Icons.timeline),
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => EnvironmentActionOverview(
-                                  environment: environment,
-                                  actionsProvider: widget.actionsProvider,
-                                )));
-                      },
-                    ),
-                  ),
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Card(
+                      child: Column(
+                        children: [
+                          Image.file(
+                            height: constraints.maxWidth / 2,
+                            width: constraints.maxWidth,
+                            fit: BoxFit.fitWidth,
+                            File(environment.bannerImagePath),
+                          ),
+                          ListTile(
+                            leading: Text(
+                              environment.type.icon,
+                              style: const TextStyle(fontSize: 22.0),
+                            ),
+                            title: Text(environment.name),
+                            subtitle: Text(environment.description),
+                            onTap: () async {
+                              debugPrint(
+                                  'Navigate to the environment detail view for ${environment.name}');
+                              await showEnvironmentDetailSheet(
+                                  context,
+                                  environment,
+                                  plantsInEnvironment,
+                                  widget.environmentsProvider,
+                                  widget.plantsProvider,
+                                  widget.actionsProvider);
+                            },
+                            trailing: IconButton(
+                              icon: Icon(Icons.timeline),
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => EnvironmentActionOverview(
+                                      environment: environment,
+                                      actionsProvider: widget.actionsProvider,
+                                    )));
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                 );
               },
             ).toList(),
@@ -112,6 +132,8 @@ class EnvironmentForm extends StatefulWidget {
 }
 
 class _EnvironmentFormState extends State<EnvironmentForm> {
+  final GlobalKey<PictureFormState> _pictureFormKey = GlobalKey<PictureFormState>();
+
   final _wattFormKey = GlobalKey<FormState>();
   final _dimensionFormKey = GlobalKey<FormState>();
 
@@ -271,6 +293,20 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                     ),
                   ),
                 ),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Text('Banner image'),
+                        PictureForm(
+                          key: _pictureFormKey,
+                          allowMultiple: false,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 if (_selectedEnvironmentType[0])
                   Column(
                     children: [
@@ -417,6 +453,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 length: double.parse(_lengthController.text),
                                 height: double.parse(_heightController.text),
                               ),
+                              bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                                  ? ''
+                                  : _pictureFormKey.currentState!.images.first,
                             );
                           } else {
                             return;
@@ -438,6 +477,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                               length: 0,
                               height: 0,
                             ),
+                            bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                                ? ''
+                                : _pictureFormKey.currentState!.images.first,
                           );
                         }
                         await widget.environmentsProvider
@@ -467,6 +509,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                             length: double.parse(_lengthController.text),
                             height: double.parse(_heightController.text),
                           ),
+                          bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                              ? ''
+                              : _pictureFormKey.currentState!.images.first,
                         );
                         await widget.environmentsProvider
                             .updateEnvironment(environment)

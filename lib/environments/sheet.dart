@@ -25,23 +25,30 @@ Future <void> showEnvironmentDetailSheet(
               leading: Icon(Icons.info),
               title: Text(environment.name),
               subtitle: Text(environment.description),
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.eco, color: Colors.green),
-              title: Text('Plants in this environment'),
-              subtitle: Text(plants.length.toString()),
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.edit, color: Colors.blue),
-                  TextButton(
+                  IconButton(
                     onPressed: () async {
-                      final updatedEnvironment = await Navigator.of(context)
-                          .push(MaterialPageRoute(
+                      final confirmed = await confirmDeletionOfEnvironmentDialog(context,
+                          environment, environmentsProvider, plantsProvider, actionsProvider);
+                      if (confirmed == true) {
+                        if (!context.mounted) {
+                          return;
+                        }
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${environment.name} has been deleted'),
+                          ),
+                        );
+                      }
+                    },
+                    icon: Icon(Icons.delete_forever, color: Colors.red),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      final updatedEnvironment = await Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => EditEnvironmentView(
                               environment: environment,
                               environmentsProvider: environmentsProvider)));
@@ -51,46 +58,16 @@ Future <void> showEnvironmentDetailSheet(
                         }
                       });
                     },
-                    child: Text('Edit environment'),
+                    icon: Icon(Icons.edit, color: Colors.amber),
                   ),
                 ],
               ),
             ),
-            Spacer(),
-            Text('Danger zone', style: TextStyle(color: Colors.red, fontSize: 20)),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Divider(),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.delete_forever,
-                        color: Colors.red,
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          final confirmed = await confirmDeletionOfEnvironmentDialog(
-                              context, environment, environmentsProvider, plantsProvider, actionsProvider);
-                          if (confirmed == true) {
-                            if (!context.mounted) {
-                              return;
-                            }
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${environment.name} has been deleted'),
-                              ),
-                            );
-                          }
-                        },
-                        child: Text('Delete environment'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.eco, color: Colors.green),
+              title: Text('Plants in this environment'),
+              subtitle: Text(plants.length.toString()),
             ),
           ],
         );

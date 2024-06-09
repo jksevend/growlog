@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
@@ -55,38 +57,53 @@ class PlantOverview extends StatelessWidget {
                   final environment = environments[plant.environmentId];
                   final plantsInEnvironment =
                       plants.values.where((p) => p.environmentId == environment?.id).toList();
-                  return Card(
-                    child: ListTile(
-                      leading: Text(
-                        plant.lifeCycleState.icon,
-                        style: const TextStyle(fontSize: 22.0),
-                      ),
-                      title: Text(plant.name),
-                      subtitle: Text(plant.description),
-                      onTap: () async {
-                        debugPrint('Navigate to the plant detail view for ${plant.name}');
-                        await showPlantDetailSheet(
-                            context,
-                            plant,
-                            plantsInEnvironment,
-                            environment,
-                            plantsProvider,
-                            actionsProvider,
-                            environmentsProvider,
-                            bottomNavigationKey);
-                      },
-                      trailing: IconButton(
-                        icon: Icon(Icons.timeline),
-                        onPressed: () {
-                          debugPrint('Navigate to the plant timeline view for ${plant.name}');
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => PlantActionOverview(
-                                    plant: plant,
-                                    actionsProvider: actionsProvider,
-                                  )));
-                        },
-                      ),
-                    ),
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Card(
+                        child: Column(
+                          children: [
+                            Image.file(
+                              File(plant.bannerImagePath),
+                              width: constraints.maxWidth,
+                              height: constraints.maxWidth / 2,
+                              fit: BoxFit.cover,
+                            ),
+                            ListTile(
+                              leading: Text(
+                                plant.lifeCycleState.icon,
+                                style: const TextStyle(fontSize: 22.0),
+                              ),
+                              title: Text(plant.name),
+                              subtitle: Text(plant.description),
+                              onTap: () async {
+                                debugPrint('Navigate to the plant detail view for ${plant.name}');
+                                await showPlantDetailSheet(
+                                    context,
+                                    plant,
+                                    plantsInEnvironment,
+                                    environment,
+                                    plantsProvider,
+                                    actionsProvider,
+                                    environmentsProvider,
+                                    bottomNavigationKey);
+                              },
+                              trailing: IconButton(
+                                icon: Icon(Icons.timeline),
+                                onPressed: () {
+                                  debugPrint(
+                                      'Navigate to the plant timeline view for ${plant.name}');
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => PlantActionOverview(
+                                            plant: plant,
+                                            actionsProvider: actionsProvider,
+                                          )));
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   );
                 },
               ).toList(),
@@ -117,6 +134,7 @@ class PlantForm extends StatefulWidget {
 }
 
 class _PlantFormState extends State<PlantForm> {
+  final GlobalKey<PictureFormState> _pictureFormKey = GlobalKey<PictureFormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late List<bool> _selectedLifeCycleState;
@@ -298,6 +316,23 @@ class _PlantFormState extends State<PlantForm> {
                     ),
                   ),
                 ),
+                SizedBox(
+                  width: double.infinity,
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Text('Banner image'),
+                          PictureForm(
+                            key: _pictureFormKey,
+                            allowMultiple: false,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
                 // Submit button
                 SizedBox(height: 16.0),
                 OutlinedButton.icon(
@@ -320,6 +355,7 @@ class _PlantFormState extends State<PlantForm> {
                             environmentId: _currentEnvironment!.id,
                             medium: _selectedMedium,
                             lifeCycleState: _lifeCycleState,
+                            bannerImagePath: _pictureFormKey.currentState!.images.first,
                           );
                           await widget.plantsProvider
                               .updatePlant(plant)
@@ -332,6 +368,7 @@ class _PlantFormState extends State<PlantForm> {
                             environmentId: _currentEnvironment!.id,
                             lifeCycleState: _lifeCycleState,
                             medium: _selectedMedium,
+                            bannerImagePath: _pictureFormKey.currentState!.images.first,
                           );
                           await widget.plantsProvider
                               .addPlant(plant)

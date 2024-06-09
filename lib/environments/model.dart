@@ -71,6 +71,7 @@ class Environment {
   final EnvironmentType type;
   final LightDetails lightDetails;
   final Dimension dimension;
+  final String bannerImagePath;
 
   Environment({
     required this.id,
@@ -79,6 +80,7 @@ class Environment {
     required this.type,
     required this.lightDetails,
     required this.dimension,
+    required this.bannerImagePath,
   });
 
   factory Environment.fromJson(Map<String, dynamic> json) => _$EnvironmentFromJson(json);
@@ -91,6 +93,7 @@ class Environment {
     required EnvironmentType type,
     required LightDetails lightDetails,
     required Dimension dimension,
+    required String bannerImagePath,
   }) {
     return Environment(
       id: id,
@@ -98,6 +101,7 @@ class Environment {
       description: description,
       type: type,
       lightDetails: lightDetails,
+      bannerImagePath: bannerImagePath,
       dimension: dimension,
     );
   }
@@ -110,6 +114,25 @@ enum LightType {
   hps,
   mh,
   lec,
+}
+
+extension LightTypeExtension on LightType {
+  String get name {
+    switch (this) {
+      case LightType.sunlight:
+        return 'Sunlight';
+      case LightType.cfl:
+        return 'CFL';
+      case LightType.led:
+        return 'LED';
+      case LightType.hps:
+        return 'HPS';
+      case LightType.mh:
+        return 'MH';
+      case LightType.lec:
+        return 'LEC';
+    }
+  }
 }
 
 @JsonSerializable()

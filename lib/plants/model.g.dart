@@ -24,6 +24,7 @@ Plant _$PlantFromJson(Map<String, dynamic> json) => Plant(
           $enumDecode(_$LifeCycleStateEnumMap, json['lifeCycleState']),
       medium: $enumDecode(_$MediumEnumMap, json['medium']),
       environmentId: json['environmentId'] as String,
+      bannerImagePath: json['bannerImagePath'] as String,
     );
 
 Map<String, dynamic> _$PlantToJson(Plant instance) => <String, dynamic>{
@@ -32,6 +33,7 @@ Map<String, dynamic> _$PlantToJson(Plant instance) => <String, dynamic>{
       'description': instance.description,
       'lifeCycleState': _$LifeCycleStateEnumMap[instance.lifeCycleState]!,
       'medium': _$MediumEnumMap[instance.medium]!,
+      'bannerImagePath': instance.bannerImagePath,
       'environmentId': instance.environmentId,
     };
 

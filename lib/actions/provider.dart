@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-
 import 'package:weedy/actions/model.dart' as weedy;
 import 'package:weedy/common/filestore.dart';
 
@@ -14,6 +13,7 @@ class ActionsProvider with ChangeNotifier {
   final BehaviorSubject<List<weedy.EnvironmentAction>> _environmentActions = BehaviorSubject();
 
   Stream<List<weedy.PlantAction>> get plantActions => _plantActions.stream;
+
   Stream<List<weedy.EnvironmentAction>> get environmentActions => _environmentActions.stream;
 
   late weedy.Actions _actions;
@@ -64,7 +64,20 @@ class ActionsProvider with ChangeNotifier {
 
   Future<void> removeActionsForEnvironment(String environmentId) async {
     final environmentActions = await _environmentActions.first;
-    final actions = environmentActions.where((action) => action.environmentId != environmentId).toList();
+    final actions =
+        environmentActions.where((action) => action.environmentId != environmentId).toList();
     await setEnvironmentActions(actions);
+  }
+
+  Future<void> deletePlantAction(weedy.PlantAction plantAction) async {
+    final plantActions = await _plantActions.first;
+    plantActions.remove(plantAction);
+    await setPlantActions(plantActions);
+  }
+
+  Future<void> deleteEnvironmentAction(weedy.EnvironmentAction environmentAction) async {
+    final environmentActions = await _environmentActions.first;
+    environmentActions.remove(environmentAction);
+    await setEnvironmentActions(environmentActions);
   }
 }

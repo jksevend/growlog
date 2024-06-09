@@ -92,6 +92,7 @@ class Plant {
   final String description;
   final LifeCycleState lifeCycleState;
   final Medium medium;
+  final String bannerImagePath;
 
   String environmentId;
 
@@ -102,6 +103,7 @@ class Plant {
     required this.lifeCycleState,
     required this.medium,
     required this.environmentId,
+    required this.bannerImagePath,
   });
 
   factory Plant.fromJson(Map<String, dynamic> json) => _$PlantFromJson(json);

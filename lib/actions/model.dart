@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -12,31 +11,14 @@ enum IntervalUnit {
 }
 
 @JsonSerializable()
-class Recurring {
-  final int interval;
-  final IntervalUnit unit;
-
-  Recurring({
-    required this.interval,
-    required this.unit,
-  });
-
-  factory Recurring.fromJson(Map<String, dynamic> json) => _$RecurringFromJson(json);
-
-  Map<String, dynamic> toJson() => _$RecurringToJson(this);
-}
-
-@JsonSerializable()
 class Action {
   final String id;
   final String description;
-  final Recurring? recurring;
   final DateTime createdAt;
 
   Action({
     required this.id,
     required this.description,
-    required this.recurring,
     required this.createdAt,
   });
 
@@ -45,6 +27,12 @@ class Action {
   factory Action.fromJson(Map<String, dynamic> json) => _$ActionFromJson(json);
 
   Map<String, dynamic> toJson() => _$ActionToJson(this);
+
+  bool isToday() {
+    return createdAt.day == DateTime.now().day &&
+        createdAt.month == DateTime.now().month &&
+        createdAt.year == DateTime.now().year;
+  }
 }
 
 enum EnvironmentMeasurementType {
@@ -84,6 +72,7 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
 
 enum EnvironmentActionType {
   measurement,
+  picture,
   other,
 }
 
@@ -92,6 +81,8 @@ extension EnvironmentActionTypeExtension on EnvironmentActionType {
     switch (this) {
       case EnvironmentActionType.measurement:
         return 'Measurement';
+      case EnvironmentActionType.picture:
+        return 'Picture';
       case EnvironmentActionType.other:
         return 'Other';
     }
@@ -101,6 +92,8 @@ extension EnvironmentActionTypeExtension on EnvironmentActionType {
     switch (this) {
       case EnvironmentActionType.measurement:
         return '📐';
+      case EnvironmentActionType.picture:
+        return '📸';
       case EnvironmentActionType.other:
         return '❓';
     }
@@ -115,7 +108,6 @@ class EnvironmentAction extends Action {
   EnvironmentAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required this.environmentId,
     required this.type,
@@ -135,7 +127,6 @@ class EnvironmentMeasurementAction extends EnvironmentAction {
   EnvironmentMeasurementAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.environmentId,
     required super.type,
@@ -150,11 +141,30 @@ class EnvironmentMeasurementAction extends EnvironmentAction {
 }
 
 @JsonSerializable()
+class EnvironmentPictureAction extends EnvironmentAction {
+  final List<String> images;
+
+  EnvironmentPictureAction({
+    required super.id,
+    required super.description,
+    required super.createdAt,
+    required super.environmentId,
+    required super.type,
+    required this.images,
+  });
+
+  factory EnvironmentPictureAction.fromJson(Map<String, dynamic> json) =>
+      _$EnvironmentPictureActionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$EnvironmentPictureActionToJson(this);
+}
+
+@JsonSerializable()
 class EnvironmentOtherAction extends EnvironmentAction {
   EnvironmentOtherAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.environmentId,
     required super.type,
@@ -223,6 +233,7 @@ enum PlantActionType {
   replanting,
   training,
   measuring,
+  picture,
   death,
   other,
 }
@@ -244,6 +255,8 @@ extension PlantActionTypeExtension on PlantActionType {
         return 'Training';
       case PlantActionType.measuring:
         return 'Measuring';
+      case PlantActionType.picture:
+        return 'Picture';
       case PlantActionType.death:
         return 'Death';
       case PlantActionType.other:
@@ -267,6 +280,8 @@ extension PlantActionTypeExtension on PlantActionType {
         return '🏋️‍♂️';
       case PlantActionType.measuring:
         return '📐';
+      case PlantActionType.picture:
+        return '📸';
       case PlantActionType.death:
         return '🪦';
       case PlantActionType.other:
@@ -283,7 +298,6 @@ class PlantAction extends Action {
   PlantAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required this.plantId,
     required this.type,
@@ -317,7 +331,6 @@ class PlantWateringAction extends PlantAction {
   PlantWateringAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -354,7 +367,6 @@ class PlantFertilizingAction extends PlantAction {
   PlantFertilizingAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -381,7 +393,6 @@ class PlantPruningAction extends PlantAction {
   PlantPruningAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -433,7 +444,6 @@ class PlantHarvestingAction extends PlantAction {
   PlantHarvestingAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -452,7 +462,6 @@ class PlantReplantingAction extends PlantAction {
   PlantReplantingAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -477,7 +486,6 @@ class PlantTrainingAction extends PlantAction {
   PlantTrainingAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -533,7 +541,6 @@ class PlantMeasuringAction extends PlantAction {
   PlantMeasuringAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -552,7 +559,6 @@ class PlantDeathAction extends PlantAction {
   PlantDeathAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,
@@ -565,11 +571,30 @@ class PlantDeathAction extends PlantAction {
 }
 
 @JsonSerializable()
+class PlantPictureAction extends PlantAction {
+  final List<String> images;
+
+  PlantPictureAction({
+    required super.id,
+    required super.description,
+    required super.createdAt,
+    required super.plantId,
+    required super.type,
+    required this.images,
+  });
+
+  factory PlantPictureAction.fromJson(Map<String, dynamic> json) =>
+      _$PlantPictureActionFromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() => _$PlantPictureActionToJson(this);
+}
+
+@JsonSerializable()
 class PlantOtherAction extends PlantAction {
   PlantOtherAction({
     required super.id,
     required super.description,
-    required super.recurring,
     required super.createdAt,
     required super.plantId,
     required super.type,

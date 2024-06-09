@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/dialog.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
@@ -200,6 +203,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
   final GlobalKey<_PlantHarvestingFormState> _plantHarvestingFormKey = GlobalKey();
   final GlobalKey<_PlantTrainingFormState> _plantTrainingFormKey = GlobalKey();
   final GlobalKey<_PlantMeasurementFormState> _plantMeasuringFormKey = GlobalKey();
+  final GlobalKey<PictureFormState> _plantPictureFormState = GlobalKey();
+  final GlobalKey<PictureFormState> _environmentPictureFormState = GlobalKey();
 
   final GlobalKey<PlantHeightMeasurementFormState> _plantHeightMeasurementWidgetKey = GlobalKey();
   final GlobalKey<PlantPHMeasurementFormState> _plantPHMeasurementWidgetKey = GlobalKey();
@@ -207,12 +212,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
   final GlobalKey<PlantPPMMeasurementFormState> _plantPPMMeasurementWidgetKey = GlobalKey();
   final GlobalKey<_EnvironmentMeasurementFormState> _environmentMeasurementWidgetKey = GlobalKey();
 
-  final GlobalKey<_RecurringDetailsFormState> _recurringDetailsFormKey = GlobalKey();
-  final GlobalKey<FormState> _plantRecurringDetailsFormKey = GlobalKey();
-  final GlobalKey<FormState> _environmentRecurringDetailsFormKey = GlobalKey();
-
   Plant? _currentPlant;
-  late PlantActionType _currentActionType = PlantActionType.watering;
+  late PlantActionType _currentPlantActionType = PlantActionType.watering;
   late EnvironmentActionType _currentEnvironmentActionType = EnvironmentActionType.measurement;
   late TextEditingController _plantActionDescriptionTextController = TextEditingController();
   late TextEditingController _environmentActionDescriptionTextController = TextEditingController();
@@ -392,7 +393,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                       children: [
                         DropdownButton<PlantActionType>(
                           icon: Icon(Icons.arrow_downward_sharp),
-                          value: _currentActionType,
+                          value: _currentPlantActionType,
                           isExpanded: true,
                           items: PlantActionType.values
                               .map(
@@ -410,7 +411,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                               .toList(),
                           onChanged: (PlantActionType? value) {
                             setState(() {
-                              _currentActionType = value!;
+                              _currentPlantActionType = value!;
                             });
                           },
                         ),
@@ -419,12 +420,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     _plantActionForm(),
                   ],
                 ),
-              ),
-            ),
-            Card(
-              child: RecurringDetailsForm(
-                key: _recurringDetailsFormKey,
-                formKey: _plantRecurringDetailsFormKey,
               ),
             ),
             Align(
@@ -456,16 +451,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 
                   final currentPlant = _currentPlant!;
                   final PlantAction action;
-
-                  final isValid = _recurringDetailsFormKey.currentState!.isValid;
-                  if (!isValid) {
-                    return;
-                  }
-                  final recurring = _recurringDetailsFormKey.currentState!.recurringDetails;
-
-                  debugPrint('Recurring: ${recurring?.toJson()}');
-
-                  if (_currentActionType == PlantActionType.watering) {
+                  if (_currentPlantActionType == PlantActionType.watering) {
                     final isValid = _plantWateringWidgetKey.currentState!.isValid;
                     if (!isValid) {
                       return;
@@ -475,9 +461,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
                       plantId: currentPlant.id,
-                      type: _currentActionType,
+                      type: _currentPlantActionType,
                       createdAt: _plantActionDate,
-                      recurring: recurring,
                       amount: watering,
                     );
                     await widget.actionsProvider
@@ -485,32 +470,30 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                         .whenComplete(() => Navigator.of(context).pop());
                     return;
                   }
-                  if (_currentActionType == PlantActionType.fertilizing) {
+                  if (_currentPlantActionType == PlantActionType.fertilizing) {
                     final fertilization = _plantFertilizingFormKey.currentState!.fertilization;
                     action = PlantFertilizingAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
                       plantId: currentPlant.id,
-                      type: _currentActionType,
+                      type: _currentPlantActionType,
                       createdAt: _plantActionDate,
                       fertilization: fertilization,
-                      recurring: recurring,
                     );
                     await widget.actionsProvider
                         .addPlantAction(action)
                         .whenComplete(() => Navigator.of(context).pop());
                     return;
                   }
-                  if (_currentActionType == PlantActionType.pruning) {
+                  if (_currentPlantActionType == PlantActionType.pruning) {
                     final pruning = _plantPruningFormKey.currentState!.pruning;
                     action = PlantPruningAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
                       plantId: currentPlant.id,
-                      type: _currentActionType,
+                      type: _currentPlantActionType,
                       createdAt: _plantActionDate,
                       pruningType: pruning,
-                      recurring: recurring,
                     );
                     await widget.actionsProvider
                         .addPlantAction(action)
@@ -518,15 +501,14 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     return;
                   }
 
-                  if (_currentActionType == PlantActionType.harvesting) {
+                  if (_currentPlantActionType == PlantActionType.harvesting) {
                     final harvesting = _plantHarvestingFormKey.currentState!.harvest;
                     action = PlantHarvestingAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
                       plantId: currentPlant.id,
-                      type: _currentActionType,
+                      type: _currentPlantActionType,
                       createdAt: _plantActionDate,
-                      recurring: recurring,
                       amount: harvesting,
                     );
                     await widget.actionsProvider
@@ -535,15 +517,14 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     return;
                   }
 
-                  if (_currentActionType == PlantActionType.training) {
+                  if (_currentPlantActionType == PlantActionType.training) {
                     final training = _plantTrainingFormKey.currentState!.training;
                     action = PlantTrainingAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
                       plantId: currentPlant.id,
-                      type: _currentActionType,
+                      type: _currentPlantActionType,
                       createdAt: _plantActionDate,
-                      recurring: recurring,
                       trainingType: training,
                     );
                     await widget.actionsProvider
@@ -552,7 +533,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     return;
                   }
 
-                  if (_currentActionType == PlantActionType.measuring) {
+                  if (_currentPlantActionType == PlantActionType.measuring) {
                     final currentPlantMeasurementType =
                         _plantMeasuringFormKey.currentState!.measurementType;
                     if (currentPlantMeasurementType == PlantMeasurementType.height) {
@@ -565,9 +546,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                         id: const Uuid().v4().toString(),
                         description: _plantActionDescriptionTextController.text,
                         plantId: currentPlant.id,
-                        type: _currentActionType,
+                        type: _currentPlantActionType,
                         createdAt: _plantActionDate,
-                        recurring: recurring,
                         measurement: PlantMeasurement(
                           type: currentPlantMeasurementType,
                           measurement: height.toJson(),
@@ -587,9 +567,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                         id: const Uuid().v4().toString(),
                         description: _plantActionDescriptionTextController.text,
                         plantId: currentPlant.id,
-                        type: _currentActionType,
+                        type: _currentPlantActionType,
                         createdAt: _plantActionDate,
-                        recurring: recurring,
                         measurement: PlantMeasurement(
                           type: currentPlantMeasurementType,
                           measurement: Map<String, dynamic>.from({'ph': ph}),
@@ -609,9 +588,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                         id: const Uuid().v4().toString(),
                         description: _plantActionDescriptionTextController.text,
                         plantId: currentPlant.id,
-                        type: _currentActionType,
+                        type: _currentPlantActionType,
                         createdAt: _plantActionDate,
-                        recurring: recurring,
                         measurement: PlantMeasurement(
                           type: currentPlantMeasurementType,
                           measurement: Map<String, dynamic>.from({'ec': ec}),
@@ -631,9 +609,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                         id: const Uuid().v4().toString(),
                         description: _plantActionDescriptionTextController.text,
                         plantId: currentPlant.id,
-                        type: _currentActionType,
+                        type: _currentPlantActionType,
                         createdAt: _plantActionDate,
-                        recurring: recurring,
                         measurement: PlantMeasurement(
                           type: currentPlantMeasurementType,
                           measurement: Map<String, dynamic>.from({'ppm': ppm}),
@@ -649,13 +626,27 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     }
                   }
 
-                  if (_currentActionType == PlantActionType.replanting) {
+                  if (_currentPlantActionType == PlantActionType.picture) {
+                    final action = PlantPictureAction(
+                      id: const Uuid().v4().toString(),
+                      description: _plantActionDescriptionTextController.text,
+                      plantId: currentPlant.id,
+                      type: _currentPlantActionType,
+                      createdAt: _plantActionDate,
+                      images: _plantPictureFormState.currentState!.images,
+                    );
+                    await widget.actionsProvider
+                        .addPlantAction(action)
+                        .whenComplete(() => Navigator.of(context).pop());
+                    return;
+                  }
+
+                  if (_currentPlantActionType == PlantActionType.replanting) {
                     action = PlantAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
                       plantId: currentPlant.id,
-                      type: _currentActionType,
-                      recurring: recurring,
+                      type: _currentPlantActionType,
                       createdAt: _plantActionDate,
                     );
                     await widget.actionsProvider
@@ -664,13 +655,12 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     return;
                   }
 
-                  if (_currentActionType == PlantActionType.death) {
+                  if (_currentPlantActionType == PlantActionType.death) {
                     action = PlantAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
                       plantId: currentPlant.id,
-                      type: _currentActionType,
-                      recurring: recurring,
+                      type: _currentPlantActionType,
                       createdAt: _plantActionDate,
                     );
                     await widget.actionsProvider
@@ -679,13 +669,12 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     return;
                   }
 
-                  if (_currentActionType == PlantActionType.other) {
+                  if (_currentPlantActionType == PlantActionType.other) {
                     action = PlantAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
                       plantId: currentPlant.id,
-                      type: _currentActionType,
-                      recurring: recurring,
+                      type: _currentPlantActionType,
                       createdAt: _plantActionDate,
                     );
                     await widget.actionsProvider
@@ -694,7 +683,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     return;
                   }
 
-                  throw Exception('Unknown action type: $_currentActionType');
+                  throw Exception('Unknown action type: $_currentPlantActionType');
                 },
                 label: Text('Save'),
                 icon: Icon(Icons.save),
@@ -796,7 +785,9 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                           (action) => DropdownMenuItem<EnvironmentActionType>(
                             child: Row(
                               children: [
-                               Text( action.icon,),
+                                Text(
+                                  action.icon,
+                                ),
                                 const SizedBox(width: 10),
                                 Text(action.name),
                               ],
@@ -817,12 +808,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
             ),
           ),
           Divider(),
-          Card(
-            child: RecurringDetailsForm(
-              key: _recurringDetailsFormKey,
-              formKey: _environmentRecurringDetailsFormKey,
-            ),
-          ),
           Align(
             alignment: Alignment.centerRight,
             child: OutlinedButton.icon(
@@ -882,21 +867,12 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     throw Exception(
                         'Unknown environment measurement type: $currentEnvironmentMeasurementType');
                   }
-
-                  final isValid = _recurringDetailsFormKey.currentState!.isValid;
-                  if (!isValid) {
-                    return;
-                  }
-
-                  final recurring = _recurringDetailsFormKey.currentState!.recurringDetails;
-
                   final action = EnvironmentMeasurementAction(
                     id: const Uuid().v4().toString(),
                     description: _environmentActionDescriptionTextController.text,
                     environmentId: currentEnvironment.id,
                     type: _currentEnvironmentActionType,
                     measurement: measurement,
-                    recurring: recurring,
                     createdAt: _environmentActionDate,
                   );
                   await widget.actionsProvider
@@ -905,18 +881,25 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                   return;
                 }
 
-                final isValid = _recurringDetailsFormKey.currentState!.isValid;
-                if (!isValid) {
+                if (_currentEnvironmentActionType == EnvironmentActionType.picture) {
+                  final action = EnvironmentPictureAction(
+                    id: const Uuid().v4().toString(),
+                    description: _environmentActionDescriptionTextController.text,
+                    environmentId: currentEnvironment.id,
+                    type: _currentEnvironmentActionType,
+                    createdAt: _environmentActionDate,
+                    images: _environmentPictureFormState.currentState!.images,
+                  );
+                  await widget.actionsProvider
+                      .addEnvironmentAction(action)
+                      .whenComplete(() => Navigator.of(context).pop());
                   return;
                 }
-
-                final recurring = _recurringDetailsFormKey.currentState!.recurringDetails;
                 final action = EnvironmentOtherAction(
                   id: const Uuid().v4().toString(),
                   description: _environmentActionDescriptionTextController.text,
                   environmentId: currentEnvironment.id,
                   type: _currentEnvironmentActionType,
-                  recurring: recurring,
                   createdAt: _environmentActionDate,
                 );
                 await widget.actionsProvider
@@ -946,7 +929,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
   }
 
   Widget _plantActionForm() {
-    switch (_currentActionType) {
+    switch (_currentPlantActionType) {
       case PlantActionType.watering:
         return PlantWateringForm(
           key: _plantWateringWidgetKey,
@@ -978,6 +961,11 @@ class _ChooseActionViewState extends State<ChooseActionView> {
           plantECMeasurementFormKey: _plantECMeasurementWidgetKey,
           plantPPMMeasurementFormKey: _plantPPMMeasurementWidgetKey,
         );
+      case PlantActionType.picture:
+        return PictureForm(
+          key: _plantPictureFormState,
+          allowMultiple: true,
+        );
       case PlantActionType.death:
       case PlantActionType.other:
         return Container();
@@ -994,141 +982,14 @@ class _ChooseActionViewState extends State<ChooseActionView> {
           environmentLightDistanceFormKey: _environmentLightDistanceFormKey,
           environmentCO2FormKey: _environmentCO2FormKey,
         );
+      case EnvironmentActionType.picture:
+        return PictureForm(
+          key: _environmentPictureFormState,
+          allowMultiple: true,
+        );
       case EnvironmentActionType.other:
         return Container();
     }
-  }
-}
-
-class RecurringDetailsForm extends StatefulWidget {
-  final GlobalKey<FormState> formKey;
-
-  const RecurringDetailsForm({super.key, required this.formKey});
-
-  @override
-  State<RecurringDetailsForm> createState() => _RecurringDetailsFormState();
-}
-
-class _RecurringDetailsFormState extends State<RecurringDetailsForm> {
-  late bool _useRecurring;
-  late TextEditingController _intervalController;
-  late IntervalUnit _interval;
-
-  @override
-  void initState() {
-    super.initState();
-    _intervalController = TextEditingController(text: '1');
-    _interval = IntervalUnit.day;
-    _useRecurring = false;
-  }
-
-  @override
-  void dispose() {
-    _intervalController.dispose();
-    super.dispose();
-  }
-
-  Recurring? get recurringDetails {
-    return _useRecurring
-        ? Recurring(
-            interval: int.parse(_intervalController.text),
-            unit: _interval,
-          )
-        : null;
-  }
-
-  bool get isValid {
-    if (!_useRecurring) {
-      return true;
-    }
-    return widget.formKey.currentState!.validate();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: widget.formKey,
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Checkbox(
-                value: _useRecurring,
-                onChanged: (bool? value) {
-                  setState(() {
-                    _useRecurring = value!;
-                  });
-                },
-              ),
-              Text('Use recurring')
-            ],
-          ),
-          Visibility(
-            visible: _useRecurring,
-            child: Column(
-              children: [
-                Divider(),
-                SizedBox(
-                  height: 100,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            controller: _intervalController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: 'Interval',
-                              hintText: '1',
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter an interval';
-                              }
-                              if (int.tryParse(value) == null) {
-                                return 'Please enter a valid number';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        SizedBox(width: 50),
-                        VerticalDivider(),
-                        SizedBox(width: 20),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text('Unit:'),
-                            DropdownButton<IntervalUnit>(
-                              value: _interval,
-                              icon: Icon(Icons.arrow_downward_sharp),
-                              items: IntervalUnit.values
-                                  .map(
-                                    (unit) => DropdownMenuItem(
-                                      child: Text(unit.name),
-                                      value: unit,
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (IntervalUnit? value) {
-                                setState(() {
-                                  _interval = value!;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -1848,7 +1709,9 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
                 (type) => DropdownMenuItem(
                   child: Row(
                     children: [
-                      Text(type.icon,),
+                      Text(
+                        type.icon,
+                      ),
                       const SizedBox(width: 10),
                       Text(type.name),
                     ],
@@ -2145,6 +2008,133 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
         },
       ),
     );
+  }
+}
+
+class PictureForm extends StatefulWidget {
+  final bool allowMultiple;
+  const PictureForm({
+    super.key,
+    required this.allowMultiple,
+  });
+
+  @override
+  State<PictureForm> createState() => PictureFormState();
+}
+
+class PictureFormState extends State<PictureForm> {
+  final ImagePicker _picker = ImagePicker();
+  late List<File> _images;
+
+  @override
+  void initState() {
+    super.initState();
+    _images = [];
+  }
+
+  List<String> get images {
+    return _images.isEmpty ? [] : _images.map((e) => e.path).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _images.isEmpty
+            ? SizedBox(
+                child: Row(
+                  children: [
+                    widget.allowMultiple ? Text('No images selected') : Text('No image selected'),
+                    _addImageButton(),
+                  ],
+                ),
+              )
+            : SizedBox(
+                height: 125,
+                child: Row(
+                  children: [
+                    ListView.separated(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _images.length,
+                      separatorBuilder: (context, index) => const VerticalDivider(),
+                      itemBuilder: (context, index) {
+                        final image = _images[index];
+                        return Column(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  _images.removeAt(index);
+                                });
+                              },
+                              icon: Icon(Icons.clear, color: Colors.red),
+                            ),
+                            Image.file(
+                              image,
+                              width: 75,
+                              height: 75,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    if (widget.allowMultiple)
+                      VerticalDivider(),
+                      _addImageButton(),
+                  ],
+                ),
+              ),
+      ],
+    );
+  }
+
+  Widget _addImageButton() {
+    return IconButton(
+      onPressed: () async {
+        final File? image = await showModalBottomSheet(
+          context: context,
+          builder: (context) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: Icon(Icons.camera_alt),
+                  title: Text('Take one with camera'),
+                  onTap: () async {
+                    final file = await getImage(ImageSource.camera);
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop(file);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.photo),
+                  title: Text('Select from gallery'),
+                  onTap: () async {
+                    final file = await getImage(ImageSource.gallery);
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop(file);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+
+        if (image == null) return;
+
+        setState(() {
+          _images.add(image);
+        });
+      },
+      icon: Icon(Icons.add_a_photo),
+    );
+  }
+
+  Future<File> getImage(final ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile == null) throw Exception('No image picked');
+    return File(pickedFile.path);
   }
 }
 

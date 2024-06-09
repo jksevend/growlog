@@ -70,7 +70,9 @@ class _HomeViewState extends State<HomeView> {
               shrinkWrap: true,
               children: [
                 Card(
-                  child: WeekAndMonthView(),
+                  child: WeekAndMonthView(
+                    actionsProvider: widget.actionsProvider,
+                  ),
                 ),
                 Card(
                   child: Column(
@@ -122,6 +124,7 @@ class _HomeViewState extends State<HomeView> {
                                               (action) => PlantActionLogHomeWidget(
                                                 plant: plants[action.plantId]!,
                                                 action: action,
+                                                actionsProvider: widget.actionsProvider,
                                               ),
                                             )
                                             .toList(),
@@ -168,6 +171,7 @@ class _HomeViewState extends State<HomeView> {
                                               (action) => EnvironmentActionLogHomeWidget(
                                                 environment: environments[action.environmentId]!,
                                                 action: action,
+                                                actionsProvider: widget.actionsProvider,
                                               ),
                                             )
                                             .toList(),
