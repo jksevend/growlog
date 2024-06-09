@@ -4,7 +4,6 @@ part 'model.g.dart';
 
 @JsonSerializable()
 class Settings {
-
   Settings();
 
   factory Settings.fromJson(Map<String, dynamic> json) => _$SettingsFromJson(json);

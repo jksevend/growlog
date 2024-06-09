@@ -16,6 +16,20 @@ import 'statistics/view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Migrate settings
+  // Example:
+  // await migrateFileStore(
+  //   name: 'settings.json',
+  //   migration:
+  //     (jsonContent) {
+  //       migrateField<bool>(
+  //         jsonContent: jsonContent,
+  //         field: 'showAdvertisements',
+  //         defaultValue: true,
+  //       );
+  //     },
+  // );
+
   runApp(const WeedyApp());
 }
 

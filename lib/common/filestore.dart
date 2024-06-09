@@ -27,3 +27,31 @@ Future<void> writeJsonFile({
   final file = File('${directory.path}/$name');
   await file.writeAsString(json.encode(content));
 }
+
+void migrateField<T>({
+  required Map<String, dynamic> jsonContent,
+  required String field,
+  required T defaultValue,
+}) {
+  if (!jsonContent.containsKey(field)) {
+    jsonContent[field] = defaultValue;
+  }
+}
+
+Future<void> migrateFileStore({
+  required String name,
+  required Function(Map<String, dynamic>) migration,
+}) async {
+  final directory = await getApplicationDocumentsDirectory();
+  final file = File('${directory.path}/$name');
+
+  if (await file.exists()) {
+    final content = await file.readAsString();
+    final jsonContent = json.decode(content);
+
+    // Migrations
+    migration(jsonContent);
+
+    await file.writeAsString(json.encode(jsonContent));
+  }
+}
