@@ -17,7 +17,6 @@ import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 
-/// An overview of the actions for a specific [Environment].
 class EnvironmentActionOverview extends StatelessWidget {
   final Environment environment;
   final ActionsProvider actionsProvider;
@@ -52,8 +51,10 @@ class EnvironmentActionOverview extends StatelessWidget {
               child: Text('No environment actions created yet.'),
             );
           }
+
           final specificEnvironmentActions =
               environmentActions.where((action) => action.environmentId == environment.id).toList();
+
           if (specificEnvironmentActions.isEmpty) {
             return const Center(
               child: Text('No actions for this environment.'),
@@ -107,7 +108,6 @@ class EnvironmentActionOverview extends StatelessWidget {
   }
 }
 
-/// An overview of the actions for a specific [Plant].
 class PlantActionOverview extends StatefulWidget {
   final Plant plant;
   final ActionsProvider actionsProvider;
@@ -147,8 +147,10 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
               child: Text('No plant actions created yet.'),
             );
           }
+
           final specificPlantActions =
               plantActions.where((action) => action.plantId == widget.plant.id).toList();
+
           if (specificPlantActions.isEmpty) {
             return const Center(
               child: Text('No actions for this plant.'),
@@ -202,10 +204,6 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
   }
 }
 
-/// A view to choose an action for a plant or environment.
-///
-/// The user can choose between a plant or environment action and fill out
-/// the necessary information to create the action.
 class ChooseActionView extends StatefulWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
@@ -225,65 +223,38 @@ class ChooseActionView extends StatefulWidget {
 }
 
 class _ChooseActionViewState extends State<ChooseActionView> {
-  /// A list of choices for the action type. Index 0 is for plant actions
-  /// and index 1 is for environment actions.
-  final List<bool> _actionTypeChoices = [true, false];
+  final List<bool> _choices = [true, false];
 
-  /// Environment action widget keys
-
-  final GlobalKey<EnvironmentTemperatureMeasurementFormState> _environmentTemperatureWidgetKey =
+  final GlobalKey<EnvironmentTemperatureFormState> _environmentTemperatureWidgetKey = GlobalKey();
+  final GlobalKey<EnvironmentHumidityFormState> _environmentHumidityWidgetKey = GlobalKey();
+  final GlobalKey<EnvironmentLightDistanceFormState> _environmentLightDistanceWidgetKey =
       GlobalKey();
-  final GlobalKey<EnvironmentHumidityMeasurementFormState> _environmentHumidityWidgetKey =
-      GlobalKey();
-  final GlobalKey<EnvironmentLightDistanceMeasurementFormState> _environmentLightDistanceWidgetKey =
-      GlobalKey();
-  final GlobalKey<EnvironmentCO2MeasurementFormState> _environmentCO2WidgetKey = GlobalKey();
-
-  /// Environment measurement widget key
-  final GlobalKey<_EnvironmentMeasurementFormState> _environmentMeasurementWidgetKey = GlobalKey();
-
-  /// Plant action widget keys
+  final GlobalKey<EnvironmentCO2FormState> _environmentCO2WidgetKey = GlobalKey();
 
   final GlobalKey<_PlantWateringFormState> _plantWateringWidgetKey = GlobalKey();
+
   final GlobalKey<_PlantFertilizingFormState> _plantFertilizingFormKey = GlobalKey();
   final GlobalKey<_PlantPruningFormState> _plantPruningFormKey = GlobalKey();
   final GlobalKey<_PlantHarvestingFormState> _plantHarvestingFormKey = GlobalKey();
   final GlobalKey<_PlantTrainingFormState> _plantTrainingFormKey = GlobalKey();
+  final GlobalKey<_PlantMeasurementFormState> _plantMeasuringFormKey = GlobalKey();
   final GlobalKey<PictureFormState> _plantPictureFormState = GlobalKey();
   final GlobalKey<PictureFormState> _environmentPictureFormState = GlobalKey();
-
-  /// Plant measurement widget keys
 
   final GlobalKey<PlantHeightMeasurementFormState> _plantHeightMeasurementWidgetKey = GlobalKey();
   final GlobalKey<PlantPHMeasurementFormState> _plantPHMeasurementWidgetKey = GlobalKey();
   final GlobalKey<PlantECMeasurementFormState> _plantECMeasurementWidgetKey = GlobalKey();
   final GlobalKey<PlantPPMMeasurementFormState> _plantPPMMeasurementWidgetKey = GlobalKey();
+  final GlobalKey<_EnvironmentMeasurementFormState> _environmentMeasurementWidgetKey = GlobalKey();
 
-  final GlobalKey<_PlantMeasurementFormState> _plantMeasuringFormKey = GlobalKey();
-
-  /// The current plant
   Plant? _currentPlant;
-
-  /// The current plan action type
   late PlantActionType _currentPlantActionType = PlantActionType.watering;
-
-  // The plant actions' description text controller
-  late TextEditingController _plantActionDescriptionTextController = TextEditingController();
-
-  /// The plant actions' date
-  final DateTime _plantActionDate = DateTime.now();
-
-  /// The current environment
-  Environment? _currentEnvironment;
-
-  /// The current environment action type
   late EnvironmentActionType _currentEnvironmentActionType = EnvironmentActionType.measurement;
-
-  /// The environment actions' description text controller
+  late TextEditingController _plantActionDescriptionTextController = TextEditingController();
   late TextEditingController _environmentActionDescriptionTextController = TextEditingController();
-
-  /// The environment actions' date
+  final DateTime _plantActionDate = DateTime.now();
   final DateTime _environmentActionDate = DateTime.now();
+  Environment? _currentEnvironment;
 
   @override
   void initState() {
@@ -323,8 +294,15 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                         const SizedBox(height: 10),
                         ToggleButtons(
                           constraints: const BoxConstraints(minWidth: 100),
-                          isSelected: _actionTypeChoices,
-                          onPressed: (int index) => _onToggleButtonsPressed(index),
+                          isSelected: _choices,
+                          onPressed: (int index) {
+                            setState(() {
+                              // The button that is tapped is set to true, and the others to false.
+                              for (int i = 0; i < _choices.length; i++) {
+                                _choices[i] = i == index;
+                              }
+                            });
+                          },
                           children: [
                             Column(
                               children: [
@@ -362,19 +340,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     );
   }
 
-  /// Switches the action type between plant and environment actions.
-  void _onToggleButtonsPressed(final int index) {
-    setState(() {
-      // The button that is tapped is set to true, and the others to false.
-      for (int i = 0; i < _actionTypeChoices.length; i++) {
-        _actionTypeChoices[i] = i == index;
-      }
-    });
-  }
-
-  /// Display either the plant or environment action form.
   Widget _actionForm(final BuildContext context) {
-    if (_actionTypeChoices[0]) {
+    if (_choices[0]) {
       // Plant actions
       return SizedBox(
         width: double.infinity,
@@ -583,7 +550,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     return;
                   }
                   if (_currentPlantActionType == PlantActionType.pruning) {
-                    final pruning = _plantPruningFormKey.currentState!.pruningType;
+                    final pruning = _plantPruningFormKey.currentState!.pruning;
                     action = PlantPruningAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
@@ -603,7 +570,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     if (!isValid) {
                       return;
                     }
-                    final harvesting = _plantHarvestingFormKey.currentState!.harvestAmount;
+                    final harvesting = _plantHarvestingFormKey.currentState!.harvest;
                     action = PlantHarvestingAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
@@ -619,7 +586,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                   }
 
                   if (_currentPlantActionType == PlantActionType.training) {
-                    final training = _plantTrainingFormKey.currentState!.trainingType;
+                    final training = _plantTrainingFormKey.currentState!.training;
                     action = PlantTrainingAction(
                       id: const Uuid().v4().toString(),
                       description: _plantActionDescriptionTextController.text,
@@ -1032,7 +999,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
   }
 
-  /// Select a date for the action.
   Future<void> _selectDate(BuildContext context, DateTime date) async {
     final DateTime? picked = await showDatePicker(
         context: context,
@@ -1046,7 +1012,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
   }
 
-  /// Display the form for the current plant action type.
   Widget _plantActionForm() {
     switch (_currentPlantActionType) {
       case PlantActionType.watering:
@@ -1094,7 +1059,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
   }
 
-  /// Display the form for the current environment action type.
   Widget _environmentActionForm() {
     switch (_currentEnvironmentActionType) {
       case EnvironmentActionType.measurement:
@@ -1116,17 +1080,16 @@ class _ChooseActionViewState extends State<ChooseActionView> {
   }
 }
 
-/// A form to measure CO2 in the environment.
 class EnvironmentCO2Form extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
   const EnvironmentCO2Form({super.key, required this.formKey});
 
   @override
-  State<EnvironmentCO2Form> createState() => EnvironmentCO2MeasurementFormState();
+  State<EnvironmentCO2Form> createState() => EnvironmentCO2FormState();
 }
 
-class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
+class EnvironmentCO2FormState extends State<EnvironmentCO2Form> {
   late TextEditingController _co2Controller;
 
   @override
@@ -1141,12 +1104,10 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
     super.dispose();
   }
 
-  /// The CO2 value
   double get co2 {
     return double.parse(_co2Controller.text);
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -1163,36 +1124,31 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
           labelText: 'CO2',
           hintText: '50',
         ),
-        validator: (value) => _validateInput(value),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a value';
+          }
+          // Check if it is a double
+          if (double.tryParse(value) == null) {
+            return 'Please enter a valid number';
+          }
+          return null;
+        },
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
 }
 
-/// A form to measure the distance of light in the environment.
 class EnvironmentLightDistanceForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
   const EnvironmentLightDistanceForm({super.key, required this.formKey});
 
   @override
-  State<EnvironmentLightDistanceForm> createState() =>
-      EnvironmentLightDistanceMeasurementFormState();
+  State<EnvironmentLightDistanceForm> createState() => EnvironmentLightDistanceFormState();
 }
 
-class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLightDistanceForm> {
+class EnvironmentLightDistanceFormState extends State<EnvironmentLightDistanceForm> {
   late TextEditingController _distanceController;
   late MeasurementUnit _distanceUnit;
 
@@ -1209,7 +1165,6 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
     super.dispose();
   }
 
-  /// The distance value
   MeasurementAmount get distance {
     return MeasurementAmount(
       value: double.parse(_distanceController.text),
@@ -1217,7 +1172,6 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
     );
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -1240,7 +1194,16 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
                   labelText: 'Distance',
                   hintText: '50',
                 ),
-                validator: (value) => _validateInput(value),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a value';
+                  }
+                  // Check if it is a double
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
               ),
             ),
             const SizedBox(width: 50),
@@ -1261,7 +1224,11 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
                         ),
                       )
                       .toList(),
-                  onChanged: (MeasurementUnit? value) => _onUnitChanged(value),
+                  onChanged: (MeasurementUnit? value) {
+                    setState(() {
+                      _distanceUnit = value!;
+                    });
+                  },
                 ),
               ],
             ),
@@ -1270,38 +1237,18 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
-
-  /// Handle the unit change
-  void _onUnitChanged(final MeasurementUnit? value) {
-    setState(() {
-      _distanceUnit = value!;
-    });
-  }
 }
 
-/// A form to measure the humidity in the environment.
 class EnvironmentHumidityForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
   const EnvironmentHumidityForm({super.key, required this.formKey});
 
   @override
-  State<EnvironmentHumidityForm> createState() => EnvironmentHumidityMeasurementFormState();
+  State<EnvironmentHumidityForm> createState() => EnvironmentHumidityFormState();
 }
 
-class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityForm> {
+class EnvironmentHumidityFormState extends State<EnvironmentHumidityForm> {
   late TextEditingController _humidityController;
 
   @override
@@ -1316,12 +1263,10 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
     super.dispose();
   }
 
-  /// The humidity value
   double get humidity {
     return double.parse(_humidityController.text);
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -1340,36 +1285,32 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
             labelText: 'Humidity',
             hintText: '50',
           ),
-          validator: (value) => _validateInput(value),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a value';
+            }
+            // Check if it is a double
+            if (double.tryParse(value) == null) {
+              return 'Please enter a valid number';
+            }
+            return null;
+          },
         ),
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
 }
 
-/// A form to measure the temperature in the environment.
 class EnvironmentTemperatureForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
   const EnvironmentTemperatureForm({super.key, required this.formKey});
 
   @override
-  State<EnvironmentTemperatureForm> createState() => EnvironmentTemperatureMeasurementFormState();
+  State<EnvironmentTemperatureForm> createState() => EnvironmentTemperatureFormState();
 }
 
-class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemperatureForm> {
+class EnvironmentTemperatureFormState extends State<EnvironmentTemperatureForm> {
   late TextEditingController _temperatureController;
   late TemperatureUnit _temperatureUnit;
 
@@ -1386,7 +1327,6 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
     super.dispose();
   }
 
-  /// The temperature value
   Temperature get temperature {
     return Temperature(
       value: double.parse(_temperatureController.text),
@@ -1394,7 +1334,6 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
     );
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -1418,7 +1357,16 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
                   labelText: 'Temperature',
                   hintText: '25',
                 ),
-                validator: (value) => _validateInput(value),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a value';
+                  }
+                  // Check if it is a double
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
               ),
             ),
             const SizedBox(width: 50),
@@ -1439,7 +1387,11 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
                         ),
                       )
                       .toList(),
-                  onChanged: (TemperatureUnit? value) => _onUnitChanged(value),
+                  onChanged: (TemperatureUnit? value) {
+                    setState(() {
+                      _temperatureUnit = value!;
+                    });
+                  },
                 ),
               ],
             ),
@@ -1448,28 +1400,8 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
-
-  /// Handle the unit change
-  void _onUnitChanged(final TemperatureUnit? value) {
-    setState(() {
-      _temperatureUnit = value!;
-    });
-  }
 }
 
-/// A form to measure the amount of water given to a plant.
 class PlantWateringForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
@@ -1496,7 +1428,6 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
     super.dispose();
   }
 
-  /// The watering amount
   LiquidAmount get watering {
     return LiquidAmount(
       unit: _waterAmountUnit,
@@ -1504,7 +1435,6 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
     );
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -1528,7 +1458,12 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
                   labelText: 'Amount',
                   hintText: '50',
                 ),
-                validator: (value) => _validateInput(value),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a value';
+                  }
+                  return null;
+                },
               ),
             ),
             const SizedBox(width: 50),
@@ -1549,7 +1484,11 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
                         ),
                       )
                       .toList(),
-                  onChanged: (LiquidUnit? value) => _onUnitChanged(value),
+                  onChanged: (LiquidUnit? value) {
+                    setState(() {
+                      _waterAmountUnit = value!;
+                    });
+                  },
                 ),
               ],
             ),
@@ -1558,28 +1497,8 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
-
-  /// Handle the unit change
-  void _onUnitChanged(final LiquidUnit? value) {
-    setState(() {
-      _waterAmountUnit = value!;
-    });
-  }
 }
 
-/// A form to measure the amount of fertilizer given to a plant.
 class PlantFertilizingForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final FertilizerProvider fertilizerProvider;
@@ -1612,7 +1531,6 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
     super.dispose();
   }
 
-  /// The fertilization amount
   PlantFertilization get fertilization {
     if (_currentFertilizer == null) {
       throw Exception('No fertilizer selected');
@@ -1626,12 +1544,10 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
     );
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
 
-  /// Check if there are fertilizers
   bool get hasFertilizers {
     return _currentFertilizer != null;
   }
@@ -1683,7 +1599,11 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                               ),
                             )
                             .toList(),
-                        onChanged: (Fertilizer? value) => _onFertilizerChanged(value),
+                        onChanged: (Fertilizer? value) {
+                          setState(() {
+                            _currentFertilizer = value!;
+                          });
+                        },
                         value: _currentFertilizer,
                       ),
                       const VerticalDivider(),
@@ -1693,7 +1613,7 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                           const SizedBox(width: 10),
                           IconButton(
                               onPressed: () async {
-                                await showFertilizersDetailSheet(
+                                await showFertilizerDetailSheet(
                                     context, widget.fertilizerProvider, fertilizers);
                               },
                               icon: const Icon(Icons.list)),
@@ -1719,7 +1639,16 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                         labelText: 'Amount',
                         hintText: '50',
                       ),
-                      validator: (value) => _validateInput(value),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a value';
+                        }
+                        // Check if it is a double
+                        if (double.tryParse(value) == null) {
+                          return 'Please enter a valid number';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(width: 50),
@@ -1740,7 +1669,11 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                               ),
                             )
                             .toList(),
-                        onChanged: (LiquidUnit? value) => _onUnitChanged(value),
+                        onChanged: (LiquidUnit? value) {
+                          setState(() {
+                            _liquidUnit = value!;
+                          });
+                        },
                       ),
                     ],
                   ),
@@ -1753,33 +1686,6 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
     );
   }
 
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
-
-  /// Handle the unit change
-  void _onUnitChanged(final LiquidUnit? value) {
-    setState(() {
-      _liquidUnit = value!;
-    });
-  }
-
-  /// Handle the fertilizer change
-  void _onFertilizerChanged(final Fertilizer? value) {
-    setState(() {
-      _currentFertilizer = value!;
-    });
-  }
-
-  /// Add a fertilizer button
   Widget _addFertilizerButton() {
     return OutlinedButton.icon(
       onPressed: () async {
@@ -1791,7 +1697,6 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
   }
 }
 
-/// A form to prune a plant.
 class PlantPruningForm extends StatefulWidget {
   const PlantPruningForm({super.key});
 
@@ -1808,8 +1713,7 @@ class _PlantPruningFormState extends State<PlantPruningForm> {
     _pruningType = PruningType.topping;
   }
 
-  /// The pruning type
-  PruningType get pruningType {
+  PruningType get pruning {
     return _pruningType;
   }
 
@@ -1827,19 +1731,15 @@ class _PlantPruningFormState extends State<PlantPruningForm> {
             ),
           )
           .toList(),
-      onChanged: (PruningType? value) => _onPruningTypeChanged(value),
+      onChanged: (PruningType? value) {
+        setState(() {
+          _pruningType = value!;
+        });
+      },
     );
-  }
-
-  /// Handle the pruning type change
-  void _onPruningTypeChanged(final PruningType? value) {
-    setState(() {
-      _pruningType = value!;
-    });
   }
 }
 
-/// A form to harvest a plant.
 class PlantHarvestingForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
@@ -1866,15 +1766,13 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
     super.dispose();
   }
 
-  /// The harvest amount
-  WeightAmount get harvestAmount {
+  WeightAmount get harvest {
     return WeightAmount(
       unit: _weightUnit,
       amount: double.parse(_harvestAmountController.text),
     );
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -1897,7 +1795,16 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
                   labelText: 'Amount',
                   hintText: '50',
                 ),
-                validator: (value) => _validateInput(value),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a value';
+                  }
+                  // Check if it is a double
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
               ),
             ),
             const SizedBox(width: 50),
@@ -1918,7 +1825,11 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
                         ),
                       )
                       .toList(),
-                  onChanged: (WeightUnit? value) => _onUnitChanged(value),
+                  onChanged: (WeightUnit? value) {
+                    setState(() {
+                      _weightUnit = value!;
+                    });
+                  },
                 ),
               ],
             ),
@@ -1927,28 +1838,8 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
-
-  /// Handle the unit change
-  void _onUnitChanged(final WeightUnit? value) {
-    setState(() {
-      _weightUnit = value!;
-    });
-  }
 }
 
-/// A form to train a plant.
 class PlantTrainingForm extends StatefulWidget {
   const PlantTrainingForm({super.key});
 
@@ -1965,8 +1856,7 @@ class _PlantTrainingFormState extends State<PlantTrainingForm> {
     _trainingType = TrainingType.lst;
   }
 
-  /// The training type
-  TrainingType get trainingType {
+  TrainingType get training {
     return _trainingType;
   }
 
@@ -1984,19 +1874,15 @@ class _PlantTrainingFormState extends State<PlantTrainingForm> {
             ),
           )
           .toList(),
-      onChanged: (TrainingType? value) => _onTrainingTypeChanged(value),
+      onChanged: (TrainingType? value) {
+        setState(() {
+          _trainingType = value!;
+        });
+      },
     );
-  }
-
-  /// Handle the training type change
-  void _onTrainingTypeChanged(final TrainingType? value) {
-    setState(() {
-      _trainingType = value!;
-    });
   }
 }
 
-/// A form to display different plant measurement forms.
 class PlantMeasurementForm extends StatefulWidget {
   final GlobalKey<PlantHeightMeasurementFormState> plantMeasurementWidgetKey;
 
@@ -2025,7 +1911,6 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
     _measurementType = PlantMeasurementType.height;
   }
 
-  /// The measurement type
   PlantMeasurementType get measurementType {
     return _measurementType;
   }
@@ -2054,7 +1939,11 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
                 ),
               )
               .toList(),
-          onChanged: (PlantMeasurementType? value) => _onMeasurementTypeChanged(value),
+          onChanged: (PlantMeasurementType? value) {
+            setState(() {
+              _measurementType = value!;
+            });
+          },
         ),
         const Divider(),
         _measurementForm(),
@@ -2062,14 +1951,6 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
     );
   }
 
-  /// Handle the measurement type change
-  void _onMeasurementTypeChanged(final PlantMeasurementType? value) {
-    setState(() {
-      _measurementType = value!;
-    });
-  }
-
-  /// Display the measurement form
   Widget _measurementForm() {
     switch (_measurementType) {
       case PlantMeasurementType.height:
@@ -2096,7 +1977,6 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
   }
 }
 
-/// A form to measure the height of a plant.
 class PlantHeightMeasurementForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
@@ -2123,7 +2003,6 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
     super.dispose();
   }
 
-  /// The height value
   MeasurementAmount get height {
     return MeasurementAmount(
       value: double.parse(_heightController.text),
@@ -2131,7 +2010,6 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
     );
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -2153,7 +2031,12 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
                   labelText: 'Height',
                   hintText: '50',
                 ),
-                validator: (value) => _validateInput(value),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a value';
+                  }
+                  return null;
+                },
               ),
             ),
             const SizedBox(width: 50),
@@ -2174,7 +2057,7 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
                         ),
                       )
                       .toList(),
-                  onChanged: (MeasurementUnit? value) => _onUnitChanged(value),
+                  onChanged: (MeasurementUnit? value) {},
                 ),
               ],
             ),
@@ -2183,28 +2066,8 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
-
-  /// Handle the unit change
-  void _onUnitChanged(final MeasurementUnit? value) {
-    setState(() {
-      _heightUnit = value!;
-    });
-  }
 }
 
-/// A form to measure the pH of a plant.
 class PlantPHMeasurementForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
@@ -2229,12 +2092,10 @@ class PlantPHMeasurementFormState extends State<PlantPHMeasurementForm> {
     super.dispose();
   }
 
-  /// The pH value
   double get ph {
     return double.parse(_phController.text);
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -2250,25 +2111,17 @@ class PlantPHMeasurementFormState extends State<PlantPHMeasurementForm> {
           labelText: 'pH',
           hintText: '7.0',
         ),
-        validator: (value) => _validateInput(value),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a value';
+          }
+          return null;
+        },
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
 }
 
-/// A form to measure the EC of a plant.
 class PlantECMeasurementForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
@@ -2293,12 +2146,10 @@ class PlantECMeasurementFormState extends State<PlantECMeasurementForm> {
     super.dispose();
   }
 
-  /// The EC value
   double get ec {
     return double.parse(_ecController.text);
   }
 
-  /// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -2314,25 +2165,17 @@ class PlantECMeasurementFormState extends State<PlantECMeasurementForm> {
           labelText: 'EC',
           hintText: '1.5',
         ),
-        validator: (value) => _validateInput(value),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a value';
+          }
+          return null;
+        },
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
 }
 
-/// A form to measure the PPM of a plant.
 class PlantPPMMeasurementForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
 
@@ -2357,12 +2200,10 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
     super.dispose();
   }
 
-  /// The PPM value
   double get ppm {
     return double.parse(_ppmController.text);
   }
 
-  //// Check if the form is valid
   bool get isValid {
     return widget.formKey.currentState!.validate();
   }
@@ -2378,25 +2219,17 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
           labelText: 'PPM',
           hintText: '500',
         ),
-        validator: (value) => _validateInput(value),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter a value';
+          }
+          return null;
+        },
       ),
     );
   }
-
-  /// Validate the input
-  String? _validateInput(final String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Please enter a value';
-    }
-    // Check if it is a double
-    if (double.tryParse(value) == null) {
-      return 'Please enter a valid number';
-    }
-    return null;
-  }
 }
 
-/// A form to take (if allowed) multiple pictures.
 class PictureForm extends StatefulWidget {
   final bool allowMultiple;
   const PictureForm({
@@ -2418,7 +2251,6 @@ class PictureFormState extends State<PictureForm> {
     _images = [];
   }
 
-  /// The image paths
   List<String> get images {
     return _images.isEmpty ? [] : _images.map((e) => e.path).toList();
   }
@@ -2452,7 +2284,11 @@ class PictureFormState extends State<PictureForm> {
                         return Column(
                           children: [
                             IconButton(
-                              onPressed: () => _removeImage(index),
+                              onPressed: () {
+                                setState(() {
+                                  _images.removeAt(index);
+                                });
+                              },
                               icon: const Icon(Icons.clear, color: Colors.red),
                             ),
                             Image.file(
@@ -2473,14 +2309,6 @@ class PictureFormState extends State<PictureForm> {
     );
   }
 
-  /// Remove an image from the list at [index]
-  void _removeImage(final int index) {
-    setState(() {
-      _images.removeAt(index);
-    });
-  }
-
-  /// Add an image button
   Widget _addImageButton() {
     return IconButton(
       onPressed: () async {
@@ -2494,7 +2322,7 @@ class PictureFormState extends State<PictureForm> {
                   leading: const Icon(Icons.camera_alt),
                   title: const Text('Take one with camera'),
                   onTap: () async {
-                    final file = await _getImage(ImageSource.camera);
+                    final file = await getImage(ImageSource.camera);
                     if (!context.mounted) return;
                     Navigator.of(context).pop(file);
                   },
@@ -2502,7 +2330,11 @@ class PictureFormState extends State<PictureForm> {
                 ListTile(
                   leading: const Icon(Icons.photo),
                   title: const Text('Select from gallery'),
-                  onTap: () async => await _selectImage(),
+                  onTap: () async {
+                    final file = await getImage(ImageSource.gallery);
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop(file);
+                  },
                 ),
               ],
             );
@@ -2519,29 +2351,18 @@ class PictureFormState extends State<PictureForm> {
     );
   }
 
-  /// Select an image from the gallery
-  Future<void> _selectImage() async {
-    final file = await _getImage(ImageSource.gallery);
-    if (!context.mounted) return;
-    setState(() {
-      _images.add(file);
-    });
-  }
-
-  /// Get an image from the [source
-  Future<File> _getImage(final ImageSource source) async {
+  Future<File> getImage(final ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile == null) throw Exception('No image picked');
     return File(pickedFile.path);
   }
 }
 
-/// A form to display different environment measurement forms.
 class EnvironmentMeasurementForm extends StatefulWidget {
-  final GlobalKey<EnvironmentCO2MeasurementFormState> environmentCO2FormKey;
-  final GlobalKey<EnvironmentHumidityMeasurementFormState> environmentHumidityFormKey;
-  final GlobalKey<EnvironmentLightDistanceMeasurementFormState> environmentLightDistanceFormKey;
-  final GlobalKey<EnvironmentTemperatureMeasurementFormState> environmentTemperatureFormKey;
+  final GlobalKey<EnvironmentCO2FormState> environmentCO2FormKey;
+  final GlobalKey<EnvironmentHumidityFormState> environmentHumidityFormKey;
+  final GlobalKey<EnvironmentLightDistanceFormState> environmentLightDistanceFormKey;
+  final GlobalKey<EnvironmentTemperatureFormState> environmentTemperatureFormKey;
 
   const EnvironmentMeasurementForm({
     super.key,
@@ -2564,7 +2385,6 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
     _measurementType = EnvironmentMeasurementType.temperature;
   }
 
-  /// The measurement type
   EnvironmentMeasurementType get measurementType {
     return _measurementType;
   }
@@ -2591,22 +2411,17 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
                 ),
               )
               .toList(),
-          onChanged: (EnvironmentMeasurementType? value) =>
-              _onEnvironmentMeasurementTypeChanged(value),
+          onChanged: (EnvironmentMeasurementType? value) {
+            setState(() {
+              _measurementType = value!;
+            });
+          },
         ),
         _environmentActionMeasurementForm(),
       ],
     );
   }
 
-  /// Handle the measurement type change
-  void _onEnvironmentMeasurementTypeChanged(final EnvironmentMeasurementType? value) {
-    setState(() {
-      _measurementType = value!;
-    });
-  }
-
-  /// Display the measurement form
   Widget _environmentActionMeasurementForm() {
     switch (_measurementType) {
       case EnvironmentMeasurementType.temperature:

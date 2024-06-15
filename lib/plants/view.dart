@@ -370,8 +370,9 @@ class _PlantFormState extends State<PlantForm> {
                         );
                         return;
                       } else {
+                        Plant plant;
                         if (widget.plant != null) {
-                          Plant plant = Plant(
+                          plant = Plant(
                             id: widget.plant!.id,
                             name: _nameController.text,
                             description: _descriptionController.text,
@@ -385,7 +386,7 @@ class _PlantFormState extends State<PlantForm> {
                               .updatePlant(plant)
                               .whenComplete(() => Navigator.of(context).pop(plant));
                         } else {
-                          Plant plant = Plant(
+                          plant = Plant(
                             id: const Uuid().v4().toString(),
                             name: _nameController.text,
                             description: _descriptionController.text,
