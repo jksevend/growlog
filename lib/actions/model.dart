@@ -3,13 +3,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 part 'model.g.dart';
 
-enum IntervalUnit {
-  hour,
-  day,
-  week,
-  month,
-}
-
+/// A class that represents an action.
 @JsonSerializable()
 class Action {
   final String id;
@@ -28,6 +22,7 @@ class Action {
 
   Map<String, dynamic> toJson() => _$ActionToJson(this);
 
+  /// Returns whether the action was created today.
   bool isToday() {
     return createdAt.day == DateTime.now().day &&
         createdAt.month == DateTime.now().month &&
@@ -35,6 +30,7 @@ class Action {
   }
 }
 
+/// Represents a measurement type in the environment.
 enum EnvironmentMeasurementType {
   temperature,
   humidity,
@@ -42,7 +38,9 @@ enum EnvironmentMeasurementType {
   lightDistance,
 }
 
+/// Extension methods for the [EnvironmentMeasurementType] enum.
 extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
+  /// Returns the name of the measurement type.
   String get name {
     switch (this) {
       case EnvironmentMeasurementType.temperature:
@@ -56,6 +54,7 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
     }
   }
 
+  /// Returns the icon of the measurement type.
   String get icon {
     switch (this) {
       case EnvironmentMeasurementType.temperature:
@@ -70,13 +69,16 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
   }
 }
 
+/// Represents an action in the environment.
 enum EnvironmentActionType {
   measurement,
   picture,
   other,
 }
 
+/// Extension methods for the [EnvironmentActionType] enum.
 extension EnvironmentActionTypeExtension on EnvironmentActionType {
+  /// Returns the name of the action type.
   String get name {
     switch (this) {
       case EnvironmentActionType.measurement:
@@ -88,6 +90,7 @@ extension EnvironmentActionTypeExtension on EnvironmentActionType {
     }
   }
 
+  /// Returns the icon of the action type.
   String get icon {
     switch (this) {
       case EnvironmentActionType.measurement:
@@ -100,6 +103,7 @@ extension EnvironmentActionTypeExtension on EnvironmentActionType {
   }
 }
 
+/// Represents an action in the environment.
 @JsonSerializable()
 class EnvironmentAction extends Action {
   final String environmentId;
@@ -120,6 +124,7 @@ class EnvironmentAction extends Action {
   Map<String, dynamic> toJson() => _$EnvironmentActionToJson(this);
 }
 
+/// Represents a measurement in the environment.
 @JsonSerializable()
 class EnvironmentMeasurementAction extends EnvironmentAction {
   final EnvironmentMeasurement measurement;
@@ -140,6 +145,7 @@ class EnvironmentMeasurementAction extends EnvironmentAction {
   Map<String, dynamic> toJson() => _$EnvironmentMeasurementActionToJson(this);
 }
 
+/// Represents an action in the environment that is a picture.
 @JsonSerializable()
 class EnvironmentPictureAction extends EnvironmentAction {
   final List<String> images;
@@ -160,6 +166,7 @@ class EnvironmentPictureAction extends EnvironmentAction {
   Map<String, dynamic> toJson() => _$EnvironmentPictureActionToJson(this);
 }
 
+//// Represents an arbitrary action in the environment.
 @JsonSerializable()
 class EnvironmentOtherAction extends EnvironmentAction {
   EnvironmentOtherAction({
@@ -177,6 +184,7 @@ class EnvironmentOtherAction extends EnvironmentAction {
   Map<String, dynamic> toJson() => _$EnvironmentOtherActionToJson(this);
 }
 
+/// Arbitrary measurement representation in the environment
 @JsonSerializable()
 class EnvironmentMeasurement {
   final EnvironmentMeasurementType type;
@@ -194,12 +202,15 @@ class EnvironmentMeasurement {
   Map<String, dynamic> toJson() => _$EnvironmentMeasurementToJson(this);
 }
 
+/// Represents a liquid unit.
 enum LiquidUnit {
   ml,
   l,
 }
 
+/// Extension methods for the [LiquidUnit] enum.
 extension WateringUnitExtension on LiquidUnit {
+  /// Returns the name of the liquid unit.
   String get name {
     switch (this) {
       case LiquidUnit.ml:
@@ -210,6 +221,7 @@ extension WateringUnitExtension on LiquidUnit {
   }
 }
 
+/// Represents a liquid amount.
 @JsonSerializable()
 class LiquidAmount {
   final LiquidUnit unit;
@@ -225,6 +237,7 @@ class LiquidAmount {
   Map<String, dynamic> toJson() => _$LiquidAmountToJson(this);
 }
 
+/// Represents a plant action type.
 enum PlantActionType {
   watering,
   fertilizing,
@@ -238,7 +251,9 @@ enum PlantActionType {
   other,
 }
 
+/// Extension methods for the [PlantActionType] enum.
 extension PlantActionTypeExtension on PlantActionType {
+  /// Returns the name of the plant action type.
   String get name {
     switch (this) {
       case PlantActionType.watering:
@@ -264,6 +279,7 @@ extension PlantActionTypeExtension on PlantActionType {
     }
   }
 
+  /// Returns the icon of the plant action type.
   String get icon {
     switch (this) {
       case PlantActionType.watering:
@@ -290,6 +306,7 @@ extension PlantActionTypeExtension on PlantActionType {
   }
 }
 
+/// Represents a plant action.
 @JsonSerializable()
 class PlantAction extends Action {
   final String plantId;
@@ -309,6 +326,7 @@ class PlantAction extends Action {
   Map<String, dynamic> toJson() => _$PlantActionToJson(this);
 }
 
+/// Represents an arbitrary plant measurement.
 @JsonSerializable()
 class PlantMeasurement {
   final PlantMeasurementType type;
@@ -324,6 +342,7 @@ class PlantMeasurement {
   Map<String, dynamic> toJson() => _$PlantMeasurementToJson(this);
 }
 
+/// Represents a watering action.
 @JsonSerializable()
 class PlantWateringAction extends PlantAction {
   final LiquidAmount amount;
@@ -344,6 +363,7 @@ class PlantWateringAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantWateringActionToJson(this);
 }
 
+/// Represents a plant fertilization.
 @JsonSerializable()
 class PlantFertilization {
   final String fertilizerId;
@@ -360,6 +380,7 @@ class PlantFertilization {
   Map<String, dynamic> toJson() => _$PlantFertilizationToJson(this);
 }
 
+/// Represents a fertilizing action.
 @JsonSerializable()
 class PlantFertilizingAction extends PlantAction {
   final PlantFertilization fertilization;
@@ -380,12 +401,29 @@ class PlantFertilizingAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantFertilizingActionToJson(this);
 }
 
+/// Represents a pruning type.
 enum PruningType {
   topping,
   fim,
   lollipopping,
 }
 
+/// Extension methods for the [PruningType] enum.
+extension PruningTypeExtension on PruningType {
+  /// Returns the name of the pruning type.
+  String get name {
+    switch (this) {
+      case PruningType.topping:
+        return 'Topping';
+      case PruningType.fim:
+        return 'FIM';
+      case PruningType.lollipopping:
+        return 'Lollipopping';
+    }
+  }
+}
+
+/// Represents a pruning action.
 @JsonSerializable()
 class PlantPruningAction extends PlantAction {
   final PruningType pruningType;
@@ -406,12 +444,15 @@ class PlantPruningAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantPruningActionToJson(this);
 }
 
+/// Represents a weight unit.
 enum WeightUnit {
   g,
   kg,
 }
 
+/// Extension methods for the [WeightUnit] enum.
 extension WeightUnitExtension on WeightUnit {
+  /// Returns the name of the weight unit.
   String get name {
     switch (this) {
       case WeightUnit.g:
@@ -422,6 +463,7 @@ extension WeightUnitExtension on WeightUnit {
   }
 }
 
+/// Represents a weight amount.
 @JsonSerializable()
 class WeightAmount {
   final WeightUnit unit;
@@ -437,6 +479,7 @@ class WeightAmount {
   Map<String, dynamic> toJson() => _$WeightAmountToJson(this);
 }
 
+/// Represents a harvesting action.
 @JsonSerializable()
 class PlantHarvestingAction extends PlantAction {
   final WeightAmount amount;
@@ -457,6 +500,7 @@ class PlantHarvestingAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantHarvestingActionToJson(this);
 }
 
+/// Represents a replanting action.
 @JsonSerializable()
 class PlantReplantingAction extends PlantAction {
   PlantReplantingAction({
@@ -474,11 +518,26 @@ class PlantReplantingAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantReplantingActionToJson(this);
 }
 
+/// Represents a plant training type.
 enum TrainingType {
   lst,
   scrog,
 }
 
+/// Extension methods for the [TrainingType] enum.
+extension TrainingTypeExtension on TrainingType {
+  /// Returns the name of the training type.
+  String get name {
+    switch (this) {
+      case TrainingType.lst:
+        return 'LST';
+      case TrainingType.scrog:
+        return 'SCROG';
+    }
+  }
+}
+
+/// Represents a training action.
 @JsonSerializable()
 class PlantTrainingAction extends PlantAction {
   final TrainingType trainingType;
@@ -499,6 +558,7 @@ class PlantTrainingAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantTrainingActionToJson(this);
 }
 
+/// Represents a plant measuring type.
 enum PlantMeasurementType {
   height,
   pH,
@@ -506,7 +566,9 @@ enum PlantMeasurementType {
   ppm,
 }
 
+/// Extension methods for the [PlantMeasurementType] enum.
 extension PlantMeasurementTypeExtension on PlantMeasurementType {
+  /// Returns the name of the plant measurement type.
   String get name {
     switch (this) {
       case PlantMeasurementType.height:
@@ -520,6 +582,7 @@ extension PlantMeasurementTypeExtension on PlantMeasurementType {
     }
   }
 
+  /// Returns the icon of the plant measurement type.
   String get icon {
     switch (this) {
       case PlantMeasurementType.height:
@@ -534,6 +597,7 @@ extension PlantMeasurementTypeExtension on PlantMeasurementType {
   }
 }
 
+/// Represents a measuring action.
 @JsonSerializable()
 class PlantMeasuringAction extends PlantAction {
   final PlantMeasurement measurement;
@@ -554,6 +618,7 @@ class PlantMeasuringAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantMeasuringActionToJson(this);
 }
 
+/// Represents a plants death.
 @JsonSerializable()
 class PlantDeathAction extends PlantAction {
   PlantDeathAction({
@@ -570,6 +635,7 @@ class PlantDeathAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantDeathActionToJson(this);
 }
 
+/// Represents a plant picture action.
 @JsonSerializable()
 class PlantPictureAction extends PlantAction {
   final List<String> images;
@@ -590,6 +656,7 @@ class PlantPictureAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantPictureActionToJson(this);
 }
 
+/// Represents an arbitrary plant action.
 @JsonSerializable()
 class PlantOtherAction extends PlantAction {
   PlantOtherAction({
@@ -606,6 +673,7 @@ class PlantOtherAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantOtherActionToJson(this);
 }
 
+/// Represents a collection of plant and environment actions.
 @JsonSerializable()
 class Actions {
   List<PlantAction> plantActions;

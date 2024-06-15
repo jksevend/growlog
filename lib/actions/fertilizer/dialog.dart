@@ -3,11 +3,14 @@ import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
 
+/// Opens a dialog to add or edit a [fertilizer]
 Future<void> showFertilizerForm(
   BuildContext context,
   FertilizerProvider fertilizerProvider,
   Fertilizer? fertilizer,
 ) async {
+  // Form parameters
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController(
     text: fertilizer == null ? '' : fertilizer.name,
   );
@@ -15,7 +18,6 @@ Future<void> showFertilizerForm(
     text: fertilizer == null ? '' : fertilizer.description,
   );
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   await showDialog(
     context: context,
@@ -54,39 +56,59 @@ Future<void> showFertilizerForm(
         ),
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
+            onPressed: () => _onClose(context),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () async {
-              if (formKey.currentState!.validate()) {
-                if (fertilizer != null) {
-                  final updatedFertilizer = fertilizer.copyWith(
-                    id: fertilizer.id,
-                    name: nameController.text,
-                    description: descriptionController.text,
-                  );
-                  await fertilizerProvider.updateFertilizer(updatedFertilizer);
-                  if (!context.mounted) return;
-                  Navigator.of(context).pop();
-                  return;
-                }
-                final newFertilizer = Fertilizer(
-                  id: const Uuid().v4().toString(),
-                  name: nameController.text,
-                  description: descriptionController.text,
-                );
-                await fertilizerProvider.addFertilizer(newFertilizer);
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
-              }
-            },
+            onPressed: () async => await _onSubmit(
+              context,
+              formKey,
+              nameController,
+              descriptionController,
+              fertilizer,
+              fertilizerProvider,
+            ),
             child: const Text('Save'),
           ),
         ],
       );
     },
   );
+}
+
+/// Closes the dialog
+void _onClose(final BuildContext context) {
+  Navigator.of(context).pop();
+}
+
+/// Handles the form submission
+Future<void> _onSubmit(
+  final BuildContext context,
+  final GlobalKey<FormState> formKey,
+  final TextEditingController nameController,
+  final TextEditingController descriptionController,
+  final Fertilizer? fertilizer,
+  final FertilizerProvider fertilizerProvider,
+) async {
+  if (formKey.currentState!.validate()) {
+    if (fertilizer != null) {
+      final updatedFertilizer = fertilizer.copyWith(
+        id: fertilizer.id,
+        name: nameController.text,
+        description: descriptionController.text,
+      );
+      await fertilizerProvider.updateFertilizer(updatedFertilizer);
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      return;
+    }
+    final newFertilizer = Fertilizer(
+      id: const Uuid().v4().toString(),
+      name: nameController.text,
+      description: descriptionController.text,
+    );
+    await fertilizerProvider.addFertilizer(newFertilizer);
+    if (!context.mounted) return;
+    Navigator.of(context).pop();
+  }
 }

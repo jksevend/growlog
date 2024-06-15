@@ -3,7 +3,8 @@ import 'package:weedy/actions/fertilizer/dialog.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
 
-Future<void> showFertilizerDetailSheet(
+/// Opens a bottom sheet to show the details of [fertilizers]
+Future<void> showFertilizersDetailSheet(
   final BuildContext context,
   final FertilizerProvider fertilizerProvider,
   final Map<String, Fertilizer> fertilizers,
@@ -29,23 +30,13 @@ Future<void> showFertilizerDetailSheet(
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () async {
-                            await showFertilizerForm(
-                              context,
-                              fertilizerProvider,
-                              fertilizer.value,
-                            );
-                            if (!context.mounted) return;
-                            Navigator.pop(context);
-                          },
+                          onPressed: () async =>
+                              await _editFertilizer(context, fertilizerProvider, fertilizer.value),
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () async {
-                            await fertilizerProvider.deleteFertilizer(fertilizer.value.id);
-                            if (!context.mounted) return;
-                            Navigator.of(context).pop();
-                          },
+                          onPressed: () async => await _deleteFertilizer(
+                              context, fertilizerProvider, fertilizer.value),
                         ),
                       ],
                     ),
@@ -58,4 +49,30 @@ Future<void> showFertilizerDetailSheet(
       );
     },
   );
+}
+
+/// Edits a [fertilizer]
+Future<void> _editFertilizer(
+  final BuildContext context,
+  final FertilizerProvider fertilizerProvider,
+  Fertilizer fertilizer,
+) async {
+  await showFertilizerForm(
+    context,
+    fertilizerProvider,
+    fertilizer,
+  );
+  if (!context.mounted) return;
+  Navigator.pop(context);
+}
+
+/// Deletes a [fertilizer]
+Future<void> _deleteFertilizer(
+  final BuildContext context,
+  final FertilizerProvider fertilizerProvider,
+  Fertilizer fertilizer,
+) async {
+  await fertilizerProvider.deleteFertilizer(fertilizer.id);
+  if (!context.mounted) return;
+  Navigator.of(context).pop();
 }

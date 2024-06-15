@@ -6,6 +6,7 @@ import 'package:weedy/actions/widget.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/plants/model.dart';
 
+/// Opens a bottom sheet to show the details of [plantAction].
 Future<void> showPlantActionDetailSheet(
   BuildContext context,
   PlantAction plantAction,
@@ -26,21 +27,8 @@ Future<void> showPlantActionDetailSheet(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: () async {
-                      final confirmed = await confirmDeletionOfPlantActionDialog(
-                          context, plantAction, actionsProvider);
-                      if (confirmed == true) {
-                        if (!context.mounted) {
-                          return;
-                        }
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${plantAction.type.name} has been deleted'),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: () async =>
+                        await _deletePlantAction(context, actionsProvider, plantAction),
                     icon: const Icon(Icons.delete_forever, color: Colors.red),
                   ),
                 ],
@@ -53,6 +41,27 @@ Future<void> showPlantActionDetailSheet(
   );
 }
 
+/// Deletes a [plantAction].
+Future<void> _deletePlantAction(
+  BuildContext context,
+  ActionsProvider actionsProvider,
+  PlantAction plantAction,
+) async {
+  final confirmed = await confirmDeletionOfPlantActionDialog(context, plantAction, actionsProvider);
+  if (confirmed == true) {
+    if (!context.mounted) {
+      return;
+    }
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${plantAction.type.name} has been deleted'),
+      ),
+    );
+  }
+}
+
+/// Opens a bottom sheet to show the details of [environmentAction].
 Future<void> showEnvironmentActionDetailSheet(
   BuildContext context,
   EnvironmentAction environmentAction,

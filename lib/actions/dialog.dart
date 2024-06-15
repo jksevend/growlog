@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 
+/// Opens a dialog to confirm the deletion of a [plantAction].
 Future<bool> confirmDeletionOfPlantActionDialog(
   BuildContext context,
   PlantAction plantAction,
@@ -15,19 +16,11 @@ Future<bool> confirmDeletionOfPlantActionDialog(
         content: const Text('Are you sure you want to delete this action?'),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
+            onPressed: () => _onClose(context),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () async {
-              await actionsProvider.deletePlantAction(plantAction);
-              if (!context.mounted) {
-                return;
-              }
-              Navigator.of(context).pop(true);
-            },
+            onPressed: () async => _deletePlantAction(context, actionsProvider, plantAction),
             child: const Text('Delete'),
           ),
         ],
@@ -38,6 +31,25 @@ Future<bool> confirmDeletionOfPlantActionDialog(
   return confirmed!;
 }
 
+/// Closes the dialog.
+void _onClose(BuildContext context) {
+  Navigator.of(context).pop(false);
+}
+
+/// Deletes a [plantAction].
+Future<void> _deletePlantAction(
+  BuildContext context,
+  ActionsProvider actionsProvider,
+  PlantAction plantAction,
+) async {
+  await actionsProvider.deletePlantAction(plantAction);
+  if (!context.mounted) {
+    return;
+  }
+  Navigator.of(context).pop(true);
+}
+
+/// Opens a dialog to confirm the deletion of an [environmentAction].
 Future<bool> confirmDeletionOfEnvironmentActionDialog(
   BuildContext context,
   EnvironmentAction environmentAction,
@@ -51,19 +63,12 @@ Future<bool> confirmDeletionOfEnvironmentActionDialog(
         content: const Text('Are you sure you want to delete this action?'),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
+            onPressed: () => _onClose(context),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () async {
-              await actionsProvider.deleteEnvironmentAction(environmentAction);
-              if (!context.mounted) {
-                return;
-              }
-              Navigator.of(context).pop(true);
-            },
+            onPressed: () async =>
+                _deleteEnvironmentAction(context, actionsProvider, environmentAction),
             child: const Text('Delete'),
           ),
         ],
@@ -72,4 +77,17 @@ Future<bool> confirmDeletionOfEnvironmentActionDialog(
   );
 
   return confirmed!;
+}
+
+/// Deletes an [environmentAction].
+Future<void> _deleteEnvironmentAction(
+  BuildContext context,
+  ActionsProvider actionsProvider,
+  EnvironmentAction environmentAction,
+) async {
+  await actionsProvider.deleteEnvironmentAction(environmentAction);
+  if (!context.mounted) {
+    return;
+  }
+  Navigator.of(context).pop(true);
 }
