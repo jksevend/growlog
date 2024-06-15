@@ -85,7 +85,7 @@ Future<void> showPlantDetailSheet(
                     },
                     icon: const Icon(
                       Icons.edit,
-                      color: Colors.amber ,
+                      color: Colors.amber,
                     ),
                   ),
                 ],

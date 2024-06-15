@@ -47,9 +47,10 @@ class PlantsProvider with ChangeNotifier {
     await setPlants(Plants(plants: plants.values.toList()));
   }
 
-  Future<void> removePlantsInEnvironment(String environmentId) async{
+  Future<void> removePlantsInEnvironment(String environmentId) async {
     final plants = await _plantsMap.first;
-    final plantsToRemove = plants.values.where((plant) => plant.environmentId == environmentId).toList();
+    final plantsToRemove =
+        plants.values.where((plant) => plant.environmentId == environmentId).toList();
     for (final plant in plantsToRemove) {
       plant.environmentId = '';
     }

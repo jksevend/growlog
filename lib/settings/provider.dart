@@ -11,7 +11,6 @@ import 'package:weedy/settings/model.dart';
 /// and can be accessed via a stream called [settings] and changed via [setSettings]
 /// which will also update the JSON file on the device's file system.
 class SettingsProvider extends ChangeNotifier {
-
   /// The name of the JSON file that holds the settings.
   static const String _fileName = 'settings.json';
 

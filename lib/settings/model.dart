@@ -7,10 +7,10 @@ class Settings {
   Settings();
 
   factory Settings.fromJson(Map<String, dynamic> json) => _$SettingsFromJson(json);
+
   Map<String, dynamic> toJson() => _$SettingsToJson(this);
 
   factory Settings.standard() {
-    return Settings(
-    );
+    return Settings();
   }
 }

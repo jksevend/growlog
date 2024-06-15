@@ -12,8 +12,7 @@ Environments _$EnvironmentsFromJson(Map<String, dynamic> json) => Environments(
           .toList(),
     );
 
-Map<String, dynamic> _$EnvironmentsToJson(Environments instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$EnvironmentsToJson(Environments instance) => <String, dynamic>{
       'environments': instance.environments,
     };
 
@@ -34,14 +33,12 @@ Environment _$EnvironmentFromJson(Map<String, dynamic> json) => Environment(
       name: json['name'] as String,
       description: json['description'] as String,
       type: $enumDecode(_$EnvironmentTypeEnumMap, json['type']),
-      lightDetails:
-          LightDetails.fromJson(json['lightDetails'] as Map<String, dynamic>),
+      lightDetails: LightDetails.fromJson(json['lightDetails'] as Map<String, dynamic>),
       dimension: Dimension.fromJson(json['dimension'] as Map<String, dynamic>),
       bannerImagePath: json['bannerImagePath'] as String,
     );
 
-Map<String, dynamic> _$EnvironmentToJson(Environment instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$EnvironmentToJson(Environment instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'description': instance.description,
@@ -84,8 +81,7 @@ LightDetails _$LightDetailsFromJson(Map<String, dynamic> json) => LightDetails(
           .toList(),
     );
 
-Map<String, dynamic> _$LightDetailsToJson(LightDetails instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$LightDetailsToJson(LightDetails instance) => <String, dynamic>{
       'lightHours': instance.lightHours,
       'lights': instance.lights,
     };

@@ -20,8 +20,7 @@ Plant _$PlantFromJson(Map<String, dynamic> json) => Plant(
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
-      lifeCycleState:
-          $enumDecode(_$LifeCycleStateEnumMap, json['lifeCycleState']),
+      lifeCycleState: $enumDecode(_$LifeCycleStateEnumMap, json['lifeCycleState']),
       medium: $enumDecode(_$MediumEnumMap, json['medium']),
       environmentId: json['environmentId'] as String,
       bannerImagePath: json['bannerImagePath'] as String,

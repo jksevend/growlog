@@ -34,8 +34,8 @@ class MeasurementAmount {
 
   MeasurementAmount({required this.value, required this.unit});
 
-  factory MeasurementAmount.fromJson(Map<String, dynamic> json) => _$MeasurementAmountFromJson(json);
+  factory MeasurementAmount.fromJson(Map<String, dynamic> json) =>
+      _$MeasurementAmountFromJson(json);
 
   Map<String, dynamic> toJson() => _$MeasurementAmountToJson(this);
-
 }

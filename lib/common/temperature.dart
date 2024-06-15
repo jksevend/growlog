@@ -40,5 +40,4 @@ class Temperature {
   factory Temperature.fromJson(Map<String, dynamic> json) => _$TemperatureFromJson(json);
 
   Map<String, dynamic> toJson() => _$TemperatureToJson(this);
-
 }

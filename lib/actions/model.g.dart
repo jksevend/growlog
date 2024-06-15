@@ -18,8 +18,7 @@ Map<String, dynamic> _$ActionToJson(Action instance) => <String, dynamic>{
       'createdAt': instance.createdAt.toIso8601String(),
     };
 
-EnvironmentAction _$EnvironmentActionFromJson(Map<String, dynamic> json) =>
-    EnvironmentAction(
+EnvironmentAction _$EnvironmentActionFromJson(Map<String, dynamic> json) => EnvironmentAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -27,8 +26,7 @@ EnvironmentAction _$EnvironmentActionFromJson(Map<String, dynamic> json) =>
       type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
     );
 
-Map<String, dynamic> _$EnvironmentActionToJson(EnvironmentAction instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$EnvironmentActionToJson(EnvironmentAction instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
@@ -42,20 +40,17 @@ const _$EnvironmentActionTypeEnumMap = {
   EnvironmentActionType.other: 'other',
 };
 
-EnvironmentMeasurementAction _$EnvironmentMeasurementActionFromJson(
-        Map<String, dynamic> json) =>
+EnvironmentMeasurementAction _$EnvironmentMeasurementActionFromJson(Map<String, dynamic> json) =>
     EnvironmentMeasurementAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       environmentId: json['environmentId'] as String,
       type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
-      measurement: EnvironmentMeasurement.fromJson(
-          json['measurement'] as Map<String, dynamic>),
+      measurement: EnvironmentMeasurement.fromJson(json['measurement'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$EnvironmentMeasurementActionToJson(
-        EnvironmentMeasurementAction instance) =>
+Map<String, dynamic> _$EnvironmentMeasurementActionToJson(EnvironmentMeasurementAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
@@ -65,20 +60,17 @@ Map<String, dynamic> _$EnvironmentMeasurementActionToJson(
       'measurement': instance.measurement,
     };
 
-EnvironmentPictureAction _$EnvironmentPictureActionFromJson(
-        Map<String, dynamic> json) =>
+EnvironmentPictureAction _$EnvironmentPictureActionFromJson(Map<String, dynamic> json) =>
     EnvironmentPictureAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       environmentId: json['environmentId'] as String,
       type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
-      images:
-          (json['images'] as List<dynamic>).map((e) => e as String).toList(),
+      images: (json['images'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
-Map<String, dynamic> _$EnvironmentPictureActionToJson(
-        EnvironmentPictureAction instance) =>
+Map<String, dynamic> _$EnvironmentPictureActionToJson(EnvironmentPictureAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
@@ -88,8 +80,7 @@ Map<String, dynamic> _$EnvironmentPictureActionToJson(
       'images': instance.images,
     };
 
-EnvironmentOtherAction _$EnvironmentOtherActionFromJson(
-        Map<String, dynamic> json) =>
+EnvironmentOtherAction _$EnvironmentOtherActionFromJson(Map<String, dynamic> json) =>
     EnvironmentOtherAction(
       id: json['id'] as String,
       description: json['description'] as String,
@@ -98,8 +89,7 @@ EnvironmentOtherAction _$EnvironmentOtherActionFromJson(
       type: $enumDecode(_$EnvironmentActionTypeEnumMap, json['type']),
     );
 
-Map<String, dynamic> _$EnvironmentOtherActionToJson(
-        EnvironmentOtherAction instance) =>
+Map<String, dynamic> _$EnvironmentOtherActionToJson(EnvironmentOtherAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
@@ -108,15 +98,13 @@ Map<String, dynamic> _$EnvironmentOtherActionToJson(
       'type': _$EnvironmentActionTypeEnumMap[instance.type]!,
     };
 
-EnvironmentMeasurement _$EnvironmentMeasurementFromJson(
-        Map<String, dynamic> json) =>
+EnvironmentMeasurement _$EnvironmentMeasurementFromJson(Map<String, dynamic> json) =>
     EnvironmentMeasurement(
       type: $enumDecode(_$EnvironmentMeasurementTypeEnumMap, json['type']),
       measurement: json['measurement'] as Map<String, dynamic>,
     );
 
-Map<String, dynamic> _$EnvironmentMeasurementToJson(
-        EnvironmentMeasurement instance) =>
+Map<String, dynamic> _$EnvironmentMeasurementToJson(EnvironmentMeasurement instance) =>
     <String, dynamic>{
       'type': _$EnvironmentMeasurementTypeEnumMap[instance.type]!,
       'measurement': instance.measurement,
@@ -134,8 +122,7 @@ LiquidAmount _$LiquidAmountFromJson(Map<String, dynamic> json) => LiquidAmount(
       amount: (json['amount'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$LiquidAmountToJson(LiquidAmount instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$LiquidAmountToJson(LiquidAmount instance) => <String, dynamic>{
       'unit': _$LiquidUnitEnumMap[instance.unit]!,
       'amount': instance.amount,
     };
@@ -153,8 +140,7 @@ PlantAction _$PlantActionFromJson(Map<String, dynamic> json) => PlantAction(
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
     );
 
-Map<String, dynamic> _$PlantActionToJson(PlantAction instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantActionToJson(PlantAction instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
@@ -175,14 +161,12 @@ const _$PlantActionTypeEnumMap = {
   PlantActionType.other: 'other',
 };
 
-PlantMeasurement _$PlantMeasurementFromJson(Map<String, dynamic> json) =>
-    PlantMeasurement(
+PlantMeasurement _$PlantMeasurementFromJson(Map<String, dynamic> json) => PlantMeasurement(
       type: $enumDecode(_$PlantMeasurementTypeEnumMap, json['type']),
       measurement: json['measurement'] as Map<String, dynamic>,
     );
 
-Map<String, dynamic> _$PlantMeasurementToJson(PlantMeasurement instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantMeasurementToJson(PlantMeasurement instance) => <String, dynamic>{
       'type': _$PlantMeasurementTypeEnumMap[instance.type]!,
       'measurement': instance.measurement,
     };
@@ -194,8 +178,7 @@ const _$PlantMeasurementTypeEnumMap = {
   PlantMeasurementType.ppm: 'ppm',
 };
 
-PlantWateringAction _$PlantWateringActionFromJson(Map<String, dynamic> json) =>
-    PlantWateringAction(
+PlantWateringAction _$PlantWateringActionFromJson(Map<String, dynamic> json) => PlantWateringAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -204,9 +187,7 @@ PlantWateringAction _$PlantWateringActionFromJson(Map<String, dynamic> json) =>
       amount: LiquidAmount.fromJson(json['amount'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PlantWateringActionToJson(
-        PlantWateringAction instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantWateringActionToJson(PlantWateringAction instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
@@ -215,32 +196,27 @@ Map<String, dynamic> _$PlantWateringActionToJson(
       'amount': instance.amount,
     };
 
-PlantFertilization _$PlantFertilizationFromJson(Map<String, dynamic> json) =>
-    PlantFertilization(
+PlantFertilization _$PlantFertilizationFromJson(Map<String, dynamic> json) => PlantFertilization(
       fertilizerId: json['fertilizerId'] as String,
       amount: LiquidAmount.fromJson(json['amount'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PlantFertilizationToJson(PlantFertilization instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantFertilizationToJson(PlantFertilization instance) => <String, dynamic>{
       'fertilizerId': instance.fertilizerId,
       'amount': instance.amount,
     };
 
-PlantFertilizingAction _$PlantFertilizingActionFromJson(
-        Map<String, dynamic> json) =>
+PlantFertilizingAction _$PlantFertilizingActionFromJson(Map<String, dynamic> json) =>
     PlantFertilizingAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
-      fertilization: PlantFertilization.fromJson(
-          json['fertilization'] as Map<String, dynamic>),
+      fertilization: PlantFertilization.fromJson(json['fertilization'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PlantFertilizingActionToJson(
-        PlantFertilizingAction instance) =>
+Map<String, dynamic> _$PlantFertilizingActionToJson(PlantFertilizingAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
@@ -250,8 +226,7 @@ Map<String, dynamic> _$PlantFertilizingActionToJson(
       'fertilization': instance.fertilization,
     };
 
-PlantPruningAction _$PlantPruningActionFromJson(Map<String, dynamic> json) =>
-    PlantPruningAction(
+PlantPruningAction _$PlantPruningActionFromJson(Map<String, dynamic> json) => PlantPruningAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -260,8 +235,7 @@ PlantPruningAction _$PlantPruningActionFromJson(Map<String, dynamic> json) =>
       pruningType: $enumDecode(_$PruningTypeEnumMap, json['pruningType']),
     );
 
-Map<String, dynamic> _$PlantPruningActionToJson(PlantPruningAction instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantPruningActionToJson(PlantPruningAction instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
@@ -281,8 +255,7 @@ WeightAmount _$WeightAmountFromJson(Map<String, dynamic> json) => WeightAmount(
       amount: (json['amount'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$WeightAmountToJson(WeightAmount instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$WeightAmountToJson(WeightAmount instance) => <String, dynamic>{
       'unit': _$WeightUnitEnumMap[instance.unit]!,
       'amount': instance.amount,
     };
@@ -292,8 +265,7 @@ const _$WeightUnitEnumMap = {
   WeightUnit.kg: 'kg',
 };
 
-PlantHarvestingAction _$PlantHarvestingActionFromJson(
-        Map<String, dynamic> json) =>
+PlantHarvestingAction _$PlantHarvestingActionFromJson(Map<String, dynamic> json) =>
     PlantHarvestingAction(
       id: json['id'] as String,
       description: json['description'] as String,
@@ -303,8 +275,7 @@ PlantHarvestingAction _$PlantHarvestingActionFromJson(
       amount: WeightAmount.fromJson(json['amount'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PlantHarvestingActionToJson(
-        PlantHarvestingAction instance) =>
+Map<String, dynamic> _$PlantHarvestingActionToJson(PlantHarvestingAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
@@ -314,8 +285,7 @@ Map<String, dynamic> _$PlantHarvestingActionToJson(
       'amount': instance.amount,
     };
 
-PlantReplantingAction _$PlantReplantingActionFromJson(
-        Map<String, dynamic> json) =>
+PlantReplantingAction _$PlantReplantingActionFromJson(Map<String, dynamic> json) =>
     PlantReplantingAction(
       id: json['id'] as String,
       description: json['description'] as String,
@@ -324,8 +294,7 @@ PlantReplantingAction _$PlantReplantingActionFromJson(
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
     );
 
-Map<String, dynamic> _$PlantReplantingActionToJson(
-        PlantReplantingAction instance) =>
+Map<String, dynamic> _$PlantReplantingActionToJson(PlantReplantingAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
@@ -334,8 +303,7 @@ Map<String, dynamic> _$PlantReplantingActionToJson(
       'type': _$PlantActionTypeEnumMap[instance.type]!,
     };
 
-PlantTrainingAction _$PlantTrainingActionFromJson(Map<String, dynamic> json) =>
-    PlantTrainingAction(
+PlantTrainingAction _$PlantTrainingActionFromJson(Map<String, dynamic> json) => PlantTrainingAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -344,9 +312,7 @@ PlantTrainingAction _$PlantTrainingActionFromJson(Map<String, dynamic> json) =>
       trainingType: $enumDecode(_$TrainingTypeEnumMap, json['trainingType']),
     );
 
-Map<String, dynamic> _$PlantTrainingActionToJson(
-        PlantTrainingAction instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantTrainingActionToJson(PlantTrainingAction instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
@@ -360,20 +326,17 @@ const _$TrainingTypeEnumMap = {
   TrainingType.scrog: 'scrog',
 };
 
-PlantMeasuringAction _$PlantMeasuringActionFromJson(
-        Map<String, dynamic> json) =>
+PlantMeasuringAction _$PlantMeasuringActionFromJson(Map<String, dynamic> json) =>
     PlantMeasuringAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
-      measurement: PlantMeasurement.fromJson(
-          json['measurement'] as Map<String, dynamic>),
+      measurement: PlantMeasurement.fromJson(json['measurement'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PlantMeasuringActionToJson(
-        PlantMeasuringAction instance) =>
+Map<String, dynamic> _$PlantMeasuringActionToJson(PlantMeasuringAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
@@ -383,8 +346,7 @@ Map<String, dynamic> _$PlantMeasuringActionToJson(
       'measurement': instance.measurement,
     };
 
-PlantDeathAction _$PlantDeathActionFromJson(Map<String, dynamic> json) =>
-    PlantDeathAction(
+PlantDeathAction _$PlantDeathActionFromJson(Map<String, dynamic> json) => PlantDeathAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -392,8 +354,7 @@ PlantDeathAction _$PlantDeathActionFromJson(Map<String, dynamic> json) =>
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
     );
 
-Map<String, dynamic> _$PlantDeathActionToJson(PlantDeathAction instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantDeathActionToJson(PlantDeathAction instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
@@ -401,19 +362,16 @@ Map<String, dynamic> _$PlantDeathActionToJson(PlantDeathAction instance) =>
       'type': _$PlantActionTypeEnumMap[instance.type]!,
     };
 
-PlantPictureAction _$PlantPictureActionFromJson(Map<String, dynamic> json) =>
-    PlantPictureAction(
+PlantPictureAction _$PlantPictureActionFromJson(Map<String, dynamic> json) => PlantPictureAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       plantId: json['plantId'] as String,
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
-      images:
-          (json['images'] as List<dynamic>).map((e) => e as String).toList(),
+      images: (json['images'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
-Map<String, dynamic> _$PlantPictureActionToJson(PlantPictureAction instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantPictureActionToJson(PlantPictureAction instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
@@ -422,8 +380,7 @@ Map<String, dynamic> _$PlantPictureActionToJson(PlantPictureAction instance) =>
       'images': instance.images,
     };
 
-PlantOtherAction _$PlantOtherActionFromJson(Map<String, dynamic> json) =>
-    PlantOtherAction(
+PlantOtherAction _$PlantOtherActionFromJson(Map<String, dynamic> json) => PlantOtherAction(
       id: json['id'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
@@ -431,8 +388,7 @@ PlantOtherAction _$PlantOtherActionFromJson(Map<String, dynamic> json) =>
       type: $enumDecode(_$PlantActionTypeEnumMap, json['type']),
     );
 
-Map<String, dynamic> _$PlantOtherActionToJson(PlantOtherAction instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$PlantOtherActionToJson(PlantOtherAction instance) => <String, dynamic>{
       'id': instance.id,
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),

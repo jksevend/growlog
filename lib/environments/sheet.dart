@@ -8,7 +8,7 @@ import 'package:weedy/environments/view.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 
-Future <void> showEnvironmentDetailSheet(
+Future<void> showEnvironmentDetailSheet(
   BuildContext context,
   Environment environment,
   List<Plant> plants,
@@ -19,7 +19,8 @@ Future <void> showEnvironmentDetailSheet(
   await showModalBottomSheet(
     context: context,
     builder: (context) {
-      return StatefulBuilder(builder: (context, setState) {
+      return StatefulBuilder(
+        builder: (context, setState) {
           return SingleChildScrollView(
             child: Column(
               children: [

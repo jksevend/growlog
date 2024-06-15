@@ -31,7 +31,9 @@ class EnvironmentsProvider with ChangeNotifier {
   Future<void> setEnvironments(Environments environments) async {
     _environments.environments = environments.environments;
     await writeJsonFile(name: _fileName, content: environments.toJson());
-    final map = environments.environments.asMap().map((index, environment) => MapEntry(environment.id, environment));
+    final map = environments.environments
+        .asMap()
+        .map((index, environment) => MapEntry(environment.id, environment));
     _environmentsMap.sink.add(map);
   }
 

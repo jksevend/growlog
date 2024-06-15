@@ -2232,6 +2232,7 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
 
 class PictureForm extends StatefulWidget {
   final bool allowMultiple;
+
   const PictureForm({
     super.key,
     required this.allowMultiple,

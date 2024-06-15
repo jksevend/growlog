@@ -7,7 +7,6 @@ import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/plants/model.dart';
 
-
 class PlantActionLogHomeWidget extends StatelessWidget {
   final Plant plant;
   final PlantAction action;
@@ -105,7 +104,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     int daysToDisplay = rows * 7;
 
     List<DateTime> monthDays =
-    List.generate(daysToDisplay, (index) => firstDayToDisplay.add(Duration(days: index)));
+        List.generate(daysToDisplay, (index) => firstDayToDisplay.add(Duration(days: index)));
 
     return monthDays;
   }
@@ -253,7 +252,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
       [bool isCurrentMonth = true]) {
     return isToday
         ? Center(
-      child: Container(
+            child: Container(
               padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right: 8),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.blue, width: 1.5),
@@ -289,24 +288,24 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                             ),
                           );
                         }),
-                      ],
+                      ].take(4).toList(),
                     )
                   ],
                 ),
               ),
             ),
-    )
+          )
         : Center(
-      child: Padding(
-        padding: const EdgeInsets.all(4.0),
-        child: Text(
-          _formatDate(date),
-          style: TextStyle(
-            color: isCurrentMonth ? Colors.grey : Colors.grey[700],
-            fontWeight: isCurrentMonth ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-      ),
-    );
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: Text(
+                _formatDate(date),
+                style: TextStyle(
+                  color: isCurrentMonth ? Colors.grey : Colors.grey[700],
+                  fontWeight: isCurrentMonth ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
+          );
   }
 }

@@ -60,11 +60,10 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
               (environment) {
                 final plantsInEnvironment =
                     plants.values.where((plant) => plant.environmentId == environment.id).toList();
-                return LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Card(
-                      child: Column(
-                        children: [
+                return LayoutBuilder(builder: (context, constraints) {
+                  return Card(
+                    child: Column(
+                      children: [
                         GestureDetector(
                           child: Image.file(
                             height: constraints.maxWidth / 2,
@@ -93,39 +92,38 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                           },
                         ),
                         ListTile(
-                            leading: Text(
-                              environment.type.icon,
-                              style: const TextStyle(fontSize: 22.0),
-                            ),
-                            title: Text(environment.name),
-                            subtitle: Text(environment.description),
-                            onTap: () async {
-                              debugPrint(
-                                  'Navigate to the environment detail view for ${environment.name}');
-                              await showEnvironmentDetailSheet(
-                                  context,
-                                  environment,
-                                  plantsInEnvironment,
-                                  widget.environmentsProvider,
-                                  widget.plantsProvider,
-                                  widget.actionsProvider);
-                            },
-                            trailing: IconButton(
+                          leading: Text(
+                            environment.type.icon,
+                            style: const TextStyle(fontSize: 22.0),
+                          ),
+                          title: Text(environment.name),
+                          subtitle: Text(environment.description),
+                          onTap: () async {
+                            debugPrint(
+                                'Navigate to the environment detail view for ${environment.name}');
+                            await showEnvironmentDetailSheet(
+                                context,
+                                environment,
+                                plantsInEnvironment,
+                                widget.environmentsProvider,
+                                widget.plantsProvider,
+                                widget.actionsProvider);
+                          },
+                          trailing: IconButton(
                             icon: const Icon(Icons.timeline),
                             onPressed: () {
                               Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => EnvironmentActionOverview(
-                                      environment: environment,
-                                      actionsProvider: widget.actionsProvider,
-                                    )));
-                              },
-                            ),
+                                  builder: (context) => EnvironmentActionOverview(
+                                        environment: environment,
+                                        actionsProvider: widget.actionsProvider,
+                                      )));
+                            },
                           ),
-                        ],
-                      ),
-                    );
-                  }
-                );
+                        ),
+                      ],
+                    ),
+                  );
+                });
               },
             ).toList(),
           ),

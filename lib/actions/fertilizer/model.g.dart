@@ -12,8 +12,7 @@ Fertilizer _$FertilizerFromJson(Map<String, dynamic> json) => Fertilizer(
       description: json['description'] as String,
     );
 
-Map<String, dynamic> _$FertilizerToJson(Fertilizer instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$FertilizerToJson(Fertilizer instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'description': instance.description,
@@ -25,7 +24,6 @@ Fertilizers _$FertilizersFromJson(Map<String, dynamic> json) => Fertilizers(
           .toList(),
     );
 
-Map<String, dynamic> _$FertilizersToJson(Fertilizers instance) =>
-    <String, dynamic>{
+Map<String, dynamic> _$FertilizersToJson(Fertilizers instance) => <String, dynamic>{
       'fertilizers': instance.fertilizers,
     };
