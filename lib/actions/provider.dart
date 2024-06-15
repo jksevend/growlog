@@ -27,6 +27,7 @@ class ActionsProvider with ChangeNotifier {
       name: _fileName,
       preset: json.encode(_standardActions.toJson()),
     );
+
     _actions = weedy.Actions.fromJson(actionsJson);
     await setPlantActions(_actions.plantActions);
     await setEnvironmentActions(_actions.environmentActions);

@@ -608,7 +608,10 @@ class PlantOtherAction extends PlantAction {
 
 @JsonSerializable()
 class Actions {
+  @JsonKey(fromJson: _plantActionsFromJson)
   List<PlantAction> plantActions;
+
+  @JsonKey(fromJson: _environmentActionsFromJson)
   List<EnvironmentAction> environmentActions;
 
   Actions({
@@ -625,5 +628,51 @@ class Actions {
       plantActions: [],
       environmentActions: [],
     );
+  }
+
+  static List<PlantAction> _plantActionsFromJson(List<dynamic> json) {
+    return json.map((e) {
+      var map = e as Map<String, dynamic>;
+      switch (map['type'] as String) {
+        case 'watering':
+          return PlantWateringAction.fromJson(map);
+        case 'fertilizing':
+          return PlantFertilizingAction.fromJson(map);
+        case 'pruning':
+          return PlantPruningAction.fromJson(map);
+        case 'harvesting':
+          return PlantHarvestingAction.fromJson(map);
+        case 'replanting':
+          return PlantReplantingAction.fromJson(map);
+        case 'training':
+          return PlantTrainingAction.fromJson(map);
+        case 'measuring':
+          return PlantMeasuringAction.fromJson(map);
+        case 'picture':
+          return PlantPictureAction.fromJson(map);
+        case 'death':
+          return PlantDeathAction.fromJson(map);
+        case 'other':
+          return PlantOtherAction.fromJson(map);
+        default:
+          throw Exception('Unknown type for PlantAction: ${map['type']}');
+      }
+    }).toList();
+  }
+
+  static List<EnvironmentAction> _environmentActionsFromJson(List<dynamic> json) {
+    return json.map((e) {
+      var map = e as Map<String, dynamic>;
+      switch (map['type'] as String) {
+        case 'measurement':
+          return EnvironmentMeasurementAction.fromJson(map);
+        case 'picture':
+          return EnvironmentPictureAction.fromJson(map);
+        case 'other':
+          return EnvironmentOtherAction.fromJson(map);
+        default:
+          throw Exception('Unknown type for EnvironmentAction: ${map['type']}');
+      }
+    }).toList();
   }
 }

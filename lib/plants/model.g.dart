@@ -35,6 +35,7 @@ Map<String, dynamic> _$PlantToJson(Plant instance) => <String, dynamic>{
       'medium': _$MediumEnumMap[instance.medium]!,
       'bannerImagePath': instance.bannerImagePath,
       'environmentId': instance.environmentId,
+      'createdAt': instance.createdAt.toIso8601String(),
     };
 
 const _$LifeCycleStateEnumMap = {

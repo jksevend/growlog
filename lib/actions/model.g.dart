@@ -397,12 +397,8 @@ Map<String, dynamic> _$PlantOtherActionToJson(PlantOtherAction instance) => <Str
     };
 
 Actions _$ActionsFromJson(Map<String, dynamic> json) => Actions(
-      plantActions: (json['plantActions'] as List<dynamic>)
-          .map((e) => PlantAction.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      environmentActions: (json['environmentActions'] as List<dynamic>)
-          .map((e) => EnvironmentAction.fromJson(e as Map<String, dynamic>))
-          .toList(),
+      plantActions: Actions._plantActionsFromJson(json['plantActions'] as List),
+      environmentActions: Actions._environmentActionsFromJson(json['environmentActions'] as List),
     );
 
 Map<String, dynamic> _$ActionsToJson(Actions instance) => <String, dynamic>{
