@@ -52,6 +52,7 @@ extension EnvironmentTypeExtension on EnvironmentType {
   }
 }
 
+/// The dimension of an environment.
 @JsonSerializable()
 class Dimension {
   final MeasurementAmount width;
@@ -69,6 +70,7 @@ class Dimension {
   Map<String, dynamic> toJson() => _$DimensionToJson(this);
 }
 
+/// An environment in which plants can grow.
 @JsonSerializable()
 class Environment {
   final String id;
@@ -113,6 +115,7 @@ class Environment {
   }
 }
 
+/// The type of light.
 enum LightType {
   sunlight,
   cfl,
@@ -122,7 +125,9 @@ enum LightType {
   lec,
 }
 
+/// An extension on the [LightType] enum.
 extension LightTypeExtension on LightType {
+  /// The name of the light type.
   String get name {
     switch (this) {
       case LightType.sunlight:
@@ -141,6 +146,7 @@ extension LightTypeExtension on LightType {
   }
 }
 
+/// A light source in an environment.
 @JsonSerializable()
 class Light {
   final String id;
