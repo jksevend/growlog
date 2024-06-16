@@ -696,6 +696,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
         return PictureForm(
           key: _plantPictureFormState,
           allowMultiple: true,
+          images: const [],
         );
       case PlantActionType.death:
       case PlantActionType.other:
@@ -1033,6 +1034,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
         return PictureForm(
           key: _environmentPictureFormState,
           allowMultiple: true,
+          images: const [],
         );
       case EnvironmentActionType.other:
         return Container();
@@ -2304,10 +2306,12 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
 /// A form to take pictures.
 class PictureForm extends StatefulWidget {
   final bool allowMultiple;
+  final List<File> images;
 
   const PictureForm({
     super.key,
     required this.allowMultiple,
+    required this.images,
   });
 
   @override
@@ -2321,12 +2325,12 @@ class PictureFormState extends State<PictureForm> {
   @override
   void initState() {
     super.initState();
-    _images = [];
+    _images = widget.images;
   }
 
   /// The images taken.
   List<String> get images {
-    return _images.isEmpty ? [] : _images.map((e) => e.path).toList();
+    return _images.isEmpty ? [] : _images.map((image) => image.path).toList();
   }
 
   @override

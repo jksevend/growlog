@@ -342,6 +342,9 @@ class _PlantFormState extends State<PlantForm> {
                           PictureForm(
                             key: _pictureFormKey,
                             allowMultiple: false,
+                            images: widget.plant?.bannerImagePath == ''
+                                ? <File>[]
+                                : <File>[File(widget.plant!.bannerImagePath)],
                           ),
                         ],
                       ),

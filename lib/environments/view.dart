@@ -329,6 +329,11 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                         PictureForm(
                           key: _pictureFormKey,
                           allowMultiple: false,
+                          images: widget.environment == null
+                              ? []
+                              : widget.environment!.bannerImagePath.isEmpty
+                                  ? []
+                                  : [File(widget.environment!.bannerImagePath)],
                         ),
                       ],
                     ),
