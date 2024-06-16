@@ -8,6 +8,7 @@ import 'package:weedy/environments/view.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 
+/// Shows a bottom sheet with the details of the [environment].
 Future<void> showEnvironmentDetailSheet(
   BuildContext context,
   Environment environment,
@@ -32,21 +33,13 @@ Future<void> showEnvironmentDetailSheet(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () async {
-                          final confirmed = await confirmDeletionOfEnvironmentDialog(context,
-                              environment, environmentsProvider, plantsProvider, actionsProvider);
-                          if (confirmed == true) {
-                            if (!context.mounted) {
-                              return;
-                            }
-                            Navigator.of(context).pop();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${environment.name} has been deleted'),
-                              ),
-                            );
-                          }
-                        },
+                        onPressed: () async => await _onDeleteEnvironment(
+                          context,
+                          environment,
+                          environmentsProvider,
+                          plantsProvider,
+                          actionsProvider,
+                        ),
                         icon: const Icon(Icons.delete_forever, color: Colors.red),
                       ),
                       IconButton(
@@ -109,4 +102,26 @@ Future<void> showEnvironmentDetailSheet(
       );
     },
   );
+}
+
+Future<void> _onDeleteEnvironment(
+  BuildContext context,
+  Environment environment,
+  EnvironmentsProvider environmentsProvider,
+  PlantsProvider plantsProvider,
+  ActionsProvider actionsProvider,
+) async {
+  final confirmed = await confirmDeletionOfEnvironmentDialog(
+      context, environment, environmentsProvider, plantsProvider, actionsProvider);
+  if (confirmed == true) {
+    if (!context.mounted) {
+      return;
+    }
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${environment.name} has been deleted'),
+      ),
+    );
+  }
 }

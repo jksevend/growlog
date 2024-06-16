@@ -3,6 +3,7 @@ import 'package:weedy/actions/provider.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 
+/// Shows a dialog that asks the user to confirm the deletion of a plant.
 Future<bool> confirmDeletionOfPlantDialog(
   BuildContext context,
   Plant plant,
@@ -17,20 +18,11 @@ Future<bool> confirmDeletionOfPlantDialog(
         content: Text('Are you sure you want to delete ${plant.name}?'),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
+            onPressed: () => _onClose(context, false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () async {
-              await plantsProvider.removePlant(plant);
-              await actionsProvider.removeActionsForPlant(plant.id);
-              if (!context.mounted) {
-                return;
-              }
-              Navigator.of(context).pop(true);
-            },
+            onPressed: () async => _onPlantDeleted(context, plantsProvider, actionsProvider, plant),
             child: const Text('Delete'),
           ),
         ],
@@ -38,4 +30,24 @@ Future<bool> confirmDeletionOfPlantDialog(
     },
   );
   return confirmed!;
+}
+
+/// Close the dialog and return a value.
+void _onClose<T>(BuildContext context, T value) {
+  Navigator.of(context).pop(value);
+}
+
+/// Deletes the [plant] and all actions associated with it.
+Future<void> _onPlantDeleted(
+  BuildContext context,
+  PlantsProvider plantsProvider,
+  ActionsProvider actionsProvider,
+  Plant plant,
+) async {
+  await plantsProvider.removePlant(plant);
+  await actionsProvider.removeActionsForPlant(plant.id);
+  if (!context.mounted) {
+    return;
+  }
+  Navigator.of(context).pop(true);
 }

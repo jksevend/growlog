@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'model.g.dart';
 
+/// A fertilizer.
 @JsonSerializable()
 class Fertilizer {
   final String id;
@@ -31,6 +32,7 @@ class Fertilizer {
   Map<String, dynamic> toJson() => _$FertilizerToJson(this);
 }
 
+/// A collection of fertilizers.
 @JsonSerializable()
 class Fertilizers {
   List<Fertilizer> fertilizers;

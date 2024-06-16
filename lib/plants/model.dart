@@ -2,13 +2,16 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'model.g.dart';
 
+/// The medium in which a plant is grown.
 enum Medium {
   soil,
   coco,
   hydroponics,
 }
 
+/// The plants that are available in the application.
 extension MediumExtension on Medium {
+  /// The name of the medium.
   String get name {
     switch (this) {
       case Medium.soil:
@@ -21,6 +24,7 @@ extension MediumExtension on Medium {
   }
 }
 
+/// The plants that are available in the application.
 @JsonSerializable()
 class Plants {
   List<Plant> plants;
@@ -40,6 +44,7 @@ class Plants {
   }
 }
 
+/// The life cycle state of a plant.
 enum LifeCycleState {
   germination,
   seedling,
@@ -49,7 +54,9 @@ enum LifeCycleState {
   curing,
 }
 
+/// An extension on the [LifeCycleState] enum.
 extension LifeCycleStateExtension on LifeCycleState {
+  /// The name of the life cycle state.
   String get name {
     switch (this) {
       case LifeCycleState.germination:
@@ -67,6 +74,7 @@ extension LifeCycleStateExtension on LifeCycleState {
     }
   }
 
+  /// The icon of the life cycle state.
   String get icon {
     switch (this) {
       case LifeCycleState.germination:
@@ -85,6 +93,7 @@ extension LifeCycleStateExtension on LifeCycleState {
   }
 }
 
+/// A plant that can be grown in the application.
 @JsonSerializable()
 class Plant {
   final String id;

@@ -16,7 +16,7 @@ import 'statistics/view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Migrate settings
+  // Migrate settings after initial release
   // Example:
   // await migrateFileStore(
   //   name: 'settings.json',
@@ -69,6 +69,7 @@ class WeedyApp extends StatelessWidget {
   }
 }
 
+/// The main view of the app that holds the bottom navigation bar.
 class MainView extends StatefulWidget {
   final SettingsProvider settingsProvider;
   final PlantsProvider plantsProvider;
@@ -112,12 +113,6 @@ class _MainViewState extends State<MainView> {
     ),
     const StatisticsView(),
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -171,6 +166,14 @@ class _MainViewState extends State<MainView> {
     );
   }
 
+  /// Handles the tap on the bottom navigation bar.
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  /// Returns the floating action button based on the selected index.
   Widget? _floatingActionButton() {
     if (_selectedIndex == 0) {
       return FloatingActionButton(
@@ -208,7 +211,7 @@ class _MainViewState extends State<MainView> {
                     environmentsProvider: widget.environmentsProvider,
                   )));
         },
-        tooltip: 'Pflanze hinzufügen',
+        tooltip: 'Add Plant',
         child: const Stack(
           children: <Widget>[
             Icon(Icons.eco, size: 36),
@@ -231,7 +234,7 @@ class _MainViewState extends State<MainView> {
                     environmentsProvider: widget.environmentsProvider,
                   )));
         },
-        tooltip: 'Umgebung hinzufügen',
+        tooltip: 'Add Environment',
         child: const Stack(
           children: <Widget>[
             Icon(Icons.lightbulb, size: 36),
@@ -247,6 +250,7 @@ class _MainViewState extends State<MainView> {
     return null;
   }
 
+  /// Returns the floating action button location based on the selected index.
   FloatingActionButtonLocation _floatingActionButtonLocation() {
     if (_selectedIndex > 0) return FloatingActionButtonLocation.endFloat;
     return FloatingActionButtonLocation.centerFloat;

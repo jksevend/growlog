@@ -12,6 +12,7 @@ import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 import 'package:weedy/plants/sheet.dart';
 
+/// A widget that displays an overview of all plants.
 class PlantOverview extends StatelessWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
@@ -63,9 +64,14 @@ class PlantOverview extends StatelessWidget {
                       return Card(
                         child: Column(
                           children: [
-                            GestureDetector(
-                              child: Image.file(
-                                File(plant.bannerImagePath),
+                          plant.bannerImagePath == ''
+                              ? Placeholder(
+                                  fallbackHeight: constraints.maxWidth / 2,
+                                  fallbackWidth: constraints.maxWidth,
+                                )
+                              : GestureDetector(
+                                  child: Image.file(
+                                    File(plant.bannerImagePath),
                                 width: constraints.maxWidth,
                                 height: constraints.maxWidth / 2,
                                 fit: BoxFit.cover,
@@ -132,11 +138,13 @@ class PlantOverview extends StatelessWidget {
                 },
               ).toList(),
             );
-          }),
+        },
+      ),
     );
   }
 }
 
+/// A widget to reuse the plant form for creating and editing plants.
 class PlantForm extends StatefulWidget {
   final Plant? plant;
   final GlobalKey<FormState> formKey;
@@ -267,11 +275,7 @@ class _PlantFormState extends State<PlantForm> {
                                       ),
                                     )
                                     .toList(),
-                                onChanged: (Environment? value) {
-                                  setState(() {
-                                    _currentEnvironment = value!;
-                                  });
-                                },
+                                onChanged: (Environment? value) => _updateCurrentEnvironment(value),
                                 value: _currentEnvironment,
                               );
                             }),
@@ -291,16 +295,7 @@ class _PlantFormState extends State<PlantForm> {
                           const SizedBox(height: 8.0),
                           ToggleButtons(
                             isSelected: _selectedLifeCycleState,
-                            onPressed: (index) {
-                              setState(() {
-                                for (var i = 0; i <= index; i++) {
-                                  _selectedLifeCycleState[i] = true;
-                                }
-                                for (var i = index + 1; i < _selectedLifeCycleState.length; i++) {
-                                  _selectedLifeCycleState[i] = false;
-                                }
-                              });
-                            },
+                            onPressed: (index) => _onLifeCycleStateSelected(index),
                             children: LifeCycleState.values
                                 .map(
                                   (state) => Padding(
@@ -331,11 +326,7 @@ class _PlantFormState extends State<PlantForm> {
                             ),
                           )
                           .toList(),
-                      onChanged: (Medium? value) {
-                        setState(() {
-                          _selectedMedium = value!;
-                        });
-                      },
+                      onChanged: (Medium? value) => _updateCurrentMedium(value),
                       value: _selectedMedium,
                     ),
                   ),
@@ -360,49 +351,7 @@ class _PlantFormState extends State<PlantForm> {
                 // Submit button
                 const SizedBox(height: 16.0),
                 OutlinedButton.icon(
-                  onPressed: () async {
-                    if (widget.formKey.currentState!.validate()) {
-                      if (_currentEnvironment == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please select an environment'),
-                          ),
-                        );
-                        return;
-                      } else {
-                        Plant plant;
-                        if (widget.plant != null) {
-                          plant = Plant(
-                            id: widget.plant!.id,
-                            name: _nameController.text,
-                            description: _descriptionController.text,
-                            environmentId: _currentEnvironment!.id,
-                            medium: _selectedMedium,
-                            lifeCycleState: _lifeCycleState,
-                            bannerImagePath: _pictureFormKey.currentState!.images.first,
-                            createdAt: widget.plant!.createdAt,
-                          );
-                          await widget.plantsProvider
-                              .updatePlant(plant)
-                              .whenComplete(() => Navigator.of(context).pop(plant));
-                        } else {
-                          plant = Plant(
-                            id: const Uuid().v4().toString(),
-                            name: _nameController.text,
-                            description: _descriptionController.text,
-                            environmentId: _currentEnvironment!.id,
-                            lifeCycleState: _lifeCycleState,
-                            medium: _selectedMedium,
-                            bannerImagePath: _pictureFormKey.currentState!.images.first,
-                            createdAt: DateTime.now(),
-                          );
-                          await widget.plantsProvider
-                              .addPlant(plant)
-                              .whenComplete(() => Navigator.of(context).pop());
-                        }
-                      }
-                    }
-                  },
+                  onPressed: () async => await _onPlantSaved(),
                   label: const Text('Save'),
                   icon: const Icon(Icons.arrow_right),
                 ),
@@ -414,6 +363,82 @@ class _PlantFormState extends State<PlantForm> {
     );
   }
 
+  /// Updates the current environment.
+  void _updateCurrentEnvironment(Environment? environment) {
+    setState(() {
+      _currentEnvironment = environment;
+    });
+  }
+
+  /// Updates the selected medium.
+  void _updateCurrentMedium(Medium? medium) {
+    setState(() {
+      _selectedMedium = medium!;
+    });
+  }
+
+  /// Updates the selected life cycle states based on the selected index.
+  void _onLifeCycleStateSelected(int index) {
+    setState(() {
+      for (var i = 0; i <= index; i++) {
+        _selectedLifeCycleState[i] = true;
+      }
+      for (var i = index + 1; i < _selectedLifeCycleState.length; i++) {
+        _selectedLifeCycleState[i] = false;
+      }
+    });
+  }
+
+  /// Handles the saving of a plant.
+  Future<void> _onPlantSaved() async {
+    if (widget.formKey.currentState!.validate()) {
+      if (_currentEnvironment == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select an environment'),
+          ),
+        );
+        return;
+      } else {
+        Plant plant;
+        if (widget.plant != null) {
+          plant = Plant(
+            id: widget.plant!.id,
+            name: _nameController.text,
+            description: _descriptionController.text,
+            environmentId: _currentEnvironment!.id,
+            medium: _selectedMedium,
+            lifeCycleState: _lifeCycleState,
+            bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                ? ''
+                : _pictureFormKey.currentState!.images.first,
+            createdAt: widget.plant!.createdAt,
+          );
+          await widget.plantsProvider
+              .updatePlant(plant)
+              .whenComplete(() => Navigator.of(context).pop(plant));
+        } else {
+          plant = Plant(
+            id: const Uuid().v4().toString(),
+            name: _nameController.text,
+            description: _descriptionController.text,
+            environmentId: _currentEnvironment!.id,
+            lifeCycleState: _lifeCycleState,
+            medium: _selectedMedium,
+            bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                ? ''
+                : _pictureFormKey.currentState!.images.first,
+            createdAt: DateTime.now(),
+          );
+          await widget.plantsProvider
+              .addPlant(plant)
+              .whenComplete(() => Navigator.of(context).pop());
+        }
+      }
+    }
+  }
+
+  /// Returns the life cycle state based on the selected life cycle states.
   LifeCycleState get _lifeCycleState {
     final lastIndex = _selectedLifeCycleState.lastIndexOf(true);
     switch (lastIndex) {
@@ -434,6 +459,7 @@ class _PlantFormState extends State<PlantForm> {
     }
   }
 
+  /// Returns a list of selected life cycle states based on the [plant].
   List<bool> _selectedLifeCycleStateFromPlant(Plant? plant) {
     if (plant == null) {
       return <bool>[true, false, false, false, false, false];
@@ -455,6 +481,7 @@ class _PlantFormState extends State<PlantForm> {
   }
 }
 
+/// A view to create a plant.
 class CreatePlantView extends StatelessWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
@@ -479,6 +506,7 @@ class CreatePlantView extends StatelessWidget {
   }
 }
 
+/// A view to edit a plant.
 class EditPlantView extends StatelessWidget {
   final Plant plant;
   final PlantsProvider plantsProvider;

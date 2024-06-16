@@ -10,6 +10,7 @@ import 'package:weedy/common/temperature.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/plants/model.dart';
 
+/// A list item to display a [PlantAction].
 class PlantActionLogItem extends StatelessWidget {
   final ActionsProvider actionsProvider;
   final Plant plant;
@@ -48,6 +49,7 @@ class PlantActionLogItem extends StatelessWidget {
   }
 }
 
+/// A list item to display an [EnvironmentAction].
 class EnvironmentActionLogItem extends StatelessWidget {
   final ActionsProvider actionsProvider;
   final Environment environment;
@@ -86,6 +88,7 @@ class EnvironmentActionLogItem extends StatelessWidget {
   }
 }
 
+/// Show a bottom sheet with the details of an [EnvironmentMeasurementAction].
 class EnvironmentMeasurementActionSheetWidget extends StatefulWidget {
   final Environment environment;
   final EnvironmentMeasurementAction action;
@@ -115,6 +118,7 @@ class _EnvironmentMeasurementActionSheetWidgetState
     );
   }
 
+  /// Return a widget based on the [EnvironmentMeasurementType] of the action.
   Widget _measurementWidget() {
     if (widget.action.measurement.type == EnvironmentMeasurementType.temperature) {
       final temperature = Temperature.fromJson(widget.action.measurement.measurement);
@@ -156,6 +160,7 @@ class _EnvironmentMeasurementActionSheetWidgetState
   }
 }
 
+/// Show a bottom sheet with the details of an [EnvironmentOtherAction].
 class EnvironmentOtherActionSheetWidget extends StatefulWidget {
   final Environment environment;
   final EnvironmentOtherAction action;
@@ -185,6 +190,7 @@ class _EnvironmentOtherActionSheetWidgetState extends State<EnvironmentOtherActi
   }
 }
 
+/// Show a bottom sheet with the details of an [EnvironmentPictureAction].
 class EnvironmentPictureActionSheetWidget extends StatefulWidget {
   final Environment environment;
   final EnvironmentPictureAction action;
@@ -251,6 +257,7 @@ class _EnvironmentPictureActionSheetWidgetState extends State<EnvironmentPicture
   }
 }
 
+/// Base widget for an [EnvironmentAction] bottom sheet.
 class _BaseEnvironmentActionSheetWidget extends StatefulWidget {
   final Environment environment;
   final EnvironmentAction action;
@@ -291,21 +298,11 @@ class _BaseEnvironmentActionSheetWidgetState extends State<_BaseEnvironmentActio
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                onPressed: () async {
-                  final confirmed = await confirmDeletionOfEnvironmentActionDialog(
-                      context, widget.action, widget.actionsProvider);
-                  if (confirmed == true) {
-                    if (!context.mounted) {
-                      return;
-                    }
-                    Navigator.of(context).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${widget.action.type.name} has been deleted'),
-                      ),
-                    );
-                  }
-                },
+                onPressed: () async => await _deleteEnvironmentAction(
+                  context,
+                  widget.action,
+                  widget.actionsProvider,
+                ),
                 icon: const Icon(Icons.delete_forever, color: Colors.red),
               ),
             ],
@@ -316,6 +313,27 @@ class _BaseEnvironmentActionSheetWidgetState extends State<_BaseEnvironmentActio
         const Divider(),
         widget.child,
       ],
+    );
+  }
+}
+
+/// Delete the [environmentAction].
+Future<void> _deleteEnvironmentAction(
+  BuildContext context,
+  EnvironmentAction environmentAction,
+  ActionsProvider actionsProvider,
+) async {
+  final confirmed =
+      await confirmDeletionOfEnvironmentActionDialog(context, environmentAction, actionsProvider);
+  if (confirmed == true) {
+    if (!context.mounted) {
+      return;
+    }
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${environmentAction.type.name} has been deleted'),
+      ),
     );
   }
 }

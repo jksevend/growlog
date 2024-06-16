@@ -7,6 +7,7 @@ import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/plants/model.dart';
 
+/// An item of a list of plant actions
 class PlantActionLogHomeWidget extends StatelessWidget {
   final Plant plant;
   final PlantAction action;
@@ -35,6 +36,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
   }
 }
 
+/// An item of a list of environment actions
 class EnvironmentActionLogHomeWidget extends StatelessWidget {
   final Environment environment;
   final EnvironmentAction action;
@@ -63,6 +65,9 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
   }
 }
 
+/// A view that displays the current weeks and the weeks of the current month.
+///
+/// In this view actions done today are highlighted.
 class WeekAndMonthView extends StatefulWidget {
   final ActionsProvider actionsProvider;
 
@@ -75,17 +80,22 @@ class WeekAndMonthView extends StatefulWidget {
 class _WeekAndMonthViewState extends State<WeekAndMonthView> {
   bool _isExpanded = false;
 
+  /// Returns the start of the current week.
   DateTime get _startOfWeek {
     DateTime now = DateTime.now();
     int weekday = now.weekday;
     return now.subtract(Duration(days: weekday - 1));
   }
 
+  /// Returns a list of days of the current week.
   List<DateTime> get _currentWeek {
     DateTime startOfWeek = _startOfWeek;
     return List.generate(7, (index) => startOfWeek.add(Duration(days: index)));
   }
 
+  /// Returns a list of days of the current month.
+  ///
+  /// The list includes the days of the previous month and the next month to fill the grid.
   List<DateTime> get _currentMonth {
     DateTime now = DateTime.now();
     DateTime startOfMonth = DateTime(now.year, now.month, 1);
@@ -109,14 +119,18 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     return monthDays;
   }
 
+  /// Formats a date to a string.
   String _formatDate(DateTime date) {
     return DateFormat('d').format(date);
   }
 
+  /// Returns the name of the current month.
   String _currentMonthName() {
     return DateFormat('MMMM').format(DateTime.now());
   }
 
+  /// A list of weekday headers.
+  /// TODO: Localize this
   List<String> get _weekdayHeaders {
     return ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
   }
@@ -172,6 +186,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     );
   }
 
+  /// A header that toggles between the week and month view.
   Widget _buildHeader() {
     return IconButton(
       icon: Icon(_isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down),
@@ -183,6 +198,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     );
   }
 
+  /// A view that displays the current week.
   Widget _buildWeekView(final int plantActionsCountToday, final int environmentActionsCountToday) {
     return Column(
       children: [
@@ -203,6 +219,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     );
   }
 
+  /// A view that displays the current month.
   Widget _buildMonthView(final int plantActionsCountToday, final int environmentActionsCountToday) {
     return LayoutBuilder(builder: (context, constraints) {
       return Column(
@@ -232,6 +249,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     });
   }
 
+  /// A header that displays the weekdays.
   Widget _buildWeekdayHeader() {
     return Row(
       children: _weekdayHeaders.map((day) {
@@ -247,6 +265,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     );
   }
 
+  /// A cell that displays a date.
   Widget _buildDateCell(
       DateTime date, bool isToday, int plantActionCountToday, int environmentActionCountToday,
       [bool isCurrentMonth = true]) {

@@ -6,12 +6,14 @@ import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/view.dart';
 import 'package:weedy/common/measurement.dart';
+import 'package:weedy/common/validators.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/environments/sheet.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 
+/// A widget that shows an overview of the environments.
 class EnvironmentOverview extends StatefulWidget {
   final EnvironmentsProvider environmentsProvider;
   final PlantsProvider plantsProvider;
@@ -64,10 +66,15 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                   return Card(
                     child: Column(
                       children: [
-                        GestureDetector(
-                          child: Image.file(
-                            height: constraints.maxWidth / 2,
-                            width: constraints.maxWidth,
+                        environment.bannerImagePath == ''
+                            ? Placeholder(
+                                fallbackHeight: constraints.maxWidth / 2,
+                                fallbackWidth: constraints.maxWidth,
+                              )
+                            : GestureDetector(
+                                child: Image.file(
+                                  height: constraints.maxWidth / 2,
+                                  width: constraints.maxWidth,
                             fit: BoxFit.fitWidth,
                             File(environment.bannerImagePath),
                           ),
@@ -133,6 +140,7 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
   }
 }
 
+/// A reusable form for creating and editing environments.
 class EnvironmentForm extends StatefulWidget {
   final Environment? environment;
   final GlobalKey<FormState> formKey;
@@ -261,23 +269,16 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                 const SizedBox(height: 16.0),
                 ToggleButtons(
                     isSelected: _selectedEnvironmentType,
-                    onPressed: (int index) {
-                      setState(() {
-                        // The button that is tapped is set to true, and the others to false.
-                        for (int i = 0; i < _selectedEnvironmentType.length; i++) {
-                          _selectedEnvironmentType[i] = i == index;
-                        }
-                      });
-                    },
+                    onPressed: (int index) => _onToggleEnvironmentType(index),
                     children: EnvironmentType.values
                         .map(
-                          (e) => Padding(
+                          (environment) => Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Row(
                               children: [
-                                Text(e.icon),
+                                Text(environment.icon),
                                 const SizedBox(width: 8.0),
-                                Text(e.name),
+                                Text(environment.name),
                               ],
                             ),
                           ),
@@ -299,11 +300,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 divisions: 24,
                                 label: _currentLightHours.round().toString(),
                                 value: _currentLightHours,
-                                onChanged: (double value) {
-                                  setState(() {
-                                    _currentLightHours = value;
-                                  });
-                                },
+                                onChanged: (double value) => _updateCurrentLightHours(value),
                               ),
                             ),
                             const Icon(Icons.wb_sunny),
@@ -349,11 +346,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                       ),
                                     )
                                     .toList(),
-                                onChanged: (LightType? value) {
-                                  setState(() {
-                                    _currentLightType = value!;
-                                  });
-                                },
+                                onChanged: (LightType? value) => _updateCurrentLightType(value!),
                                 value: _currentLightType,
                               ),
                               const SizedBox(height: 16.0),
@@ -367,12 +360,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     hintText: 'Enter the watt of the light',
                                     suffixIcon: Icon(Icons.electrical_services),
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter a watt';
-                                    }
-                                    return null;
-                                  },
+                                  validator: (value) => validateInput(value, isDouble: true),
                                 ),
                               ),
                             ],
@@ -397,13 +385,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     labelText: 'Width',
                                     hintText: 'Enter the width of the environment',
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter a width';
-                                    }
-                                    return null;
-                                  },
-                                ),
+                                    validator: (value) => validateInput(value, isDouble: true)),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
                                   controller: _lengthController,
@@ -412,13 +394,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     labelText: 'Length',
                                     hintText: 'Enter the length of the environment',
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter a length';
-                                    }
-                                    return null;
-                                  },
-                                ),
+                                    validator: (value) => validateInput(value, isDouble: true)),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
                                   controller: _heightController,
@@ -427,13 +403,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     labelText: 'Height',
                                     hintText: 'Enter the height of the environment',
                                   ),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter a height';
-                                    }
-                                    return null;
-                                  },
-                                ),
+                                    validator: (value) => validateInput(value, isDouble: true)),
                               ],
                             ),
                           ),
@@ -444,127 +414,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                 // Submit button
                 const SizedBox(height: 16.0),
                 OutlinedButton.icon(
-                  onPressed: () async {
-                    if (widget.formKey.currentState!.validate()) {
-                      Environment environment;
-                      if (widget.environment == null) {
-                        if (_selectedEnvironmentType[0]) {
-                          if (_wattFormKey.currentState!.validate() &&
-                              _dimensionFormKey.currentState!.validate()) {
-                            environment = Environment(
-                              id: const Uuid().v4().toString(),
-                              name: _nameController.text,
-                              description: _descriptionController.text,
-                              type: _selectedEnvironmentType[0]
-                                  ? EnvironmentType.indoor
-                                  : EnvironmentType.outdoor,
-                              lightDetails: LightDetails(
-                                lightHours: _currentLightHours.toInt(),
-                                lights: [
-                                  Light(
-                                    id: const Uuid().v4().toString(),
-                                    type: _currentLightType,
-                                    watt: double.parse(_wattController.text),
-                                  ),
-                                ],
-                              ),
-                              dimension: Dimension(
-                                  width: MeasurementAmount(
-                                    value: double.parse(_widthController.text),
-                                    unit: MeasurementUnit.cm,
-                                  ),
-                                  length: MeasurementAmount(
-                                    value: double.parse(_lengthController.text),
-                                    unit: MeasurementUnit.cm,
-                                  ),
-                                  height: MeasurementAmount(
-                                    value: double.parse(_heightController.text),
-                                    unit: MeasurementUnit.cm,
-                                  )),
-                              bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
-                                  ? ''
-                                  : _pictureFormKey.currentState!.images.first,
-                            );
-                          } else {
-                            return;
-                          }
-                        } else {
-                          environment = Environment(
-                            id: const Uuid().v4().toString(),
-                            name: _nameController.text,
-                            description: _descriptionController.text,
-                            type: _selectedEnvironmentType[0]
-                                ? EnvironmentType.indoor
-                                : EnvironmentType.outdoor,
-                            lightDetails: LightDetails(
-                              lightHours: _currentLightHours.toInt(),
-                              lights: [],
-                            ),
-                            dimension: Dimension(
-                                width: MeasurementAmount(
-                                  value: 0,
-                                  unit: MeasurementUnit.cm,
-                                ),
-                                length: MeasurementAmount(
-                                  value: 0,
-                                  unit: MeasurementUnit.cm,
-                                ),
-                                height: MeasurementAmount(
-                                  value: 0,
-                                  unit: MeasurementUnit.cm,
-                                )),
-                            bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
-                                ? ''
-                                : _pictureFormKey.currentState!.images.first,
-                          );
-                        }
-                        await widget.environmentsProvider
-                            .addEnvironment(environment)
-                            .whenComplete(() {
-                          Navigator.of(context).pop();
-                        });
-                      } else {
-                        environment = widget.environment!.copyWith(
-                          name: _nameController.text,
-                          description: _descriptionController.text,
-                          type: _selectedEnvironmentType[0]
-                              ? EnvironmentType.indoor
-                              : EnvironmentType.outdoor,
-                          lightDetails: LightDetails(
-                            lightHours: _currentLightHours.toInt(),
-                            lights: [
-                              Light(
-                                id: const Uuid().v4().toString(),
-                                type: _currentLightType,
-                                watt: double.parse(_wattController.text),
-                              ),
-                            ],
-                          ),
-                          dimension: Dimension(
-                              width: MeasurementAmount(
-                                value: double.parse(_widthController.text),
-                                unit: MeasurementUnit.cm,
-                              ),
-                              length: MeasurementAmount(
-                                value: double.parse(_lengthController.text),
-                                unit: MeasurementUnit.cm,
-                              ),
-                              height: MeasurementAmount(
-                                value: double.parse(_heightController.text),
-                                unit: MeasurementUnit.cm,
-                              )),
-                          bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
-                              ? ''
-                              : _pictureFormKey.currentState!.images.first,
-                        );
-                        await widget.environmentsProvider
-                            .updateEnvironment(environment)
-                            .whenComplete(() {
-                          Navigator.of(context).pop(environment);
-                        });
-                      }
-                    }
-                  },
+                  onPressed: () async => await _onEnvironmentSaved(),
                   label: const Text('Save'),
                   icon: const Icon(Icons.arrow_right),
                 ),
@@ -575,8 +425,144 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
       ),
     );
   }
+
+  /// Updates the current light hours.
+  void _updateCurrentLightHours(double value) {
+    setState(() {
+      _currentLightHours = value;
+    });
+  }
+
+  /// Updates the current light type.
+  void _updateCurrentLightType(LightType value) {
+    setState(() {
+      _currentLightType = value;
+    });
+  }
+
+  /// Toggles the environment type.
+  void _onToggleEnvironmentType(int index) {
+    setState(() {
+      for (int i = 0; i < _selectedEnvironmentType.length; i++) {
+        _selectedEnvironmentType[i] = i == index;
+      }
+    });
+  }
+
+  /// Saves the environment.
+  Future<void> _onEnvironmentSaved() async {
+    if (widget.formKey.currentState!.validate()) {
+      Environment environment;
+      if (widget.environment == null) {
+        if (_selectedEnvironmentType[0]) {
+          if (_wattFormKey.currentState!.validate() && _dimensionFormKey.currentState!.validate()) {
+            environment = Environment(
+              id: const Uuid().v4().toString(),
+              name: _nameController.text,
+              description: _descriptionController.text,
+              type: _selectedEnvironmentType[0] ? EnvironmentType.indoor : EnvironmentType.outdoor,
+              lightDetails: LightDetails(
+                lightHours: _currentLightHours.toInt(),
+                lights: [
+                  Light(
+                    id: const Uuid().v4().toString(),
+                    type: _currentLightType,
+                    watt: double.parse(_wattController.text),
+                  ),
+                ],
+              ),
+              dimension: Dimension(
+                  width: MeasurementAmount(
+                    value: double.parse(_widthController.text),
+                    unit: MeasurementUnit.cm,
+                  ),
+                  length: MeasurementAmount(
+                    value: double.parse(_lengthController.text),
+                    unit: MeasurementUnit.cm,
+                  ),
+                  height: MeasurementAmount(
+                    value: double.parse(_heightController.text),
+                    unit: MeasurementUnit.cm,
+                  )),
+              bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                  ? ''
+                  : _pictureFormKey.currentState!.images.first,
+            );
+          } else {
+            return;
+          }
+        } else {
+          environment = Environment(
+            id: const Uuid().v4().toString(),
+            name: _nameController.text,
+            description: _descriptionController.text,
+            type: _selectedEnvironmentType[0] ? EnvironmentType.indoor : EnvironmentType.outdoor,
+            lightDetails: LightDetails(
+              lightHours: _currentLightHours.toInt(),
+              lights: [],
+            ),
+            dimension: Dimension(
+                width: MeasurementAmount(
+                  value: 0,
+                  unit: MeasurementUnit.cm,
+                ),
+                length: MeasurementAmount(
+                  value: 0,
+                  unit: MeasurementUnit.cm,
+                ),
+                height: MeasurementAmount(
+                  value: 0,
+                  unit: MeasurementUnit.cm,
+                )),
+            bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                ? ''
+                : _pictureFormKey.currentState!.images.first,
+          );
+        }
+        await widget.environmentsProvider.addEnvironment(environment).whenComplete(() {
+          Navigator.of(context).pop();
+        });
+      } else {
+        environment = widget.environment!.copyWith(
+          name: _nameController.text,
+          description: _descriptionController.text,
+          type: _selectedEnvironmentType[0] ? EnvironmentType.indoor : EnvironmentType.outdoor,
+          lightDetails: LightDetails(
+            lightHours: _currentLightHours.toInt(),
+            lights: [
+              Light(
+                id: const Uuid().v4().toString(),
+                type: _currentLightType,
+                watt: double.parse(_wattController.text),
+              ),
+            ],
+          ),
+          dimension: Dimension(
+              width: MeasurementAmount(
+                value: double.parse(_widthController.text),
+                unit: MeasurementUnit.cm,
+              ),
+              length: MeasurementAmount(
+                value: double.parse(_lengthController.text),
+                unit: MeasurementUnit.cm,
+              ),
+              height: MeasurementAmount(
+                value: double.parse(_heightController.text),
+                unit: MeasurementUnit.cm,
+              )),
+          bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+              ? ''
+              : _pictureFormKey.currentState!.images.first,
+        );
+        await widget.environmentsProvider.updateEnvironment(environment).whenComplete(() {
+          Navigator.of(context).pop(environment);
+        });
+      }
+    }
+  }
 }
 
+/// A view that allows the user to create a new environment.
 class CreateEnvironmentView extends StatelessWidget {
   final EnvironmentsProvider environmentsProvider;
 
@@ -595,6 +581,7 @@ class CreateEnvironmentView extends StatelessWidget {
   }
 }
 
+/// A view that allows the user to edit an existing environment.
 class EditEnvironmentView extends StatelessWidget {
   final Environment environment;
   final EnvironmentsProvider environmentsProvider;

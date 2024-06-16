@@ -28,6 +28,7 @@ Future<void> writeJsonFile({
   await file.writeAsString(json.encode(content));
 }
 
+/// Migrate a field in a JSON object called [jsonContent].
 void migrateField<T>({
   required Map<String, dynamic> jsonContent,
   required String field,
@@ -38,6 +39,7 @@ void migrateField<T>({
   }
 }
 
+/// Migrate a list in a JSON object called [jsonContent].
 Future<void> migrateFileStore({
   required String name,
   required Function(Map<String, dynamic>) migration,

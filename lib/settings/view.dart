@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:weedy/settings/model.dart';
 import 'package:weedy/settings/provider.dart';
 
+/// A view that displays the application's settings.
 class SettingsView extends StatefulWidget {
   final SettingsProvider settingsProvider;
 

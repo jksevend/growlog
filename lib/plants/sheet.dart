@@ -8,6 +8,7 @@ import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 import 'package:weedy/plants/view.dart';
 
+/// Shows a bottom sheet with detailed information about a [plant].
 Future<void> showPlantDetailSheet(
   BuildContext context,
   Plant plant,
@@ -50,39 +51,29 @@ Future<void> showPlantDetailSheet(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: () async {
-                      final confirmed = await confirmDeletionOfPlantDialog(
-                          context, plant, plantsProvider, actionsProvider);
-                      if (confirmed == true) {
-                        if (!context.mounted) {
-                          return;
-                        }
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${plant.name} has been deleted'),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: () async =>
+                        _onDeletePlant(context, plant, plantsProvider, actionsProvider),
                     icon: const Icon(
                       Icons.delete_forever,
                       color: Colors.red,
                     ),
                   ),
                   IconButton(
-                    onPressed: () async {
-                      final updatedPlant = await Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => EditPlantView(
-                              plant: plant,
-                              plantsProvider: plantsProvider,
-                              environmentsProvider: environmentsProvider)));
-                      setState(() {
-                        if (updatedPlant != null) {
-                          plant = updatedPlant;
-                        }
-                      });
-                    },
+                    onPressed: () async => _onUpdatePlant(
+                      context,
+                      plant,
+                      plantsProvider,
+                      environmentsProvider,
+                      (updatedPlant) {
+                        setState(
+                          () {
+                            if (updatedPlant != null) {
+                              plant = updatedPlant;
+                            }
+                          },
+                        );
+                      },
+                    ),
                     icon: const Icon(
                       Icons.edit,
                       color: Colors.amber,
@@ -101,18 +92,17 @@ Future<void> showPlantDetailSheet(
                     subtitle: Text(plantEnvironment.name),
                     trailing: IconButton(
                         icon: const Icon(Icons.arrow_right_alt),
-                        onPressed: () async {
-                          var navigationBar =
-                              bottomNavigationBarKey.currentWidget as BottomNavigationBar;
-                          await Future.delayed(const Duration(milliseconds: 500));
-                          if (!context.mounted) {
-                            return;
-                          }
-                          Navigator.of(context).pop();
-                          navigationBar.onTap!(2);
-                          await showEnvironmentDetailSheet(context, plantEnvironment, plants,
-                              environmentsProvider, plantsProvider, actionsProvider);
-                        }),
+                      onPressed: () async => _navigateToEnvironmentDetailSheet(
+                        context,
+                        bottomNavigationBarKey,
+                        plant,
+                        plantEnvironment,
+                        plants,
+                        plantsProvider,
+                        environmentsProvider,
+                        actionsProvider,
+                      ),
+                    ),
                   ),
             const Divider(),
           ],
@@ -120,4 +110,64 @@ Future<void> showPlantDetailSheet(
       });
     },
   );
+}
+
+/// Delete the [plant] and all actions associated with it.
+Future<void> _onDeletePlant(
+  BuildContext context,
+  Plant plant,
+  PlantsProvider plantsProvider,
+  ActionsProvider actionsProvider,
+) async {
+  final confirmed =
+      await confirmDeletionOfPlantDialog(context, plant, plantsProvider, actionsProvider);
+  if (confirmed == true) {
+    if (!context.mounted) {
+      return;
+    }
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${plant.name} has been deleted'),
+      ),
+    );
+  }
+}
+
+/// Update the [plant] in the provider.
+Future<void> _onUpdatePlant(
+  BuildContext context,
+  Plant plant,
+  PlantsProvider plantsProvider,
+  EnvironmentsProvider environmentsProvider,
+  Function(Plant?) stateSetter,
+) async {
+  final updatedPlant = await Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => EditPlantView(
+          plant: plant,
+          plantsProvider: plantsProvider,
+          environmentsProvider: environmentsProvider)));
+  stateSetter(updatedPlant);
+}
+
+/// Navigates to the environment detail sheet.
+Future<void> _navigateToEnvironmentDetailSheet(
+  BuildContext context,
+  GlobalKey<State<BottomNavigationBar>> bottomNavigationBarKey,
+  Plant plant,
+  Environment plantEnvironment,
+  List<Plant> plants,
+  PlantsProvider plantsProvider,
+  EnvironmentsProvider environmentsProvider,
+  ActionsProvider actionsProvider,
+) async {
+  var navigationBar = bottomNavigationBarKey.currentWidget as BottomNavigationBar;
+  await Future.delayed(const Duration(milliseconds: 500));
+  if (!context.mounted) {
+    return;
+  }
+  Navigator.of(context).pop();
+  navigationBar.onTap!(2);
+  await showEnvironmentDetailSheet(
+      context, plantEnvironment, plants, environmentsProvider, plantsProvider, actionsProvider);
 }

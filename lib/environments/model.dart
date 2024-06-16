@@ -3,6 +3,7 @@ import 'package:weedy/common/measurement.dart';
 
 part 'model.g.dart';
 
+/// The environments that are available in the application.
 @JsonSerializable()
 class Environments {
   List<Environment> environments;
@@ -22,12 +23,15 @@ class Environments {
   }
 }
 
+/// The type of environment.
 enum EnvironmentType {
   indoor,
   outdoor,
 }
 
+/// An extension on the [EnvironmentType] enum.
 extension EnvironmentTypeExtension on EnvironmentType {
+  /// The name of the environment type.
   String get name {
     switch (this) {
       case EnvironmentType.indoor:
@@ -37,6 +41,7 @@ extension EnvironmentTypeExtension on EnvironmentType {
     }
   }
 
+  /// The icon of the environment type.
   String get icon {
     switch (this) {
       case EnvironmentType.indoor:

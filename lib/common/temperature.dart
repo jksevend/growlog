@@ -2,12 +2,15 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'temperature.g.dart';
 
+/// A temperature unit.
 enum TemperatureUnit {
   celsius,
   fahrenheit,
 }
 
+/// An extension for the [TemperatureUnit] enum.
 extension TemperatureUnitExtension on TemperatureUnit {
+  /// The name of the temperature unit.
   String get name {
     switch (this) {
       case TemperatureUnit.celsius:
@@ -17,6 +20,7 @@ extension TemperatureUnitExtension on TemperatureUnit {
     }
   }
 
+  /// The symbol of the temperature unit.
   String get symbol {
     switch (this) {
       case TemperatureUnit.celsius:
@@ -27,6 +31,7 @@ extension TemperatureUnitExtension on TemperatureUnit {
   }
 }
 
+/// A temperature.
 @JsonSerializable()
 class Temperature {
   final double value;

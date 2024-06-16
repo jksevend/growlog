@@ -3,6 +3,7 @@ import 'package:weedy/actions/fertilizer/dialog.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
 
+/// Show a bottom sheet with the details of the [fertilizers].
 Future<void> showFertilizerDetailSheet(
   final BuildContext context,
   final FertilizerProvider fertilizerProvider,
@@ -29,24 +30,12 @@ Future<void> showFertilizerDetailSheet(
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit, color: Colors.blue),
-                          onPressed: () async {
-                            await showFertilizerForm(
-                              context,
-                              fertilizerProvider,
-                              fertilizer.value,
-                            );
-                            if (!context.mounted) return;
-                            Navigator.pop(context);
-                          },
-                        ),
+                            onPressed: () async =>
+                                await _onEdit(context, fertilizerProvider, fertilizer.value)),
                         IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
-                          onPressed: () async {
-                            await fertilizerProvider.deleteFertilizer(fertilizer.value.id);
-                            if (!context.mounted) return;
-                            Navigator.of(context).pop();
-                          },
-                        ),
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () async =>
+                                await _onDelete(context, fertilizerProvider, fertilizer.value)),
                       ],
                     ),
                   );
@@ -58,4 +47,30 @@ Future<void> showFertilizerDetailSheet(
       );
     },
   );
+}
+
+/// Callback for editing the [fertilizer].
+Future<void> _onEdit(
+  final BuildContext context,
+  final FertilizerProvider fertilizerProvider,
+  final Fertilizer fertilizer,
+) async {
+  await showFertilizerForm(
+    context,
+    fertilizerProvider,
+    fertilizer,
+  );
+  if (!context.mounted) return;
+  Navigator.pop(context);
+}
+
+/// Callback for deleting the [fertilizer].
+Future<void> _onDelete(
+  final BuildContext context,
+  final FertilizerProvider fertilizerProvider,
+  final Fertilizer fertilizer,
+) async {
+  await fertilizerProvider.deleteFertilizer(fertilizer.id);
+  if (!context.mounted) return;
+  Navigator.of(context).pop();
 }

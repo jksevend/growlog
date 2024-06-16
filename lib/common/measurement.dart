@@ -2,12 +2,14 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'measurement.g.dart';
 
+/// A measurement unit.
 enum MeasurementUnit {
   cm,
   m,
 }
 
 extension MeasurementUnitExtension on MeasurementUnit {
+  /// The name of the measurement unit.
   String get name {
     switch (this) {
       case MeasurementUnit.cm:
@@ -17,6 +19,7 @@ extension MeasurementUnitExtension on MeasurementUnit {
     }
   }
 
+  /// The symbol of the measurement unit.
   String get symbol {
     switch (this) {
       case MeasurementUnit.cm:
@@ -27,6 +30,7 @@ extension MeasurementUnitExtension on MeasurementUnit {
   }
 }
 
+/// A measurement amount.
 @JsonSerializable()
 class MeasurementAmount {
   final double value;

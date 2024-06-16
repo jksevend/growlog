@@ -4,6 +4,7 @@ import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/provider.dart';
 
+/// Shows a dialog that asks the user to confirm the deletion of an [environment].
 Future<bool> confirmDeletionOfEnvironmentDialog(
   BuildContext context,
   Environment environment,
@@ -19,21 +20,17 @@ Future<bool> confirmDeletionOfEnvironmentDialog(
         content: Text('Are you sure you want to delete ${environment.name}?'),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
+            onPressed: () => _onClose(context, false),
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () async {
-              await environmentsProvider.removeEnvironment(environment);
-              await plantsProvider.removePlantsInEnvironment(environment.id);
-              await actionsProvider.removeActionsForEnvironment(environment.id);
-              if (!context.mounted) {
-                return;
-              }
-              Navigator.of(context).pop(true);
-            },
+            onPressed: () async => _onEnvironmentDeleted(
+              context,
+              environmentsProvider,
+              plantsProvider,
+              actionsProvider,
+              environment,
+            ),
             child: const Text('Delete'),
           ),
         ],
@@ -41,4 +38,26 @@ Future<bool> confirmDeletionOfEnvironmentDialog(
     },
   );
   return confirmed!;
+}
+
+/// Close the dialog and return a value.
+void _onClose<T>(BuildContext context, T value) {
+  Navigator.of(context).pop(value);
+}
+
+/// Deletes the [environment] and all plants and actions associated with it.
+void _onEnvironmentDeleted(
+  BuildContext context,
+  EnvironmentsProvider environmentsProvider,
+  PlantsProvider plantsProvider,
+  ActionsProvider actionsProvider,
+  Environment environment,
+) async {
+  await environmentsProvider.removeEnvironment(environment);
+  await plantsProvider.removePlantsInEnvironment(environment.id);
+  await actionsProvider.removeActionsForEnvironment(environment.id);
+  if (!context.mounted) {
+    return;
+  }
+  _onClose(context, true);
 }

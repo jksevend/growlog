@@ -6,6 +6,7 @@ import 'package:weedy/actions/widget.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/plants/model.dart';
 
+/// Show a bottom sheet with the details of the [plantAction].
 Future<void> showPlantActionDetailSheet(
   BuildContext context,
   PlantAction plantAction,
@@ -26,21 +27,11 @@ Future<void> showPlantActionDetailSheet(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: () async {
-                      final confirmed = await confirmDeletionOfPlantActionDialog(
-                          context, plantAction, actionsProvider);
-                      if (confirmed == true) {
-                        if (!context.mounted) {
-                          return;
-                        }
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${plantAction.type.name} has been deleted'),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: () async => await _deletePlantAction(
+                      context,
+                      plantAction,
+                      actionsProvider,
+                    ),
                     icon: const Icon(Icons.delete_forever, color: Colors.red),
                   ),
                 ],
@@ -53,6 +44,27 @@ Future<void> showPlantActionDetailSheet(
   );
 }
 
+/// Delete the [plantAction].
+Future<void> _deletePlantAction(
+  BuildContext context,
+  PlantAction plantAction,
+  ActionsProvider actionsProvider,
+) async {
+  final confirmed = await confirmDeletionOfPlantActionDialog(context, plantAction, actionsProvider);
+  if (confirmed == true) {
+    if (!context.mounted) {
+      return;
+    }
+    Navigator.of(context).pop();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${plantAction.type.name} has been deleted'),
+      ),
+    );
+  }
+}
+
+/// Show a bottom sheet with the details of the [environmentAction].
 Future<void> showEnvironmentActionDetailSheet(
   BuildContext context,
   EnvironmentAction environmentAction,

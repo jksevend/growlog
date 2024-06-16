@@ -3,13 +3,7 @@ import 'package:timeago/timeago.dart' as timeago;
 
 part 'model.g.dart';
 
-enum IntervalUnit {
-  hour,
-  day,
-  week,
-  month,
-}
-
+/// An action.
 @JsonSerializable()
 class Action {
   final String id;
@@ -35,6 +29,7 @@ class Action {
   }
 }
 
+/// The environment measurement types.
 enum EnvironmentMeasurementType {
   temperature,
   humidity,
@@ -42,7 +37,9 @@ enum EnvironmentMeasurementType {
   lightDistance,
 }
 
+/// An extension for [EnvironmentMeasurementType]
 extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
+  /// The name of the environment measurement type.
   String get name {
     switch (this) {
       case EnvironmentMeasurementType.temperature:
@@ -56,6 +53,7 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
     }
   }
 
+  /// The icon of the environment measurement type.
   String get icon {
     switch (this) {
       case EnvironmentMeasurementType.temperature:
@@ -70,13 +68,16 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
   }
 }
 
+/// An environment action.
 enum EnvironmentActionType {
   measurement,
   picture,
   other,
 }
 
+/// An extension for [EnvironmentActionType]
 extension EnvironmentActionTypeExtension on EnvironmentActionType {
+  /// The name of the environment action type.
   String get name {
     switch (this) {
       case EnvironmentActionType.measurement:
@@ -88,6 +89,7 @@ extension EnvironmentActionTypeExtension on EnvironmentActionType {
     }
   }
 
+  /// The icon of the environment action type.
   String get icon {
     switch (this) {
       case EnvironmentActionType.measurement:
@@ -100,11 +102,13 @@ extension EnvironmentActionTypeExtension on EnvironmentActionType {
   }
 }
 
+/// An environment action.
 @JsonSerializable()
 class EnvironmentAction extends Action {
   final String environmentId;
   final EnvironmentActionType type;
 
+  /// Creates a new environment action.
   EnvironmentAction({
     required super.id,
     required super.description,
@@ -120,6 +124,7 @@ class EnvironmentAction extends Action {
   Map<String, dynamic> toJson() => _$EnvironmentActionToJson(this);
 }
 
+/// An environment measurement action.
 @JsonSerializable()
 class EnvironmentMeasurementAction extends EnvironmentAction {
   final EnvironmentMeasurement measurement;
@@ -140,6 +145,7 @@ class EnvironmentMeasurementAction extends EnvironmentAction {
   Map<String, dynamic> toJson() => _$EnvironmentMeasurementActionToJson(this);
 }
 
+/// An environment picture action.
 @JsonSerializable()
 class EnvironmentPictureAction extends EnvironmentAction {
   final List<String> images;
@@ -160,6 +166,7 @@ class EnvironmentPictureAction extends EnvironmentAction {
   Map<String, dynamic> toJson() => _$EnvironmentPictureActionToJson(this);
 }
 
+/// An arbitrary environment action.
 @JsonSerializable()
 class EnvironmentOtherAction extends EnvironmentAction {
   EnvironmentOtherAction({
@@ -177,6 +184,7 @@ class EnvironmentOtherAction extends EnvironmentAction {
   Map<String, dynamic> toJson() => _$EnvironmentOtherActionToJson(this);
 }
 
+/// A environment measurement.
 @JsonSerializable()
 class EnvironmentMeasurement {
   final EnvironmentMeasurementType type;
@@ -194,12 +202,15 @@ class EnvironmentMeasurement {
   Map<String, dynamic> toJson() => _$EnvironmentMeasurementToJson(this);
 }
 
+/// The liquid units.
 enum LiquidUnit {
   ml,
   l,
 }
 
+/// An extension for [LiquidUnit]
 extension WateringUnitExtension on LiquidUnit {
+  /// The name of the liquid unit.
   String get name {
     switch (this) {
       case LiquidUnit.ml:
@@ -210,6 +221,7 @@ extension WateringUnitExtension on LiquidUnit {
   }
 }
 
+/// A liquid amount.
 @JsonSerializable()
 class LiquidAmount {
   final LiquidUnit unit;
@@ -225,6 +237,7 @@ class LiquidAmount {
   Map<String, dynamic> toJson() => _$LiquidAmountToJson(this);
 }
 
+/// The plant action types.
 enum PlantActionType {
   watering,
   fertilizing,
@@ -238,7 +251,9 @@ enum PlantActionType {
   other,
 }
 
+/// An extension for [PlantActionType]
 extension PlantActionTypeExtension on PlantActionType {
+  /// The name of the plant action type.
   String get name {
     switch (this) {
       case PlantActionType.watering:
@@ -264,6 +279,7 @@ extension PlantActionTypeExtension on PlantActionType {
     }
   }
 
+  /// The icon of the plant action type.
   String get icon {
     switch (this) {
       case PlantActionType.watering:
@@ -290,6 +306,7 @@ extension PlantActionTypeExtension on PlantActionType {
   }
 }
 
+/// A plant action.
 @JsonSerializable()
 class PlantAction extends Action {
   final String plantId;
@@ -309,6 +326,7 @@ class PlantAction extends Action {
   Map<String, dynamic> toJson() => _$PlantActionToJson(this);
 }
 
+/// A plant watering action.
 @JsonSerializable()
 class PlantMeasurement {
   final PlantMeasurementType type;
@@ -324,6 +342,7 @@ class PlantMeasurement {
   Map<String, dynamic> toJson() => _$PlantMeasurementToJson(this);
 }
 
+/// A plant watering action.
 @JsonSerializable()
 class PlantWateringAction extends PlantAction {
   final LiquidAmount amount;
@@ -344,6 +363,7 @@ class PlantWateringAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantWateringActionToJson(this);
 }
 
+/// A plant fertilization.
 @JsonSerializable()
 class PlantFertilization {
   final String fertilizerId;
@@ -360,6 +380,7 @@ class PlantFertilization {
   Map<String, dynamic> toJson() => _$PlantFertilizationToJson(this);
 }
 
+/// A plant fertilizing action.
 @JsonSerializable()
 class PlantFertilizingAction extends PlantAction {
   final PlantFertilization fertilization;
@@ -380,12 +401,14 @@ class PlantFertilizingAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantFertilizingActionToJson(this);
 }
 
+/// The pruning types.
 enum PruningType {
   topping,
   fim,
   lollipopping,
 }
 
+/// An extension for [PruningType]
 @JsonSerializable()
 class PlantPruningAction extends PlantAction {
   final PruningType pruningType;
@@ -406,12 +429,15 @@ class PlantPruningAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantPruningActionToJson(this);
 }
 
+/// The weight units.
 enum WeightUnit {
   g,
   kg,
 }
 
+/// An extension for [WeightUnit]
 extension WeightUnitExtension on WeightUnit {
+  /// The name of the weight unit.
   String get name {
     switch (this) {
       case WeightUnit.g:
@@ -422,6 +448,7 @@ extension WeightUnitExtension on WeightUnit {
   }
 }
 
+/// A weight amount.
 @JsonSerializable()
 class WeightAmount {
   final WeightUnit unit;
@@ -437,6 +464,7 @@ class WeightAmount {
   Map<String, dynamic> toJson() => _$WeightAmountToJson(this);
 }
 
+/// A plant harvesting action.
 @JsonSerializable()
 class PlantHarvestingAction extends PlantAction {
   final WeightAmount amount;
@@ -457,6 +485,7 @@ class PlantHarvestingAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantHarvestingActionToJson(this);
 }
 
+/// A plant replanting action.
 @JsonSerializable()
 class PlantReplantingAction extends PlantAction {
   PlantReplantingAction({
@@ -474,11 +503,26 @@ class PlantReplantingAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantReplantingActionToJson(this);
 }
 
+/// The training types.
 enum TrainingType {
   lst,
   scrog,
 }
 
+/// An extension for [TrainingType]
+extension TrainingTypeExtension on TrainingType {
+  /// The name of the training type.
+  String get name {
+    switch (this) {
+      case TrainingType.lst:
+        return 'LST';
+      case TrainingType.scrog:
+        return 'SCROG';
+    }
+  }
+}
+
+/// A plant training action.
 @JsonSerializable()
 class PlantTrainingAction extends PlantAction {
   final TrainingType trainingType;
@@ -499,6 +543,7 @@ class PlantTrainingAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantTrainingActionToJson(this);
 }
 
+/// The plant measurement types.
 enum PlantMeasurementType {
   height,
   pH,
@@ -506,7 +551,9 @@ enum PlantMeasurementType {
   ppm,
 }
 
+/// An extension for [PlantMeasurementType]
 extension PlantMeasurementTypeExtension on PlantMeasurementType {
+  /// The name of the plant measurement type.
   String get name {
     switch (this) {
       case PlantMeasurementType.height:
@@ -520,6 +567,7 @@ extension PlantMeasurementTypeExtension on PlantMeasurementType {
     }
   }
 
+  /// The icon of the plant measurement type.
   String get icon {
     switch (this) {
       case PlantMeasurementType.height:
@@ -534,6 +582,7 @@ extension PlantMeasurementTypeExtension on PlantMeasurementType {
   }
 }
 
+/// A plant measuring action.
 @JsonSerializable()
 class PlantMeasuringAction extends PlantAction {
   final PlantMeasurement measurement;
@@ -554,6 +603,7 @@ class PlantMeasuringAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantMeasuringActionToJson(this);
 }
 
+/// A plant death action.
 @JsonSerializable()
 class PlantDeathAction extends PlantAction {
   PlantDeathAction({
@@ -570,6 +620,7 @@ class PlantDeathAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantDeathActionToJson(this);
 }
 
+/// A plant picture action.
 @JsonSerializable()
 class PlantPictureAction extends PlantAction {
   final List<String> images;
@@ -590,6 +641,7 @@ class PlantPictureAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantPictureActionToJson(this);
 }
 
+/// An arbitrary plant action.
 @JsonSerializable()
 class PlantOtherAction extends PlantAction {
   PlantOtherAction({
@@ -606,6 +658,7 @@ class PlantOtherAction extends PlantAction {
   Map<String, dynamic> toJson() => _$PlantOtherActionToJson(this);
 }
 
+/// The actions.
 @JsonSerializable()
 class Actions {
   @JsonKey(fromJson: _plantActionsFromJson)
@@ -630,6 +683,7 @@ class Actions {
     );
   }
 
+  /// Create the implementations of the [PlantAction] classes from the JSON.
   static List<PlantAction> _plantActionsFromJson(List<dynamic> json) {
     return json.map((e) {
       var map = e as Map<String, dynamic>;
@@ -660,6 +714,7 @@ class Actions {
     }).toList();
   }
 
+  /// Create the implementations of the [EnvironmentAction] classes from the JSON.
   static List<EnvironmentAction> _environmentActionsFromJson(List<dynamic> json) {
     return json.map((e) {
       var map = e as Map<String, dynamic>;
