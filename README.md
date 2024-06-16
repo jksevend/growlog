@@ -11,10 +11,15 @@ Weedy is a simple, lightweight and free diary app to track the progress of your 
 - 📸 Perform actions on environments (pictures, measurements, etc.)
 - 📈 Track the progress of your plants
 
-## 📄 License
-
-Weedy is licensed under the [MIT License](LICENSE).
-
 ## 📊 Tracking progress
 
 We use [GitHub Projects](https://github.com/users/jksevend/projects/20) to track the progress of Weedy.
+
+## 🚨 Reporting an issue
+
+Open a bug report by creating an
+issue [here](https://github.com/jksevend/weedy/issues/new?assignees=jksevend&labels=bug&projects=&template=bug_report.md&title=).
+
+## 📄 License
+
+Weedy is licensed under the [MIT License](LICENSE).
