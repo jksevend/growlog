@@ -619,6 +619,28 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     });
   }
 
+  void _showImageSelectionMandatorySnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Row(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.error,
+                color: Colors.red,
+              ),
+            ),
+            Text(
+              'Add images before saving the action',
+            ),
+          ],
+        ),
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
   /// Open up a date picker to select a date.
   Future<void> _selectDate(BuildContext context, DateTime date) async {
     final DateTime? picked = await showDatePicker(
@@ -918,13 +940,18 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
 
     if (_currentPlantActionType == PlantActionType.picture) {
+      final images = _plantPictureFormState.currentState!.images;
+      if (images.isEmpty) {
+        _showImageSelectionMandatorySnackbar();
+        return;
+      }
       final action = PlantPictureAction(
         id: const Uuid().v4().toString(),
         description: _plantActionDescriptionTextController.text,
         plantId: currentPlant.id,
         type: _currentPlantActionType,
         createdAt: _plantActionDate,
-        images: _plantPictureFormState.currentState!.images,
+        images: images,
       );
       await widget.actionsProvider
           .addPlantAction(action)
@@ -1097,13 +1124,18 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
 
     if (_currentEnvironmentActionType == EnvironmentActionType.picture) {
+      final images = _environmentPictureFormState.currentState!.images;
+      if (images.isEmpty) {
+        _showImageSelectionMandatorySnackbar();
+        return;
+      }
       final action = EnvironmentPictureAction(
         id: const Uuid().v4().toString(),
         description: _environmentActionDescriptionTextController.text,
         environmentId: currentEnvironment.id,
         type: _currentEnvironmentActionType,
         createdAt: _environmentActionDate,
-        images: _environmentPictureFormState.currentState!.images,
+        images: images,
       );
       await widget.actionsProvider
           .addEnvironmentAction(action)
