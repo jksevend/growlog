@@ -80,59 +80,45 @@ class WeekAndMonthView extends StatefulWidget {
 class _WeekAndMonthViewState extends State<WeekAndMonthView> {
   bool _isExpanded = false;
 
-  /// Returns the start of the current week.
+  DateTime get _now => DateTime.now();
+
   DateTime get _startOfWeek {
-    DateTime now = DateTime.now();
-    int weekday = now.weekday;
-    return now.subtract(Duration(days: weekday - 1));
+    int weekday = _now.weekday;
+    return _now.subtract(Duration(days: weekday - 1));
   }
 
-  /// Returns a list of days of the current week.
   List<DateTime> get _currentWeek {
     DateTime startOfWeek = _startOfWeek;
     return List.generate(7, (index) => startOfWeek.add(Duration(days: index)));
   }
 
-  /// Returns a list of days of the current month.
-  ///
-  /// The list includes the days of the previous month and the next month to fill the grid.
   List<DateTime> get _currentMonth {
-    DateTime now = DateTime.now();
-    DateTime startOfMonth = DateTime(now.year, now.month, 1);
-    int daysInMonth = DateTime(now.year, now.month + 1, 0).day;
+    DateTime startOfMonth = DateTime(_now.year, _now.month, 1);
+    int daysInMonth = DateTime(_now.year, _now.month + 1, 0).day;
     int startWeekday = startOfMonth.weekday;
-
-    // Adjust startWeekday to make Monday as the start of the week
     int adjustedStartWeekday = (startWeekday + 6) % 7;
-
-    // Calculate the first day to display (including the previous month's days)
     DateTime firstDayToDisplay = startOfMonth.subtract(Duration(days: adjustedStartWeekday));
-
-    // Calculate the total number of days to display (including next month's days)
     int totalDays = daysInMonth + adjustedStartWeekday;
     int rows = (totalDays / 7).ceil();
     int daysToDisplay = rows * 7;
 
-    List<DateTime> monthDays =
-        List.generate(daysToDisplay, (index) => firstDayToDisplay.add(Duration(days: index)));
-
-    return monthDays;
+    return List.generate(daysToDisplay, (index) => firstDayToDisplay.add(Duration(days: index)));
   }
 
-  /// Formats a date to a string.
-  String _formatDate(DateTime date) {
-    return DateFormat('d').format(date);
-  }
+  String _formatDate(DateTime date) => DateFormat('d').format(date);
 
-  /// Returns the name of the current month.
-  String _currentMonthName() {
-    return DateFormat('MMMM').format(DateTime.now());
-  }
+  String _currentMonthName() => DateFormat('MMMM').format(_now);
 
-  /// A list of weekday headers.
-  /// TODO: Localize this
   List<String> get _weekdayHeaders {
-    return ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    return List.generate(7, (index) {
+      return DateFormat('E', Localizations.localeOf(context).toString())
+          .dateSymbols
+          .SHORTWEEKDAYS[(index + 1) % 7];
+    });
+  }
+
+  bool _isToday(DateTime date) {
+    return date.year == _now.year && date.month == _now.month && date.day == _now.day;
   }
 
   @override
@@ -152,65 +138,64 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
         ),
         const Divider(),
         StreamBuilder(
-            stream: CombineLatestStream.list([
-              widget.actionsProvider.plantActions,
-              widget.actionsProvider.environmentActions,
-            ]),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(
-                  child: CircularProgressIndicator(),
+          stream: CombineLatestStream.list([
+            widget.actionsProvider.plantActions,
+            widget.actionsProvider.environmentActions,
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+            if (!snapshot.hasData) {
+              return const Center(child: Text('No actions found.'));
+            }
+
+            final plantActions = snapshot.data![0] as List<weedy.PlantAction>;
+            final environmentActions = snapshot.data![1] as List<weedy.EnvironmentAction>;
+
+            List<weedy.Action> allActions = [...plantActions, ...environmentActions];
+            allActions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+            final List<weedy.Action> fourLatestActions =
+                allActions.where((action) => action.isToday()).take(4).toList();
+
+            final List<Widget> actionIndicators = fourLatestActions.map((action) {
+              if (action is weedy.PlantAction) {
+                return Container(
+                  width: 5,
+                  height: 5,
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                );
+              } else if (action is weedy.EnvironmentAction) {
+                return Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.yellow[900],
+                    shape: BoxShape.circle,
+                  ),
                 );
               }
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text('Error ${snapshot.error}'),
-                );
-              }
+              throw Exception('Unknown action type');
+            }).toList();
 
-              final plantActions = snapshot.data![0] as List<weedy.PlantAction>;
-              final environmentActions = snapshot.data![1] as List<weedy.EnvironmentAction>;
-
-              List<weedy.Action> allActions = [...plantActions, ...environmentActions];
-              allActions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-              final List<weedy.Action> fourLatestActions =
-                  allActions.where((action) => action.isToday()).take(4).toList();
-
-              final List<Widget> actionIndicators = fourLatestActions.map((action) {
-                if (action is weedy.PlantAction) {
-                  return Container(
-                    width: 5,
-                    height: 5,
-                    decoration: const BoxDecoration(
-                      color: Colors.green,
-                      shape: BoxShape.circle,
-                    ),
-                  );
-                } else if (action is weedy.EnvironmentAction) {
-                  return Container(
-                    width: 5,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.yellow[900],
-                      shape: BoxShape.circle,
-                    ),
-                  );
-                }
-                throw Exception('Unknown action type');
-              }).toList();
-
-              return AnimatedCrossFade(
-                firstChild: _buildWeekView(actionIndicators),
-                secondChild: _buildMonthView(actionIndicators),
-                crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                duration: const Duration(milliseconds: 500),
-              );
-            }),
+            return AnimatedCrossFade(
+              firstChild: _buildWeekView(actionIndicators),
+              secondChild: _buildMonthView(actionIndicators),
+              crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 500),
+            );
+          },
+        ),
       ],
     );
   }
 
-  /// A header that toggles between the week and month view.
   Widget _buildHeader() {
     return IconButton(
       icon: Icon(_isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down),
@@ -222,8 +207,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     );
   }
 
-  /// A view that displays the current week.
-  Widget _buildWeekView(final List<Widget> actionIndicators) {
+  Widget _buildWeekView(List<Widget> actionIndicators) {
     return Column(
       children: [
         _buildWeekdayHeader(),
@@ -232,18 +216,14 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           children: _currentWeek.map((date) {
-            bool isToday = date.day == DateTime.now().day &&
-                date.month == DateTime.now().month &&
-                date.year == DateTime.now().year;
-            return _buildDateCell(date, isToday, actionIndicators);
+            return _buildDateCell(date, _isToday(date), actionIndicators);
           }).toList(),
         ),
       ],
     );
   }
 
-  /// A view that displays the current month.
-  Widget _buildMonthView(final List<Widget> actionIndicators) {
+  Widget _buildMonthView(List<Widget> actionIndicators) {
     return LayoutBuilder(builder: (context, constraints) {
       return Column(
         children: [
@@ -253,13 +233,10 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
             child: GridView.count(
               crossAxisCount: 7,
               children: _currentMonth.map((date) {
-                bool isCurrentMonth = date.month == DateTime.now().month;
-                bool isToday = date.day == DateTime.now().day &&
-                    date.month == DateTime.now().month &&
-                    date.year == DateTime.now().year;
+                bool isCurrentMonth = date.month == _now.month;
                 return _buildDateCell(
                   date,
-                  isToday,
+                  _isToday(date),
                   actionIndicators,
                   isCurrentMonth: isCurrentMonth,
                 );
@@ -271,7 +248,6 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     });
   }
 
-  /// A header that displays the weekdays.
   Widget _buildWeekdayHeader() {
     return Row(
       children: _weekdayHeaders.map((day) {
@@ -287,30 +263,24 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     );
   }
 
-  /// A cell that displays a date.
-  Widget _buildDateCell(DateTime date, bool isToday, final List<Widget> actionIndicators,
+  Widget _buildDateCell(DateTime date, bool isToday, List<Widget> actionIndicators,
       {bool isCurrentMonth = true}) {
     return isToday
         ? Center(
             child: Container(
-              padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right: 8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.blue, width: 1.5),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(4.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      _formatDate(date),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: actionIndicators,
-                    ),
-                  ],
-                ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(_formatDate(date)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: actionIndicators,
+                  ),
+                ],
               ),
             ),
           )
