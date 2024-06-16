@@ -75,8 +75,9 @@ Future<void> showEnvironmentDetailSheet(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('${environment.lightDetails.lightHours}h per day'),
-                      Text(
-                          '${environment.lightDetails.lights[0].watt}W ${environment.lightDetails.lights[0].type.name}'),
+                      Text(environment.lightDetails.lights.isEmpty
+                          ? 'No lights'
+                          : '${environment.lightDetails.lights[0].watt}W ${environment.lightDetails.lights[0].type.name}'),
                     ],
                   ),
                 ),
@@ -88,10 +89,12 @@ Future<void> showEnvironmentDetailSheet(
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                          '${environment.dimension.width.value}${environment.dimension.width.unit.symbol} x '
-                          '${environment.dimension.length.value}${environment.dimension.length.unit.symbol} x '
-                          '${environment.dimension.height.value}${environment.dimension.height.unit.symbol}'),
+                      environment.dimension == null
+                          ? const Text('No dimensions')
+                          : Text(
+                              '${environment.dimension!.width.value}${environment.dimension!.width.unit.symbol} x '
+                              '${environment.dimension!.length.value}${environment.dimension!.length.unit.symbol} x '
+                              '${environment.dimension!.height.value}${environment.dimension!.height.unit.symbol}'),
                     ],
                   ),
                 ),

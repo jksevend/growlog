@@ -76,7 +76,7 @@ class Environment {
   final String description;
   final EnvironmentType type;
   final LightDetails lightDetails;
-  final Dimension dimension;
+  final Dimension? dimension;
   final String bannerImagePath;
 
   Environment({

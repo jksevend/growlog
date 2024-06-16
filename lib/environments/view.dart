@@ -189,11 +189,17 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
             ? widget.environment!.lightDetails.lights.first.watt.toString()
             : '0.0');
     _widthController = TextEditingController(
-        text: widget.environment != null ? widget.environment!.dimension.width.toString() : '0.0');
+        text: widget.environment != null
+            ? widget.environment!.dimension?.width.value.toString()
+            : '0.0');
     _lengthController = TextEditingController(
-        text: widget.environment != null ? widget.environment!.dimension.length.toString() : '0.0');
+        text: widget.environment != null
+            ? widget.environment!.dimension?.length.value.toString()
+            : '0.0');
     _heightController = TextEditingController(
-        text: widget.environment != null ? widget.environment!.dimension.height.toString() : '0.0');
+        text: widget.environment != null
+            ? widget.environment!.dimension?.height.value.toString()
+            : '0.0');
     _selectedEnvironmentType = widget.environment == null
         ? [true, false]
         : [
@@ -201,7 +207,11 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
             widget.environment!.type == EnvironmentType.outdoor
           ];
     _currentLightHours = widget.environment?.lightDetails.lightHours.toDouble() ?? 12;
-    _currentLightType = widget.environment?.lightDetails.lights.first.type ?? LightType.led;
+    _currentLightType = widget.environment == null
+        ? LightType.led
+        : widget.environment!.lightDetails.lights.isEmpty
+            ? LightType.led
+            : widget.environment!.lightDetails.lights.first.type;
   }
 
   @override
@@ -501,19 +511,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
               lightHours: _currentLightHours.toInt(),
               lights: [],
             ),
-            dimension: Dimension(
-                width: MeasurementAmount(
-                  value: 0,
-                  unit: MeasurementUnit.cm,
-                ),
-                length: MeasurementAmount(
-                  value: 0,
-                  unit: MeasurementUnit.cm,
-                ),
-                height: MeasurementAmount(
-                  value: 0,
-                  unit: MeasurementUnit.cm,
-                )),
+            dimension: null,
             bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
                 ? ''
                 : _pictureFormKey.currentState!.images.first,

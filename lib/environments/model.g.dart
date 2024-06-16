@@ -34,7 +34,9 @@ Environment _$EnvironmentFromJson(Map<String, dynamic> json) => Environment(
       description: json['description'] as String,
       type: $enumDecode(_$EnvironmentTypeEnumMap, json['type']),
       lightDetails: LightDetails.fromJson(json['lightDetails'] as Map<String, dynamic>),
-      dimension: Dimension.fromJson(json['dimension'] as Map<String, dynamic>),
+      dimension: json['dimension'] == null
+          ? null
+          : Dimension.fromJson(json['dimension'] as Map<String, dynamic>),
       bannerImagePath: json['bannerImagePath'] as String,
     );
 
