@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:weedy/actions/model.dart';
+import 'package:weedy/actions/model.dart' as weedy;
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/environments/model.dart';
@@ -10,7 +10,7 @@ import 'package:weedy/plants/model.dart';
 /// An item of a list of plant actions
 class PlantActionLogHomeWidget extends StatelessWidget {
   final Plant plant;
-  final PlantAction action;
+  final weedy.PlantAction action;
   final ActionsProvider actionsProvider;
 
   const PlantActionLogHomeWidget({
@@ -39,7 +39,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
 /// An item of a list of environment actions
 class EnvironmentActionLogHomeWidget extends StatelessWidget {
   final Environment environment;
-  final EnvironmentAction action;
+  final weedy.EnvironmentAction action;
   final ActionsProvider actionsProvider;
 
   const EnvironmentActionLogHomeWidget({
@@ -168,16 +168,40 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                 );
               }
 
-              final plantActions = snapshot.data![0] as List<PlantAction>;
-              final environmentActions = snapshot.data![1] as List<EnvironmentAction>;
+              final plantActions = snapshot.data![0] as List<weedy.PlantAction>;
+              final environmentActions = snapshot.data![1] as List<weedy.EnvironmentAction>;
 
-              final plantActionsCountToday =
-                  plantActions.where((action) => action.isToday()).length;
-              final environmentActionsCountToday =
-                  environmentActions.where((action) => action.isToday()).length;
+              List<weedy.Action> allActions = [...plantActions, ...environmentActions];
+              allActions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+              final List<weedy.Action> fourLatestActions =
+                  allActions.where((action) => action.isToday()).take(4).toList();
+
+              final List<Widget> actionIndicators = fourLatestActions.map((action) {
+                if (action is weedy.PlantAction) {
+                  return Container(
+                    width: 5,
+                    height: 5,
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                  );
+                } else if (action is weedy.EnvironmentAction) {
+                  return Container(
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.yellow[900],
+                      shape: BoxShape.circle,
+                    ),
+                  );
+                }
+                throw Exception('Unknown action type');
+              }).toList();
+
               return AnimatedCrossFade(
-                firstChild: _buildWeekView(plantActionsCountToday, environmentActionsCountToday),
-                secondChild: _buildMonthView(plantActionsCountToday, environmentActionsCountToday),
+                firstChild: _buildWeekView(actionIndicators),
+                secondChild: _buildMonthView(actionIndicators),
                 crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
                 duration: const Duration(milliseconds: 500),
               );
@@ -199,7 +223,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
   }
 
   /// A view that displays the current week.
-  Widget _buildWeekView(final int plantActionsCountToday, final int environmentActionsCountToday) {
+  Widget _buildWeekView(final List<Widget> actionIndicators) {
     return Column(
       children: [
         _buildWeekdayHeader(),
@@ -211,8 +235,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
             bool isToday = date.day == DateTime.now().day &&
                 date.month == DateTime.now().month &&
                 date.year == DateTime.now().year;
-            return _buildDateCell(
-                date, isToday, plantActionsCountToday, environmentActionsCountToday);
+            return _buildDateCell(date, isToday, actionIndicators);
           }).toList(),
         ),
       ],
@@ -220,7 +243,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
   }
 
   /// A view that displays the current month.
-  Widget _buildMonthView(final int plantActionsCountToday, final int environmentActionsCountToday) {
+  Widget _buildMonthView(final List<Widget> actionIndicators) {
     return LayoutBuilder(builder: (context, constraints) {
       return Column(
         children: [
@@ -237,9 +260,8 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                 return _buildDateCell(
                   date,
                   isToday,
-                  plantActionsCountToday,
-                  environmentActionsCountToday,
-                  isCurrentMonth,
+                  actionIndicators,
+                  isCurrentMonth: isCurrentMonth,
                 );
               }).toList(),
             ),
@@ -266,9 +288,8 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
   }
 
   /// A cell that displays a date.
-  Widget _buildDateCell(
-      DateTime date, bool isToday, int plantActionCountToday, int environmentActionCountToday,
-      [bool isCurrentMonth = true]) {
+  Widget _buildDateCell(DateTime date, bool isToday, final List<Widget> actionIndicators,
+      {bool isCurrentMonth = true}) {
     return isToday
         ? Center(
             child: Container(
@@ -284,31 +305,10 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                     Text(
                       _formatDate(date),
                     ),
-                    Wrap(
-                      clipBehavior: Clip.hardEdge,
-                      children: [
-                        ...List.generate(plantActionCountToday, (index) {
-                          return Container(
-                            width: 5,
-                            height: 5,
-                            decoration: const BoxDecoration(
-                              color: Colors.green,
-                              shape: BoxShape.circle,
-                            ),
-                          );
-                        }),
-                        ...List.generate(environmentActionCountToday, (index) {
-                          return Container(
-                            width: 5,
-                            height: 5,
-                            decoration: BoxDecoration(
-                              color: Colors.yellow[900],
-                              shape: BoxShape.circle,
-                            ),
-                          );
-                        }),
-                      ].take(4).toList(),
-                    )
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: actionIndicators,
+                    ),
                   ],
                 ),
               ),
