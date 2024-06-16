@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/plants/model.dart';
@@ -14,16 +15,17 @@ Future<bool> confirmDeletionOfPlantDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Delete plant'),
-        content: Text('Are you sure you want to delete ${plant.name}?'),
+        title: Text(tr('plants.dialog.delete_title')),
+        content: Text(tr('plants.dialog.delete_message')),
         actions: [
           TextButton(
             onPressed: () => _onClose(context, false),
-            child: const Text('Cancel'),
+            child: Text(tr('common.cancel')),
           ),
           TextButton(
-            onPressed: () async => _onPlantDeleted(context, plantsProvider, actionsProvider, plant),
-            child: const Text('Delete'),
+            onPressed: () async => _onPlantDeleted(
+                context, plantsProvider, actionsProvider, plant),
+            child: Text(tr('common.delete')),
           ),
         ],
       );

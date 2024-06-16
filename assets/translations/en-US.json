@@ -15,10 +15,39 @@
       "description": "Information about the app"
     }
   },
+  "plants": {
+    "none": "No plants",
+    "details": "Plant details",
+    "current_lifecycle_state": "Current lifecycle state",
+    "dialog": {
+      "delete_title": "Delete plant",
+      "delete_message": "Are you sure you want to delete this plant?"
+    },
+    "form": {
+      "hint_name": "Enter the name of the plant",
+      "hint_description": "Enter a description of the plant"
+    },
+    "create": "Create plant",
+    "edit": "Edit {name}"
+  },
+  "environments": {
+    "none": "No environments",
+    "select": "Select an environment",
+    "select_mandatory": "Please select an environment"
+  },
   "statistics": {
     "coming_soon": "The statistics feature is in development. Check out the progress "
   },
   "common": {
-    "here": "here"
+    "here": "here",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteArgs": "{name} has been deleted.",
+    "environment": "Environment",
+    "name": "Name",
+    "name_mandatory": "Please enter a name",
+    "description": "Description",
+    "banner_image": "Banner image",
+    "save": "Save"
   }
 }
