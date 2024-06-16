@@ -1,0 +1,24 @@
+{
+  "home": {
+    "home_label": "Home",
+    "plants_label": "Plants",
+    "environments_label": "Environments",
+    "statistics_label": "Statistics",
+    "add_action": "Perform an action",
+    "add_plant": "Add a plant",
+    "add_environment": "Add an environment"
+  },
+  "settings": {
+    "title": "Settings",
+    "about": {
+      "title": "About",
+      "description": "Information about the app"
+    }
+  },
+  "statistics": {
+    "coming_soon": "The statistics feature is in development. Check out the progress "
+  },
+  "common": {
+    "here": "here"
+  }
+}

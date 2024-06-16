@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/settings/model.dart';
 import 'package:weedy/settings/provider.dart';
@@ -17,7 +18,7 @@ class _SettingsViewState extends State<SettingsView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(tr('settings.title')),
         centerTitle: true,
       ),
       body: StreamBuilder<Settings>(
@@ -37,8 +38,8 @@ class _SettingsViewState extends State<SettingsView> {
                 children: [
                   ListTile(
                       leading: const Icon(Icons.info_outline),
-                      title: const Text('About'),
-                      subtitle: const Text('Information about the app'),
+                      title: Text(tr('settings.about.title')),
+                      subtitle: Text(tr('settings.about.description')),
                       onTap: () {
                         showAboutDialog(
                           context: context,

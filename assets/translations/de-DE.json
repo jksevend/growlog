@@ -1,0 +1,24 @@
+{
+  "home": {
+    "home_label": "Home",
+    "plants_label": "Pflanzen",
+    "environments_label": "Umgebung",
+    "statistics_label": "Statistiken",
+    "add_action": "Aktion ausführen",
+    "add_plant": "Pflanze hinzufügen",
+    "add_environment": "Umgebung hinzufügen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "about": {
+      "title": "Info",
+      "description": "Informationen über diese Anwendung"
+    }
+  },
+  "statistics": {
+    "coming_soon": "Die Statistikfunktion befindet sich in der Entwicklung. Überprüfen Sie den Fortschritt "
+  },
+  "common": {
+    "here": "hier"
+  }
+}

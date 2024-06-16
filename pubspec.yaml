@@ -22,6 +22,8 @@ dependencies:
   image_picker: ^1.1.2
   collection: ^1.15.0
   url_launcher: ^6.3.0
+  shared_preferences: ^2.2.3
+  easy_localization: ^3.0.7
 
 dev_dependencies:
   flutter_test:
@@ -32,5 +34,6 @@ dev_dependencies:
   flutter_lints: ^4.0.0
 
 flutter:
-
   uses-material-design: true
+  assets:
+    - assets/translations/
