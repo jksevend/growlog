@@ -135,10 +135,8 @@
       "delete_title": "Delete plant"
     },
     "edit": "Edit {name}",
-    "form": {
-      "hint_description": "Enter a description of the plant",
-      "hint_name": "Enter the name of the plant"
-    },
+    "hint_description": "Enter a description of the plant",
+    "hint_name": "Enter the name of the plant",
     "none": "No plants"
   },
   "settings": {

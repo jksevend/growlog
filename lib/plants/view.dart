@@ -234,7 +234,7 @@ class _PlantFormState extends State<PlantForm> {
                           minLines: 5,
                           decoration: InputDecoration(
                             labelText: tr('common.description'),
-                            hintText: tr('plants.description_hint'),
+                            hintText: tr('plants.hint_description'),
                           ),
                         ),
                       ],
