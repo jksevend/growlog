@@ -23,8 +23,7 @@ Future<bool> confirmDeletionOfPlantDialog(
             child: Text(tr('common.cancel')),
           ),
           TextButton(
-            onPressed: () async => _onPlantDeleted(
-                context, plantsProvider, actionsProvider, plant),
+            onPressed: () async => _onPlantDeleted(context, plantsProvider, actionsProvider, plant),
             child: Text(tr('common.delete')),
           ),
         ],

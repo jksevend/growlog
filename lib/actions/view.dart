@@ -1518,8 +1518,8 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
           children: [
             Expanded(
               child: TextFormField(
-                controller: _waterAmountController,
-                keyboardType: TextInputType.number,
+                  controller: _waterAmountController,
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     suffixIcon: const Icon(Icons.water_drop_outlined),
                     labelText: tr('common.amount'),
@@ -1695,8 +1695,8 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                 children: [
                   Flexible(
                     child: TextFormField(
-                      controller: _fertilizerAmountController,
-                      keyboardType: TextInputType.number,
+                        controller: _fertilizerAmountController,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           suffixIcon: const Icon(Icons.eco),
                           labelText: tr('common.amount'),
@@ -1860,8 +1860,8 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
           children: [
             Flexible(
               child: TextFormField(
-                controller: _harvestAmountController,
-                keyboardType: TextInputType.number,
+                  controller: _harvestAmountController,
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     suffixIcon: const Icon(Icons.eco),
                     labelText: tr('common.amount'),
@@ -2101,8 +2101,8 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
           children: [
             Expanded(
               child: TextFormField(
-                controller: _heightController,
-                keyboardType: TextInputType.number,
+                  controller: _heightController,
+                  keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     labelText: tr('common.height'),
                     hintText: '50',

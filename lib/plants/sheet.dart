@@ -52,8 +52,8 @@ Future<void> showPlantDetailSheet(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: () async => _onDeletePlant(
-                        context, plant, plantsProvider, actionsProvider),
+                    onPressed: () async =>
+                        _onDeletePlant(context, plant, plantsProvider, actionsProvider),
                     icon: const Icon(
                       Icons.delete_forever,
                       color: Colors.red,
@@ -120,8 +120,8 @@ Future<void> _onDeletePlant(
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
 ) async {
-  final confirmed = await confirmDeletionOfPlantDialog(
-      context, plant, plantsProvider, actionsProvider);
+  final confirmed =
+      await confirmDeletionOfPlantDialog(context, plant, plantsProvider, actionsProvider);
   if (confirmed == true) {
     if (!context.mounted) {
       return;
@@ -162,14 +162,13 @@ Future<void> _navigateToEnvironmentDetailSheet(
   EnvironmentsProvider environmentsProvider,
   ActionsProvider actionsProvider,
 ) async {
-  var navigationBar =
-      bottomNavigationBarKey.currentWidget as BottomNavigationBar;
+  var navigationBar = bottomNavigationBarKey.currentWidget as BottomNavigationBar;
   await Future.delayed(const Duration(milliseconds: 500));
   if (!context.mounted) {
     return;
   }
   Navigator.of(context).pop();
   navigationBar.onTap!(2);
-  await showEnvironmentDetailSheet(context, plantEnvironment, plants,
-      environmentsProvider, plantsProvider, actionsProvider);
+  await showEnvironmentDetailSheet(
+      context, plantEnvironment, plants, environmentsProvider, plantsProvider, actionsProvider);
 }

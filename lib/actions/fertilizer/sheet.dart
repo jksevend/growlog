@@ -30,7 +30,7 @@ Future<void> showFertilizerDetailSheet(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.edit, color: Colors.blue),
+                            icon: const Icon(Icons.edit, color: Colors.blue),
                             onPressed: () async =>
                                 await _onEdit(context, fertilizerProvider, fertilizer.value)),
                         IconButton(

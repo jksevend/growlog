@@ -58,10 +58,10 @@ class WeedyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ActionsProvider()),
         ChangeNotifierProvider(create: (_) => FertilizerProvider()),
       ],
-      child: Consumer5<SettingsProvider, PlantsProvider, EnvironmentsProvider,
-          ActionsProvider, FertilizerProvider>(
-        builder: (context, settingsProvider, plantsProvider,
-            environmentsProvider, actionsProvider, fertilizerProvider, _) {
+      child: Consumer5<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider,
+          FertilizerProvider>(
+        builder: (context, settingsProvider, plantsProvider, environmentsProvider, actionsProvider,
+            fertilizerProvider, _) {
           return MaterialApp(
             title: 'Weedy',
             localizationsDelegates: context.localizationDelegates,
@@ -106,8 +106,7 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  final GlobalKey<State<BottomNavigationBar>> _bottomNavigationKey =
-      GlobalKey();
+  final GlobalKey<State<BottomNavigationBar>> _bottomNavigationKey = GlobalKey();
   int _selectedIndex = 0;
   late final List<Widget> _pages = [
     HomeView(
@@ -175,8 +174,7 @@ class _MainViewState extends State<MainView> {
           )
         ],
         elevation: 10.0,
-        backgroundColor:
-            Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+        backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,

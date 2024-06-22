@@ -9,7 +9,7 @@ class StatisticsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-        child: Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           RichText(

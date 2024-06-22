@@ -33,51 +33,51 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: CombineLatestStream.list(
-          [
-            widget.plantsProvider.plants,
-            widget.environmentsProvider.environments,
-            widget.actionsProvider.plantActions,
-            widget.actionsProvider.environmentActions,
-          ],
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      stream: CombineLatestStream.list(
+        [
+          widget.plantsProvider.plants,
+          widget.environmentsProvider.environments,
+          widget.actionsProvider.plantActions,
+          widget.actionsProvider.environmentActions,
+        ],
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
 
-          // Extract data
-          var plants = snapshot.data![0] as Map<String, Plant>;
-          var environments = snapshot.data![1] as Map<String, Environment>;
-          var plantActions = snapshot.data![2] as List<PlantAction>;
-          var environmentActions = snapshot.data![3] as List<EnvironmentAction>;
+        // Extract data
+        var plants = snapshot.data![0] as Map<String, Plant>;
+        var environments = snapshot.data![1] as Map<String, Environment>;
+        var plantActions = snapshot.data![2] as List<PlantAction>;
+        var environmentActions = snapshot.data![3] as List<EnvironmentAction>;
 
-          // Filter actions performed today
-          var todayPlantActions =
-              plantActions.where((action) => action.createdAt.day == DateTime.now().day).toList();
-          var todayEnvironmentActions = environmentActions
-              .where((action) => action.createdAt.day == DateTime.now().day)
-              .toList();
-          var todayPlantActionsPerformed = todayPlantActions.length;
-          var todayEnvironmentActionsPerformed = todayEnvironmentActions.length;
+        // Filter actions performed today
+        var todayPlantActions =
+            plantActions.where((action) => action.createdAt.day == DateTime.now().day).toList();
+        var todayEnvironmentActions = environmentActions
+            .where((action) => action.createdAt.day == DateTime.now().day)
+            .toList();
+        var todayPlantActionsPerformed = todayPlantActions.length;
+        var todayEnvironmentActionsPerformed = todayEnvironmentActions.length;
 
-          return Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Card(
-                  child: WeekAndMonthView(
-                    actionsProvider: widget.actionsProvider,
-                  ),
+        return Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Card(
+                child: WeekAndMonthView(
+                  actionsProvider: widget.actionsProvider,
                 ),
-                Card(
-                  child: Column(
-                    children: [
+              ),
+              Card(
+                child: Column(
+                  children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Align(
@@ -95,13 +95,13 @@ class _HomeViewState extends State<HomeView> {
                       ),
                     ),
                     const Divider(),
-                      Card(
-                        elevation: 20,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              ExpansionTile(
+                    Card(
+                      elevation: 20,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            ExpansionTile(
                               title: Text(tr('home.plant_actions')),
                               subtitle: Text(
                                 tr('common.actions_performed_today_args',
@@ -122,36 +122,36 @@ class _HomeViewState extends State<HomeView> {
                                 else
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: todayPlantActions
-                                            .map(
-                                              (action) => PlantActionLogHomeWidget(
-                                                plant: plants[action.plantId]!,
-                                                action: action,
-                                                actionsProvider: widget.actionsProvider,
+                                    child: Column(
+                                      children: todayPlantActions
+                                          .map(
+                                            (action) => PlantActionLogHomeWidget(
+                                              plant: plants[action.plantId]!,
+                                              action: action,
+                                              actionsProvider: widget.actionsProvider,
                                               fertilizerProvider: widget.fertilizerProvider,
                                             ),
                                           )
                                           .toList(),
-                                      ),
                                     ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                  ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Divider(),
-                      ),
-                      Card(
-                        elevation: 20,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              ExpansionTile(
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Divider(),
+                    ),
+                    Card(
+                      elevation: 20,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            ExpansionTile(
                               title: Text(tr('home.environment_actions')),
                               subtitle: Text(
                                 tr(
@@ -163,8 +163,8 @@ class _HomeViewState extends State<HomeView> {
                                 Icons.lightbulb,
                                 color: Colors.yellow[900],
                               ),
-                                children: [
-                                  if (todayEnvironmentActions.isEmpty)
+                              children: [
+                                if (todayEnvironmentActions.isEmpty)
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Center(
@@ -172,32 +172,32 @@ class _HomeViewState extends State<HomeView> {
                                     ),
                                   )
                                 else
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        children: todayEnvironmentActions
-                                            .map(
-                                              (action) => EnvironmentActionLogHomeWidget(
-                                                environment: environments[action.environmentId]!,
-                                                action: action,
-                                                actionsProvider: widget.actionsProvider,
-                                              ),
-                                            )
-                                            .toList(),
-                                      ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Column(
+                                      children: todayEnvironmentActions
+                                          .map(
+                                            (action) => EnvironmentActionLogHomeWidget(
+                                              environment: environments[action.environmentId]!,
+                                              action: action,
+                                              actionsProvider: widget.actionsProvider,
+                                            ),
+                                          )
+                                          .toList(),
                                     ),
-                                ],
-                              ),
-                            ],
-                          ),
+                                  ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
+              ),
+            ],
+          ),
+        );
       },
     );
   }
