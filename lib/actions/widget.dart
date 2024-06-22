@@ -39,11 +39,28 @@ class PlantActionLogItem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListTile(
+          isThreeLine: true,
           leading: Text(action.type.icon, style: const TextStyle(fontSize: 18)),
-          title: Text(action.type.name),
-          subtitle: Text(
-            action.description,
-            style: const TextStyle(fontStyle: FontStyle.italic),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(action.type.name),
+              Text(
+                action.formattedDate,
+                style:
+                    const TextStyle(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic),
+              ),
+            ],
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                action.description,
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
+              _actionInformationWidget(),
+            ],
           ),
           onTap: () async {
             await showPlantActionDetailSheet(
@@ -52,6 +69,125 @@ class PlantActionLogItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _actionInformationWidget() {
+    if (action is PlantWateringAction) {
+      final wateringAction = action as PlantWateringAction;
+      return Text(
+        '${tr('common.water_amount')}\n${wateringAction.amount.amount} ${wateringAction.amount.unit.name}',
+      );
+    }
+
+    if (action is PlantFertilizingAction) {
+      final fertilizingAction = action as PlantFertilizingAction;
+      return StreamBuilder<Map<String, Fertilizer>>(
+        stream: fertilizerProvider.fertilizers,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          final fertilizer = snapshot.data![fertilizingAction.fertilization.fertilizerId]!;
+          return Text(
+            '${fertilizer.name} - ${fertilizingAction.fertilization.amount.amount} ${fertilizingAction.fertilization.amount.unit.name}',
+          );
+        },
+      );
+    }
+
+    if (action is PlantPruningAction) {
+      final pruningAction = action as PlantPruningAction;
+      return Text('${tr('common.pruning')}\n${pruningAction.pruningType.name}');
+    }
+
+    if (action is PlantTrainingAction) {
+      final trainingAction = action as PlantTrainingAction;
+      return Text('${tr('common.training')}\n${trainingAction.trainingType.name}');
+    }
+
+    if (action is PlantReplantingAction) {
+      return Container();
+    }
+
+    if (action is PlantHarvestingAction) {
+      final harvestingAction = action as PlantHarvestingAction;
+      return Text(
+          '${tr('common.harvesting')}\n${harvestingAction.amount.amount} ${harvestingAction.amount.unit.name}');
+    }
+
+    if (action is PlantDeathAction) {
+      return Text(tr('common.death'));
+    }
+
+    if (action is PlantOtherAction) {
+      return Container();
+    }
+
+    if (action is PlantPictureAction) {
+      final pictureAction = action as PlantPictureAction;
+      return Row(
+        children: pictureAction.images
+            .map(
+              (image) => CircleAvatar(
+                backgroundImage: FileImage(File(image)),
+              ),
+            )
+            .toList(),
+      );
+    }
+
+    if (action is PlantMeasurementAction) {
+      final measurementAction = action as PlantMeasurementAction;
+      if (measurementAction.measurement.type == PlantMeasurementType.height) {
+        final amount = MeasurementAmount.fromJson(measurementAction.measurement.measurement);
+        return Row(
+          children: [
+            Text(measurementAction.measurement.type.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
+            Text('${tr('common.height')}\n${amount.value} ${amount.unit.symbol}'),
+          ],
+        );
+      }
+
+      if (measurementAction.measurement.type == PlantMeasurementType.pH) {
+        final ph = measurementAction.measurement.measurement['ph'] as double;
+        return Row(
+          children: [
+            Text(measurementAction.measurement.type.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
+            Text('pH\n$ph'),
+          ],
+        );
+      }
+
+      if (measurementAction.measurement.type == PlantMeasurementType.ec) {
+        final ec = measurementAction.measurement.measurement['ec'] as double;
+        return Row(
+          children: [
+            Text(measurementAction.measurement.type.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
+            Text('EC\n$ec'),
+          ],
+        );
+      }
+
+      if (measurementAction.measurement.type == PlantMeasurementType.ppm) {
+        final ppm = measurementAction.measurement.measurement['ppm'] as double;
+        return Row(
+          children: [
+            Text(measurementAction.measurement.type.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
+            Text('PPM\n$ppm'),
+          ],
+        );
+      }
+    }
+
+    return Container();
   }
 }
 
@@ -79,11 +215,18 @@ class EnvironmentActionLogItem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListTile(
+          isThreeLine: true,
           leading: Text(action.type.icon, style: const TextStyle(fontSize: 18)),
           title: Text(action.type.name),
-          subtitle: Text(
-            action.description,
-            style: const TextStyle(fontStyle: FontStyle.italic),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                action.description,
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
+              _actionInformationWidget(),
+            ],
           ),
           onTap: () async {
             await showEnvironmentActionDetailSheet(context, action, environment, actionsProvider);
@@ -91,6 +234,74 @@ class EnvironmentActionLogItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _actionInformationWidget() {
+    if (action is EnvironmentMeasurementAction) {
+      final measurementAction = action as EnvironmentMeasurementAction;
+      if (measurementAction.measurement.type == EnvironmentMeasurementType.temperature) {
+        final temperature = Temperature.fromJson(measurementAction.measurement.measurement);
+        return Row(
+          children: [
+            Text(measurementAction.measurement.type.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
+            Text('${tr('common.temperature')}\n${temperature.value} ${temperature.unit.symbol}'),
+          ],
+        );
+      }
+
+      if (measurementAction.measurement.type == EnvironmentMeasurementType.humidity) {
+        final humidity = measurementAction.measurement.measurement['humidity'] as double;
+        return Row(
+          children: [
+            Text(measurementAction.measurement.type.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
+            Text('${tr('common.humidity')}\n$humidity %'),
+          ],
+        );
+      }
+
+      if (measurementAction.measurement.type == EnvironmentMeasurementType.co2) {
+        final co2 = measurementAction.measurement.measurement['co2'] as double;
+        return Row(
+          children: [
+            Text(measurementAction.measurement.type.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
+            Text('CO2\n$co2 ppm'),
+          ],
+        );
+      }
+
+      if (measurementAction.measurement.type == EnvironmentMeasurementType.lightDistance) {
+        final amount = MeasurementAmount.fromJson(measurementAction.measurement.measurement);
+        return Row(
+          children: [
+            Text(measurementAction.measurement.type.icon, style: const TextStyle(fontSize: 16)),
+            const SizedBox(width: 10),
+            Text('${tr('common.light_distance')}\n${amount.value}${amount.unit.symbol}'),
+          ],
+        );
+      }
+    }
+
+    if (action is EnvironmentOtherAction) {
+      return Container();
+    }
+
+    if (action is EnvironmentPictureAction) {
+      final pictureAction = action as EnvironmentPictureAction;
+      return Row(
+        children: pictureAction.images
+            .map(
+              (image) => CircleAvatar(
+                backgroundImage: FileImage(File(image)),
+              ),
+            )
+            .toList(),
+      );
+    }
+
+    return Container();
   }
 }
 
@@ -496,10 +707,19 @@ class _PlantFertilizingActionSheetWidgetState extends State<PlantFertilizingActi
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          final fertilizer = snapshot.data![widget.action.fertilization.fertilizerId];
+          final fertilizer = snapshot.data![widget.action.fertilization.fertilizerId]!;
           return ListTile(
+            isThreeLine: true,
             title: Text(tr('common.fertilizer')),
-            subtitle: Text(fertilizer!.name),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(fertilizer.name),
+                const SizedBox(height: 5),
+                Text(
+                    '${widget.action.fertilization.amount.amount} ${widget.action.fertilization.amount.unit.name}'),
+              ],
+            ),
             trailing: IconButton(
               onPressed: () {
                 showDialog(
