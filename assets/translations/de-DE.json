@@ -31,7 +31,7 @@
     "curing": "Aushärten",
     "death": "Tod",
     "delete": "Löschen",
-    "delete_args": "{name} wurde gelöscht.",
+    "deleted_args": "{name} wurde gelöscht.",
     "description": "Beschreibung",
     "dimension": "Abmessungen",
     "dimension_hint": "Geben Sie die Abmessungen der Umgebung ein",
