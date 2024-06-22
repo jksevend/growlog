@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/common/measurement.dart';
@@ -63,20 +64,21 @@ Future<void> showEnvironmentDetailSheet(
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.eco, color: Colors.green),
-                  title: const Text('Plants in this environment'),
+                  title: Text(tr('environment.plants')),
                   subtitle: Text(plants.length.toString()),
                 ),
                 const Divider(),
                 ListTile(
                   isThreeLine: true,
                   leading: const Icon(Icons.light_mode, color: Colors.yellow),
-                  title: const Text('Light'),
+                  title: Text(tr('common.light')),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${environment.lightDetails.lightHours}h per day'),
+                      Text(tr('common.light_hours_per_day',
+                          namedArgs: {'count': environment.lightDetails.lightHours.toString()})),
                       Text(environment.lightDetails.lights.isEmpty
-                          ? 'No lights'
+                          ? tr('common.light_none')
                           : '${environment.lightDetails.lights[0].watt}W ${environment.lightDetails.lights[0].type.name}'),
                     ],
                   ),
@@ -85,12 +87,12 @@ Future<void> showEnvironmentDetailSheet(
                 ListTile(
                   isThreeLine: true,
                   leading: const Icon(Icons.rectangle_outlined, color: Colors.amber),
-                  title: const Text('Dimensions'),
+                  title: Text(tr('common.dimension')),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       environment.dimension == null
-                          ? const Text('No dimensions')
+                          ? Text(tr('common.dimension_unknown'))
                           : Text(
                               '${environment.dimension!.width.value}${environment.dimension!.width.unit.symbol} x '
                               '${environment.dimension!.length.value}${environment.dimension!.length.unit.symbol} x '
@@ -123,7 +125,7 @@ Future<void> _onDeleteEnvironment(
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${environment.name} has been deleted'),
+        content: Text(tr('common.deleted_args', namedArgs: {'name': environment.name})),
       ),
     );
   }

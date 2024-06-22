@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/environments/model.dart';
@@ -16,12 +17,12 @@ Future<bool> confirmDeletionOfEnvironmentDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Delete environment'),
-        content: Text('Are you sure you want to delete ${environment.name}?'),
+        title: Text(tr('environments.dialog.delete_title')),
+        content: Text(tr('environments.dialog.delete_message')),
         actions: [
           TextButton(
             onPressed: () => _onClose(context, false),
-            child: const Text('Cancel'),
+            child: Text(tr('common.cancel')),
           ),
           TextButton(
             onPressed: () async => _onEnvironmentDeleted(
@@ -31,7 +32,7 @@ Future<bool> confirmDeletionOfEnvironmentDialog(
               actionsProvider,
               environment,
             ),
-            child: const Text('Delete'),
+            child: Text(tr('common.delete')),
           ),
         ],
       );

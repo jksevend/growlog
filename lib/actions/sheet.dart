@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/dialog.dart';
 import 'package:weedy/actions/model.dart';
@@ -58,7 +59,7 @@ Future<void> _deletePlantAction(
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${plantAction.type.name} has been deleted'),
+        content: Text(tr('common.deleted_args', namedArgs: {'name': plantAction.type.name})),
       ),
     );
   }

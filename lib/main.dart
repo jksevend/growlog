@@ -11,8 +11,7 @@ import 'package:weedy/plants/provider.dart';
 import 'package:weedy/plants/view.dart';
 import 'package:weedy/settings/provider.dart';
 import 'package:weedy/settings/view.dart';
-
-import 'statistics/view.dart';
+import 'package:weedy/statistics/view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,10 +23,14 @@ void main() async {
   //   name: 'settings.json',
   //   migration:
   //     (jsonContent) {
-  //       migrateField<bool>(
+  //       addField<bool>(
   //         jsonContent: jsonContent,
   //         field: 'showAdvertisements',
   //         defaultValue: true,
+  //       );
+  //       deleteField(
+  //         jsonContent: jsonContent,
+  //         field: 'showAds',
   //       );
   //     },
   // );
@@ -153,21 +156,21 @@ class _MainViewState extends State<MainView> {
           BottomNavigationBarItem(
             icon: const Icon(Icons.home_outlined),
             activeIcon: const Icon(Icons.home),
-            label: tr('home.home_label'),
+            label: tr('main.home_label'),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.eco_outlined),
             activeIcon: const Icon(Icons.eco),
-            label: tr('home.plants_label'),
+            label: tr('main.plants_label'),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.lightbulb_outlined),
             activeIcon: const Icon(Icons.lightbulb),
-            label: tr('home.environments_label'),
+            label: tr('main.environments_label'),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.bar_chart_outlined),
-            label: tr('home.statistics_label'),
+            label: tr('main.statistics_label'),
           )
         ],
         elevation: 10.0,
@@ -201,7 +204,7 @@ class _MainViewState extends State<MainView> {
                     fertilizerProvider: widget.fertilizerProvider,
                   )));
         },
-        tooltip: tr('home.add_action'),
+        tooltip: tr('main.add_action'),
         child: const Stack(
           children: <Widget>[
             Icon(Icons.bolt, size: 36),
@@ -225,7 +228,7 @@ class _MainViewState extends State<MainView> {
                     environmentsProvider: widget.environmentsProvider,
                   )));
         },
-        tooltip: tr('home.add_plant'),
+        tooltip: tr('main.add_plant'),
         child: const Stack(
           children: <Widget>[
             Icon(Icons.eco, size: 36),
@@ -248,7 +251,7 @@ class _MainViewState extends State<MainView> {
                     environmentsProvider: widget.environmentsProvider,
                   )));
         },
-        tooltip: tr('home.add_environment'),
+        tooltip: tr('main.add_environment'),
         child: const Stack(
           children: <Widget>[
             Icon(Icons.lightbulb, size: 36),

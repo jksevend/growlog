@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
@@ -22,7 +23,7 @@ Future<void> showFertilizerForm(
     builder: (context) {
       return AlertDialog(
         title: Text(
-          fertilizer == null ? 'Add Fertilizer' : 'Edit Fertilizer',
+          fertilizer == null ? tr('fertilizers.create') : tr('fertilizers.edit'),
         ),
         content: Form(
           key: formKey,
@@ -31,8 +32,8 @@ Future<void> showFertilizerForm(
             children: <Widget>[
               TextFormField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Name',
+                decoration: InputDecoration(
+                  labelText: tr('common.name'),
                 ),
                 validator: (value) => _validateName(value),
               ),
@@ -40,8 +41,8 @@ Future<void> showFertilizerForm(
                 controller: descriptionController,
                 maxLines: null,
                 minLines: 5,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
+                decoration: InputDecoration(
+                  labelText: tr('common.description'),
                 ),
               ),
             ],
@@ -50,7 +51,7 @@ Future<void> showFertilizerForm(
         actions: <Widget>[
           TextButton(
             onPressed: () => _onCancel(context),
-            child: const Text('Cancel'),
+            child: Text(tr('common.cancel')),
           ),
           TextButton(
             onPressed: () async => await _onSave(
@@ -61,7 +62,7 @@ Future<void> showFertilizerForm(
               fertilizer,
               fertilizerProvider,
             ),
-            child: const Text('Save'),
+            child: Text(tr('common.save')),
           ),
         ],
       );

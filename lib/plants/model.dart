@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'model.g.dart';
@@ -15,11 +16,11 @@ extension MediumExtension on Medium {
   String get name {
     switch (this) {
       case Medium.soil:
-        return 'Soil';
+        return tr('common.soil');
       case Medium.coco:
-        return 'Coco';
+        return tr('common.coco');
       case Medium.hydroponics:
-        return 'Hydroponics';
+        return tr('common.hydroponics');
     }
   }
 }
@@ -60,17 +61,17 @@ extension LifeCycleStateExtension on LifeCycleState {
   String get name {
     switch (this) {
       case LifeCycleState.germination:
-        return 'Germination';
+        return tr('common.germination');
       case LifeCycleState.seedling:
-        return 'Seedling';
+        return tr('common.seedling');
       case LifeCycleState.vegetative:
-        return 'Vegetative';
+        return tr('common.vegetative');
       case LifeCycleState.flowering:
-        return 'Flowering';
+        return tr('common.flowering');
       case LifeCycleState.drying:
-        return 'Drying';
+        return tr('common.drying');
       case LifeCycleState.curing:
-        return 'Curing';
+        return tr('common.curing');
     }
   }
 

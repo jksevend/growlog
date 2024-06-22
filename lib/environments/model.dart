@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weedy/common/measurement.dart';
 
@@ -35,9 +36,9 @@ extension EnvironmentTypeExtension on EnvironmentType {
   String get name {
     switch (this) {
       case EnvironmentType.indoor:
-        return 'Indoor';
+        return tr('common.indoor');
       case EnvironmentType.outdoor:
-        return 'Outdoor';
+        return tr('common.outdoor');
     }
   }
 
@@ -131,7 +132,7 @@ extension LightTypeExtension on LightType {
   String get name {
     switch (this) {
       case LightType.sunlight:
-        return 'Sunlight';
+        return tr('common.sunlight');
       case LightType.cfl:
         return 'CFL';
       case LightType.led:

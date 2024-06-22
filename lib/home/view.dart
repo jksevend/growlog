@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/streams.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
@@ -77,23 +78,23 @@ class _HomeViewState extends State<HomeView> {
                 Card(
                   child: Column(
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Row(
-                            children: [
-                              Text('⚡️', style: TextStyle(fontSize: 22)),
-                              SizedBox(width: 8),
-                              Text(
-                                'Actions today',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                            ],
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            const Text('⚡️', style: TextStyle(fontSize: 22)),
+                            const SizedBox(width: 8),
+                            Text(
+                              tr('home.actions_today'),
+                              style: const TextStyle(fontSize: 18),
+                            ),
+                          ],
                         ),
                       ),
-                      const Divider(),
+                    ),
+                    const Divider(),
                       Card(
                         elevation: 20,
                         child: Padding(
@@ -101,23 +102,26 @@ class _HomeViewState extends State<HomeView> {
                           child: Column(
                             children: [
                               ExpansionTile(
-                                title: const Text('Plant actions'),
-                                subtitle: Text('Performed today: $todayPlantActionsPerformed'),
-                                leading: const Icon(
-                                  Icons.eco,
-                                  color: Colors.green,
-                                ),
-                                children: [
-                                  if (todayPlantActions.isEmpty)
-                                    const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Center(
-                                        child: Text('No plant actions performed today.'),
-                                      ),
-                                    )
-                                  else
-                                    Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                              title: Text(tr('home.plant_actions')),
+                              subtitle: Text(
+                                tr('common.actions_performed_today_args',
+                                    namedArgs: {'count': todayPlantActionsPerformed.toString()}),
+                              ),
+                              leading: const Icon(
+                                Icons.eco,
+                                color: Colors.green,
+                              ),
+                              children: [
+                                if (todayPlantActions.isEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text(tr('home.plant_actions_none_today')),
+                                    ),
+                                  )
+                                else
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
                                       child: Column(
                                         children: todayPlantActions
                                             .map(
@@ -147,22 +151,26 @@ class _HomeViewState extends State<HomeView> {
                           child: Column(
                             children: [
                               ExpansionTile(
-                                title: const Text('Environment actions'),
-                                subtitle:
-                                    Text('Performed today: $todayEnvironmentActionsPerformed'),
-                                leading: Icon(
-                                  Icons.lightbulb,
-                                  color: Colors.yellow[900],
+                              title: Text(tr('home.environment_actions')),
+                              subtitle: Text(
+                                tr(
+                                  'common.actions_performed_today_args',
+                                  namedArgs: {'count': todayEnvironmentActionsPerformed.toString()},
                                 ),
+                              ),
+                              leading: Icon(
+                                Icons.lightbulb,
+                                color: Colors.yellow[900],
+                              ),
                                 children: [
                                   if (todayEnvironmentActions.isEmpty)
-                                    const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Center(
-                                        child: Text('No environment actions performed today.'),
-                                      ),
-                                    )
-                                  else
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text(tr('home.environment_actions_none_today')),
+                                    ),
+                                  )
+                                else
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Column(

@@ -1,5 +1,5 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:weedy/actions/model.dart' as weedy;
 import 'package:weedy/actions/provider.dart';
@@ -150,7 +150,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
             if (!snapshot.hasData) {
-              return const Center(child: Text('No actions found.'));
+              return Center(child: Text(tr('actions.none')));
             }
 
             final plantActions = snapshot.data![0] as List<weedy.PlantAction>;

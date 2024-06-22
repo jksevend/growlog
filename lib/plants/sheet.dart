@@ -129,8 +129,7 @@ Future<void> _onDeletePlant(
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:
-            Text(tr('common.deletedArgs', namedArgs: {'name': plant.name})),
+        content: Text(tr('common.deleted_args', namedArgs: {'name': plant.name})),
       ),
     );
   }
