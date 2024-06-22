@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/dialog.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
@@ -2320,7 +2322,7 @@ class PictureFormState extends State<PictureForm> {
   @override
   void initState() {
     super.initState();
-    _images = widget.images;
+    _images = [...widget.images];
   }
 
   /// The images taken.
@@ -2432,6 +2434,29 @@ class PictureFormState extends State<PictureForm> {
   Future<File> _getImage(final ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile == null) throw Exception('No image picked');
+    if (source == ImageSource.camera) {
+      // images taken from the camera are stored in the app directory for now
+      // TODO: Store images in platform specific gallery directory
+      final appDir = await getApplicationDocumentsDirectory();
+      final fileName = path.basename(pickedFile.path);
+      final fullPath = '${appDir.path}/images/$fileName';
+
+      // Create the images directory if it does not exist
+      final imagesDirectory = Directory('${appDir.path}/images');
+      if (!imagesDirectory.existsSync()) {
+        imagesDirectory.createSync();
+      }
+
+      // Save the image to the app directory
+      await pickedFile.saveTo(fullPath);
+
+      // Delete the image from the temporary directory
+      final cachedFile = File(pickedFile.path);
+      await cachedFile.delete();
+
+      final file = File(fullPath);
+      return file;
+    }
     return File(pickedFile.path);
   }
 }

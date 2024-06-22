@@ -30,7 +30,7 @@
     "curing": "Curing",
     "death": "Death",
     "delete": "Delete",
-    "delete_args": "{name} has been deleted.",
+    "deleted_args": "{name} has been deleted.",
     "description": "Description",
     "dimension": "Dimensions",
     "dimension_hint": "Enter the dimensions of the environment",

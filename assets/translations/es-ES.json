@@ -30,7 +30,7 @@
     "curing": "Curado",
     "death": "Muerte",
     "delete": "Eliminar",
-    "delete_args": "{name} ha sido eliminado.",
+    "deleted_args": "{name} ha sido eliminado.",
     "description": "Descripción",
     "dimension": "Dimensiones",
     "dimension_hint": "Ingrese las dimensiones del entorno",
