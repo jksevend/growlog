@@ -129,9 +129,10 @@ class _HomeViewState extends State<HomeView> {
                                                 plant: plants[action.plantId]!,
                                                 action: action,
                                                 actionsProvider: widget.actionsProvider,
-                                              ),
-                                            )
-                                            .toList(),
+                                              fertilizerProvider: widget.fertilizerProvider,
+                                            ),
+                                          )
+                                          .toList(),
                                       ),
                                     ),
                                 ],

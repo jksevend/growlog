@@ -115,11 +115,13 @@ class EnvironmentActionOverview extends StatelessWidget {
 class PlantActionOverview extends StatefulWidget {
   final Plant plant;
   final ActionsProvider actionsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantActionOverview({
     super.key,
     required this.plant,
     required this.actionsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -176,6 +178,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                 itemBuilder: (context, index) {
                   final action = specificPlantActions.elementAt(index);
                   return PlantActionLogItem(
+                    fertilizerProvider: widget.fertilizerProvider,
                     actionsProvider: widget.actionsProvider,
                     plant: widget.plant,
                     action: action,
@@ -858,7 +861,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
           return;
         }
         final height = _plantHeightMeasurementWidgetKey.currentState!.height;
-        action = PlantMeasuringAction(
+        action = PlantMeasurementAction(
           id: const Uuid().v4().toString(),
           description: _plantActionDescriptionTextController.text,
           plantId: currentPlant.id,
@@ -879,7 +882,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
           return;
         }
         final ph = _plantPHMeasurementWidgetKey.currentState!.ph;
-        action = PlantMeasuringAction(
+        action = PlantMeasurementAction(
           id: const Uuid().v4().toString(),
           description: _plantActionDescriptionTextController.text,
           plantId: currentPlant.id,
@@ -900,7 +903,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
           return;
         }
         final ec = _plantECMeasurementWidgetKey.currentState!.ec;
-        action = PlantMeasuringAction(
+        action = PlantMeasurementAction(
           id: const Uuid().v4().toString(),
           description: _plantActionDescriptionTextController.text,
           plantId: currentPlant.id,
@@ -921,7 +924,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
           return;
         }
         final ppm = _plantPPMMeasurementWidgetKey.currentState!.ppm;
-        action = PlantMeasuringAction(
+        action = PlantMeasurementAction(
           id: const Uuid().v4().toString(),
           description: _plantActionDescriptionTextController.text,
           plantId: currentPlant.id,
@@ -962,7 +965,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
 
     if (_currentPlantActionType == PlantActionType.replanting) {
-      action = PlantAction(
+      action = PlantReplantingAction(
         id: const Uuid().v4().toString(),
         description: _plantActionDescriptionTextController.text,
         plantId: currentPlant.id,
@@ -976,7 +979,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
 
     if (_currentPlantActionType == PlantActionType.death) {
-      action = PlantAction(
+      action = PlantDeathAction(
         id: const Uuid().v4().toString(),
         description: _plantActionDescriptionTextController.text,
         plantId: currentPlant.id,
@@ -990,7 +993,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     }
 
     if (_currentPlantActionType == PlantActionType.other) {
-      action = PlantAction(
+      action = PlantOtherAction(
         id: const Uuid().v4().toString(),
         description: _plantActionDescriptionTextController.text,
         plantId: currentPlant.id,
@@ -2320,7 +2323,7 @@ class PictureFormState extends State<PictureForm> {
   @override
   void initState() {
     super.initState();
-    _images = widget.images;
+    _images = [...widget.images];
   }
 
   /// The images taken.

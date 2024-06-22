@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
+import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/view.dart';
 import 'package:weedy/common/date_utils.dart';
@@ -18,6 +19,7 @@ class PlantOverview extends StatelessWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
+  final FertilizerProvider fertilizerProvider;
   final GlobalKey<State<BottomNavigationBar>> bottomNavigationKey;
 
   const PlantOverview({
@@ -25,6 +27,7 @@ class PlantOverview extends StatelessWidget {
     required this.plantsProvider,
     required this.environmentsProvider,
     required this.actionsProvider,
+    required this.fertilizerProvider,
     required this.bottomNavigationKey,
   });
 
@@ -130,6 +133,7 @@ class PlantOverview extends StatelessWidget {
                                     builder: (context) => PlantActionOverview(
                                           plant: plant,
                                           actionsProvider: actionsProvider,
+                                          fertilizerProvider: fertilizerProvider,
                                         )));
                               },
                             ),

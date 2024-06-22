@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/model.dart' as weedy;
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/sheet.dart';
@@ -12,12 +13,14 @@ class PlantActionLogHomeWidget extends StatelessWidget {
   final Plant plant;
   final weedy.PlantAction action;
   final ActionsProvider actionsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantActionLogHomeWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -29,7 +32,8 @@ class PlantActionLogHomeWidget extends StatelessWidget {
         title: Text(plant.name),
         subtitle: Text(action.formattedDate),
         onTap: () async {
-          await showPlantActionDetailSheet(context, action, plant, actionsProvider);
+          await showPlantActionDetailSheet(
+              context, action, plant, actionsProvider, fertilizerProvider);
         },
       ),
     );

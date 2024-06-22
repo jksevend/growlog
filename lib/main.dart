@@ -120,6 +120,7 @@ class _MainViewState extends State<MainView> {
       plantsProvider: widget.plantsProvider,
       environmentsProvider: widget.environmentsProvider,
       actionsProvider: widget.actionsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
       bottomNavigationKey: _bottomNavigationKey,
     ),
     EnvironmentOverview(
