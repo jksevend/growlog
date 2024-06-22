@@ -1,6 +1,5 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/dialog.dart';
+import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/widget.dart';
@@ -13,56 +12,95 @@ Future<void> showPlantActionDetailSheet(
   PlantAction plantAction,
   Plant plant,
   ActionsProvider actionsProvider,
+  FertilizerProvider fertilizerProvider,
 ) async {
   await showModalBottomSheet(
     context: context,
     builder: (context) {
-      return StatefulBuilder(builder: (context, setState) {
-        return Column(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: Text(plantAction.type.name),
-              subtitle: Text(plantAction.description),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: () async => await _deletePlantAction(
-                      context,
-                      plantAction,
-                      actionsProvider,
-                    ),
-                    icon: const Icon(Icons.delete_forever, color: Colors.red),
-                  ),
-                ],
-              ),
-            ),
-          ],
+      if (plantAction is PlantWateringAction) {
+        return PlantWateringActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
         );
-      });
+      }
+
+      if (plantAction is PlantFertilizingAction) {
+        return PlantFertilizingActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+          fertilizerProvider: fertilizerProvider,
+        );
+      }
+
+      if (plantAction is PlantHarvestingAction) {
+        return PlantHarvestingActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+        );
+      }
+
+      if (plantAction is PlantPruningAction) {
+        return PlantPruningActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+        );
+      }
+
+      if (plantAction is PlantTrainingAction) {
+        return PlantTrainingActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+        );
+      }
+
+      if (plantAction is PlantReplantingAction) {
+        return PlantReplantingActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+        );
+      }
+
+      if (plantAction.type == PlantActionType.other) {
+        return PlantOtherActionSheetWidget(
+          action: plantAction as PlantOtherAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+        );
+      }
+
+      if (plantAction is PlantPictureAction) {
+        return PlantPictureActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+        );
+      }
+
+      if (plantAction is PlantDeathAction) {
+        return PlantDeathActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+        );
+      }
+
+      if (plantAction is PlantMeasurementAction) {
+        return PlantMeasurementActionSheetWidget(
+          action: plantAction,
+          plant: plant,
+          actionsProvider: actionsProvider,
+        );
+      }
+
+      throw UnimplementedError('Unknown plant action type: ${plantAction.toJson()}');
     },
   );
-}
-
-/// Delete the [plantAction].
-Future<void> _deletePlantAction(
-  BuildContext context,
-  PlantAction plantAction,
-  ActionsProvider actionsProvider,
-) async {
-  final confirmed = await confirmDeletionOfPlantActionDialog(context, plantAction, actionsProvider);
-  if (confirmed == true) {
-    if (!context.mounted) {
-      return;
-    }
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(tr('common.deleted_args', namedArgs: {'name': plantAction.type.name})),
-      ),
-    );
-  }
 }
 
 /// Show a bottom sheet with the details of the [environmentAction].

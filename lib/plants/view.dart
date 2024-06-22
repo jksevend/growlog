@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
+import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/view.dart';
 import 'package:weedy/common/date_utils.dart';
@@ -18,6 +19,7 @@ class PlantOverview extends StatelessWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
+  final FertilizerProvider fertilizerProvider;
   final GlobalKey<State<BottomNavigationBar>> bottomNavigationKey;
 
   const PlantOverview({
@@ -25,6 +27,7 @@ class PlantOverview extends StatelessWidget {
     required this.plantsProvider,
     required this.environmentsProvider,
     required this.actionsProvider,
+    required this.fertilizerProvider,
     required this.bottomNavigationKey,
   });
 
@@ -58,9 +61,8 @@ class PlantOverview extends StatelessWidget {
             children: plants.values.map(
               (plant) {
                 final environment = environments[plant.environmentId];
-                final plantsInEnvironment = plants.values
-                    .where((p) => p.environmentId == environment?.id)
-                    .toList();
+                final plantsInEnvironment =
+                    plants.values.where((p) => p.environmentId == environment?.id).toList();
                 return LayoutBuilder(
                   builder: (context, constraints) {
                     return Card(
@@ -86,8 +88,7 @@ class PlantOverview extends StatelessWidget {
                                           child: InteractiveViewer(
                                             panEnabled: false,
                                             // Set it to false
-                                            boundaryMargin:
-                                                const EdgeInsets.all(100),
+                                            boundaryMargin: const EdgeInsets.all(100),
                                             minScale: 1,
                                             maxScale: 2,
                                             child: Image.file(
@@ -109,8 +110,7 @@ class PlantOverview extends StatelessWidget {
                             subtitle: Text(
                                 '${daysSince(plant.createdAt)} days (W${weeksSince(plant.createdAt)})'),
                             onTap: () async {
-                              debugPrint(
-                                  'Navigate to the plant detail view for ${plant.name}');
+                              debugPrint('Navigate to the plant detail view for ${plant.name}');
                               await showPlantDetailSheet(
                                   context,
                                   plant,
@@ -124,12 +124,12 @@ class PlantOverview extends StatelessWidget {
                             trailing: IconButton(
                               icon: const Icon(Icons.timeline),
                               onPressed: () {
-                                debugPrint(
-                                    'Navigate to the plant timeline view for ${plant.name}');
+                                debugPrint('Navigate to the plant timeline view for ${plant.name}');
                                 Navigator.of(context).push(MaterialPageRoute(
                                     builder: (context) => PlantActionOverview(
                                           plant: plant,
                                           actionsProvider: actionsProvider,
+                                          fertilizerProvider: fertilizerProvider,
                                         )));
                               },
                             ),
@@ -170,8 +170,7 @@ class PlantForm extends StatefulWidget {
 }
 
 class _PlantFormState extends State<PlantForm> {
-  final GlobalKey<PictureFormState> _pictureFormKey =
-      GlobalKey<PictureFormState>();
+  final GlobalKey<PictureFormState> _pictureFormKey = GlobalKey<PictureFormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late List<bool> _selectedLifeCycleState;
@@ -182,8 +181,7 @@ class _PlantFormState extends State<PlantForm> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.plant?.name);
-    _descriptionController =
-        TextEditingController(text: widget.plant?.description);
+    _descriptionController = TextEditingController(text: widget.plant?.description);
     _selectedLifeCycleState = _selectedLifeCycleStateFromPlant(widget.plant);
     _selectedMedium = widget.plant?.medium ?? Medium.soil;
   }
@@ -251,21 +249,16 @@ class _PlantFormState extends State<PlantForm> {
                         StreamBuilder<Map<String, Environment>>(
                             stream: widget.environmentsProvider.environments,
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const Center(child: CircularProgressIndicator());
                               }
 
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator());
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const Center(child: CircularProgressIndicator());
                               }
 
                               if (snapshot.hasError) {
-                                return Center(
-                                    child: Text('Error: ${snapshot.error}'));
+                                return Center(child: Text('Error: ${snapshot.error}'));
                               }
 
                               final environments = snapshot.data!;
@@ -274,22 +267,19 @@ class _PlantFormState extends State<PlantForm> {
                                   child: Text(tr('environments.none')),
                                 );
                               }
-                              _currentEnvironment =
-                                  environments[environments.keys.first]!;
+                              _currentEnvironment = environments[environments.keys.first]!;
                               return DropdownButton<Environment>(
                                 icon: const Icon(Icons.arrow_downward_sharp),
                                 isExpanded: true,
                                 items: environments.values
                                     .map(
-                                      (environment) =>
-                                          DropdownMenuItem<Environment>(
+                                      (environment) => DropdownMenuItem<Environment>(
                                         value: environment,
                                         child: Text(environment.name),
                                       ),
                                     )
                                     .toList(),
-                                onChanged: (Environment? value) =>
-                                    _updateCurrentEnvironment(value),
+                                onChanged: (Environment? value) => _updateCurrentEnvironment(value),
                                 value: _currentEnvironment,
                               );
                             }),
@@ -309,14 +299,12 @@ class _PlantFormState extends State<PlantForm> {
                           const SizedBox(height: 8.0),
                           ToggleButtons(
                             isSelected: _selectedLifeCycleState,
-                            onPressed: (index) =>
-                                _onLifeCycleStateSelected(index),
+                            onPressed: (index) => _onLifeCycleStateSelected(index),
                             children: LifeCycleState.values
                                 .map(
                                   (state) => Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text(state.icon,
-                                        style: const TextStyle(fontSize: 18.0)),
+                                    child: Text(state.icon, style: const TextStyle(fontSize: 18.0)),
                                   ),
                                 )
                                 .toList(),

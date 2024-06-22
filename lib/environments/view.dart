@@ -76,29 +76,29 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                                 child: Image.file(
                                   height: constraints.maxWidth / 2,
                                   width: constraints.maxWidth,
-                            fit: BoxFit.fitWidth,
-                            File(environment.bannerImagePath),
-                          ),
-                          onTap: () async {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return Dialog(
-                                    child: InteractiveViewer(
-                                      panEnabled: false,
-                                      // Set it to false
-                                      boundaryMargin: const EdgeInsets.all(100),
-                                      minScale: 1,
-                                      maxScale: 2,
-                                      child: Image.file(
-                                        alignment: Alignment.center,
-                                        File(environment.bannerImagePath),
-                                      ),
-                                    ),
-                                  );
-                                });
-                          },
-                        ),
+                                  fit: BoxFit.fitWidth,
+                                  File(environment.bannerImagePath),
+                                ),
+                                onTap: () async {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          child: InteractiveViewer(
+                                            panEnabled: false,
+                                            // Set it to false
+                                            boundaryMargin: const EdgeInsets.all(100),
+                                            minScale: 1,
+                                            maxScale: 2,
+                                            child: Image.file(
+                                              alignment: Alignment.center,
+                                              File(environment.bannerImagePath),
+                                            ),
+                                          ),
+                                        );
+                                      });
+                                },
+                              ),
                         ListTile(
                           leading: Text(
                             environment.type.icon,
@@ -396,8 +396,8 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 Text(tr('common.dimension_hint')),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
-                                  controller: _widthController,
-                                  keyboardType: TextInputType.number,
+                                    controller: _widthController,
+                                    keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
                                       labelText: tr('common.width'),
                                       hintText: tr('common.width_hint'),
@@ -405,8 +405,8 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     validator: (value) => validateInput(value, isDouble: true)),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
-                                  controller: _lengthController,
-                                  keyboardType: TextInputType.number,
+                                    controller: _lengthController,
+                                    keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
                                       labelText: tr('common.length'),
                                       hintText: tr('common.length_hint'),
@@ -414,8 +414,8 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     validator: (value) => validateInput(value, isDouble: true)),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
-                                  controller: _heightController,
-                                  keyboardType: TextInputType.number,
+                                    controller: _heightController,
+                                    keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
                                       labelText: tr('common.height'),
                                       hintText: tr('common.height_hint'),

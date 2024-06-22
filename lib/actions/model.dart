@@ -409,6 +409,21 @@ enum PruningType {
   lollipopping,
 }
 
+/// The extension for [PruningType]
+extension PruningTypeExtension on PruningType {
+  /// The name of the pruning type.
+  String get name {
+    switch (this) {
+      case PruningType.topping:
+        return 'Topping';
+      case PruningType.fim:
+        return 'FIM';
+      case PruningType.lollipopping:
+        return 'Lollipopping';
+    }
+  }
+}
+
 /// An extension for [PruningType]
 @JsonSerializable()
 class PlantPruningAction extends PlantAction {
@@ -585,10 +600,10 @@ extension PlantMeasurementTypeExtension on PlantMeasurementType {
 
 /// A plant measuring action.
 @JsonSerializable()
-class PlantMeasuringAction extends PlantAction {
+class PlantMeasurementAction extends PlantAction {
   final PlantMeasurement measurement;
 
-  PlantMeasuringAction({
+  PlantMeasurementAction({
     required super.id,
     required super.description,
     required super.createdAt,
@@ -597,7 +612,7 @@ class PlantMeasuringAction extends PlantAction {
     required this.measurement,
   });
 
-  factory PlantMeasuringAction.fromJson(Map<String, dynamic> json) =>
+  factory PlantMeasurementAction.fromJson(Map<String, dynamic> json) =>
       _$PlantMeasuringActionFromJson(json);
 
   @override
@@ -702,7 +717,7 @@ class Actions {
         case 'training':
           return PlantTrainingAction.fromJson(map);
         case 'measuring':
-          return PlantMeasuringAction.fromJson(map);
+          return PlantMeasurementAction.fromJson(map);
         case 'picture':
           return PlantPictureAction.fromJson(map);
         case 'death':
