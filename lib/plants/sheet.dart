@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/environments/model.dart';
@@ -51,8 +52,8 @@ Future<void> showPlantDetailSheet(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: () async =>
-                        _onDeletePlant(context, plant, plantsProvider, actionsProvider),
+                    onPressed: () async => _onDeletePlant(
+                        context, plant, plantsProvider, actionsProvider),
                     icon: const Icon(
                       Icons.delete_forever,
                       color: Colors.red,
@@ -85,13 +86,13 @@ Future<void> showPlantDetailSheet(
             const Divider(),
             // Information about the plants' environment
             plantEnvironment == null
-                ? const Text('No environment')
+                ? Text(tr('environments.none'))
                 : ListTile(
                     leading: const Icon(Icons.lightbulb, color: Colors.yellow),
-                    title: const Text('Environment'),
+                    title: Text(tr('common.environment')),
                     subtitle: Text(plantEnvironment.name),
                     trailing: IconButton(
-                        icon: const Icon(Icons.arrow_right_alt),
+                      icon: const Icon(Icons.arrow_right_alt),
                       onPressed: () async => _navigateToEnvironmentDetailSheet(
                         context,
                         bottomNavigationBarKey,
@@ -119,8 +120,8 @@ Future<void> _onDeletePlant(
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
 ) async {
-  final confirmed =
-      await confirmDeletionOfPlantDialog(context, plant, plantsProvider, actionsProvider);
+  final confirmed = await confirmDeletionOfPlantDialog(
+      context, plant, plantsProvider, actionsProvider);
   if (confirmed == true) {
     if (!context.mounted) {
       return;
@@ -128,7 +129,7 @@ Future<void> _onDeletePlant(
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${plant.name} has been deleted'),
+        content: Text(tr('common.deleted_args', namedArgs: {'name': plant.name})),
       ),
     );
   }
@@ -161,13 +162,14 @@ Future<void> _navigateToEnvironmentDetailSheet(
   EnvironmentsProvider environmentsProvider,
   ActionsProvider actionsProvider,
 ) async {
-  var navigationBar = bottomNavigationBarKey.currentWidget as BottomNavigationBar;
+  var navigationBar =
+      bottomNavigationBarKey.currentWidget as BottomNavigationBar;
   await Future.delayed(const Duration(milliseconds: 500));
   if (!context.mounted) {
     return;
   }
   Navigator.of(context).pop();
   navigationBar.onTap!(2);
-  await showEnvironmentDetailSheet(
-      context, plantEnvironment, plants, environmentsProvider, plantsProvider, actionsProvider);
+  await showEnvironmentDetailSheet(context, plantEnvironment, plants,
+      environmentsProvider, plantsProvider, actionsProvider);
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
@@ -49,8 +50,8 @@ class EnvironmentActionOverview extends StatelessWidget {
 
           final environmentActions = snapshot.data!;
           if (environmentActions.isEmpty) {
-            return const Center(
-              child: Text('No environment actions created yet.'),
+            return Center(
+              child: Text(tr('actions.environment.none')),
             );
           }
 
@@ -58,8 +59,8 @@ class EnvironmentActionOverview extends StatelessWidget {
               environmentActions.where((action) => action.environmentId == environment.id).toList();
 
           if (specificEnvironmentActions.isEmpty) {
-            return const Center(
-              child: Text('No actions for this environment.'),
+            return Center(
+              child: Text(tr('actions.environment.none_for_this')),
             );
           }
 
@@ -146,8 +147,8 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
 
           final plantActions = snapshot.data!;
           if (plantActions.isEmpty) {
-            return const Center(
-              child: Text('No plant actions created yet.'),
+            return Center(
+              child: Text(tr('actions.plants.none')),
             );
           }
 
@@ -155,8 +156,8 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
               plantActions.where((action) => action.plantId == widget.plant.id).toList();
 
           if (specificPlantActions.isEmpty) {
-            return const Center(
-              child: Text('No actions for this plant.'),
+            return Center(
+              child: Text(tr('actions.plants.none_for_this')),
             );
           }
 
@@ -291,7 +292,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Choose Action'),
+        title: Text(tr('actions.choose')),
         centerTitle: true,
       ),
       body: Padding(
@@ -306,7 +307,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        const Text('What do you want to do?'),
+                        Text(tr('actions.choose_hint')),
                         const SizedBox(height: 10),
                         ToggleButtons(
                           constraints: const BoxConstraints(minWidth: 100),
@@ -320,7 +321,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                                   size: 50,
                                   color: Colors.green[900],
                                 ),
-                                const Text('Plant')
+                                Text(tr('common.plant')),
                               ],
                             ),
                             Column(
@@ -330,7 +331,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                                   size: 50,
                                   color: Colors.yellow[900],
                                 ),
-                                const Text('Environment')
+                                Text(tr('common.environment')),
                               ],
                             )
                           ],
@@ -372,7 +373,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    const Text('Choose a plant:'),
+                    Text(tr('actions.plants.choose')),
                     StreamBuilder<Map<String, Plant>>(
                         stream: widget.plantsProvider.plants,
                         builder: (context, snapshot) {
@@ -386,10 +387,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 
                           final plants = snapshot.data!;
                           if (plants.isEmpty) {
-                            return const Padding(
-                              padding: EdgeInsets.all(8.0),
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
                               child: Center(
-                                child: Text('No plants created yet.'),
+                                child: Text(tr('plants.none')),
                               ),
                             );
                           }
@@ -413,7 +414,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         const Icon(Icons.calendar_month),
-                        const Text('Select date: '),
+                        Text('${tr('common.select_date')}: '),
                         TextButton(
                           onPressed: () => _selectDate(context, _plantActionDate),
                           child: Text(
@@ -427,9 +428,9 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                       controller: _plantActionDescriptionTextController,
                       maxLines: null,
                       minLines: 5,
-                      decoration: const InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'Enter a description of the plant',
+                      decoration: InputDecoration(
+                        labelText: tr('common.description'),
+                        hintText: tr('actions.plants.description_hint'),
                       ),
                     ),
                   ],
@@ -476,7 +477,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
               alignment: Alignment.centerRight,
               child: OutlinedButton.icon(
                 onPressed: () async => await _onPlantActionCreated(),
-                label: const Text('Save'),
+                label: Text(tr('common.save')),
                 icon: const Icon(Icons.save),
               ),
             ),
@@ -492,7 +493,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  const Text('Choose an environment:'),
+                  Text(tr('actions.environment.choose')),
                   StreamBuilder<Map<String, Environment>>(
                     stream: widget.environmentsProvider.environments,
                     builder: (builder, snapshot) {
@@ -506,10 +507,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 
                       final environments = snapshot.data!;
                       if (environments.isEmpty) {
-                        return const Padding(
-                          padding: EdgeInsets.all(8.0),
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: Center(
-                            child: Text('No environments created yet.'),
+                            child: Text(tr('environments.none')),
                           ),
                         );
                       }
@@ -534,7 +535,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       const Icon(Icons.calendar_month),
-                      const Text('Select date: '),
+                      Text('${tr('common.select_date')}: '),
                       TextButton(
                         onPressed: () => _selectDate(context, _environmentActionDate),
                         child: Text(
@@ -548,9 +549,9 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     controller: _environmentActionDescriptionTextController,
                     maxLines: null,
                     minLines: 5,
-                    decoration: const InputDecoration(
-                      labelText: 'Description',
-                      hintText: 'Enter a description of the plant',
+                    decoration: InputDecoration(
+                      labelText: tr('common.description'),
+                      hintText: tr('actions.environment.description_hint'),
                     ),
                   ),
                 ],
@@ -596,7 +597,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
             alignment: Alignment.centerRight,
             child: OutlinedButton.icon(
               onPressed: () async => await _onEnvironmentActionCreated(),
-              label: const Text('Save'),
+              label: Text(tr('common.save')),
               icon: const Icon(Icons.save),
             ),
           ),
@@ -621,10 +622,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 
   void _showImageSelectionMandatorySnackbar() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Row(
           children: [
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(8.0),
               child: Icon(
                 Icons.error,
@@ -632,11 +633,11 @@ class _ChooseActionViewState extends State<ChooseActionView> {
               ),
             ),
             Text(
-              'Add images before saving the action',
+              tr('common.images_mandatory'),
             ),
           ],
         ),
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -709,10 +710,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
     // If no plant is selected, show a snackbar and return.
     if (_currentPlant == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Icon(
                   Icons.error,
@@ -720,11 +721,11 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                 ),
               ),
               Text(
-                'Create a plant before creating an action for it',
+                tr('plants.none'),
               ),
             ],
           ),
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 3),
         ),
       );
       return;
@@ -758,10 +759,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
       final hasFertilizer = _plantFertilizingFormKey.currentState!.hasFertilizers;
       if (!hasFertilizer) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
-                Padding(
+                const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Icon(
                     Icons.error,
@@ -769,11 +770,11 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                   ),
                 ),
                 Text(
-                  'Add fertilizers before saving the action',
+                  tr('fertilizers.none'),
                 ),
               ],
             ),
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           ),
         );
         return;
@@ -1045,10 +1046,10 @@ class _ChooseActionViewState extends State<ChooseActionView> {
   Future<void> _onEnvironmentActionCreated() async {
     if (_currentEnvironment == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Row(
             children: [
-              Padding(
+              const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Icon(
                   Icons.error,
@@ -1056,11 +1057,11 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                 ),
               ),
               Text(
-                'Create an environment before creating an action!',
+                tr('environments.none'),
               ),
             ],
           ),
-          duration: Duration(seconds: 3),
+          duration: const Duration(seconds: 3),
         ),
       );
       return;
@@ -1264,9 +1265,9 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
               child: TextFormField(
                 controller: _distanceController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  suffixIcon: Icon(Icons.highlight_rounded),
-                  labelText: 'Distance',
+                decoration: InputDecoration(
+                  suffixIcon: const Icon(Icons.highlight_rounded),
+                  labelText: tr('common.distance'),
                   hintText: '50',
                 ),
                 validator: (value) => validateInput(value, isDouble: true),
@@ -1352,9 +1353,9 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
         child: TextFormField(
           controller: _humidityController,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            suffixIcon: Icon(Icons.water_damage),
-            labelText: 'Humidity',
+          decoration: InputDecoration(
+            suffixIcon: const Icon(Icons.water_damage),
+            labelText: tr('common.humidity'),
             hintText: '50',
           ),
           validator: (value) => validateInput(value, isDouble: true),
@@ -1418,9 +1419,9 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
               child: TextFormField(
                 controller: _temperatureController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  suffixIcon: Icon(Icons.thermostat),
-                  labelText: 'Temperature',
+                decoration: InputDecoration(
+                  suffixIcon: const Icon(Icons.thermostat),
+                  labelText: tr('common.temperature'),
                   hintText: '25',
                 ),
                 validator: (value) => validateInput(value, isDouble: true),
@@ -1516,18 +1517,12 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
               child: TextFormField(
                 controller: _waterAmountController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  suffixIcon: Icon(Icons.water_drop_outlined),
-                  labelText: 'Amount',
-                  hintText: '50',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a value';
-                  }
-                  return null;
-                },
-              ),
+                  decoration: InputDecoration(
+                    suffixIcon: const Icon(Icons.water_drop_outlined),
+                    labelText: tr('common.amount'),
+                    hintText: '50',
+                  ),
+                  validator: (value) => validateInput(value, isDouble: true)),
             ),
             const SizedBox(width: 50),
             const VerticalDivider(),
@@ -1645,7 +1640,7 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Text('No fertilizers created yet.'),
+                      Text(tr('fertilizers.none')),
                       _addFertilizerButton(),
                     ],
                   );
@@ -1699,11 +1694,11 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                     child: TextFormField(
                       controller: _fertilizerAmountController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        suffixIcon: Icon(Icons.eco),
-                        labelText: 'Amount',
-                        hintText: '50',
-                      ),
+                        decoration: InputDecoration(
+                          suffixIcon: const Icon(Icons.eco),
+                          labelText: tr('common.amount'),
+                          hintText: '50',
+                        ),
                         validator: (value) => validateInput(value, isDouble: true)),
                   ),
                   const SizedBox(width: 50),
@@ -1864,11 +1859,11 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
               child: TextFormField(
                 controller: _harvestAmountController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  suffixIcon: Icon(Icons.eco),
-                  labelText: 'Amount',
-                  hintText: '50',
-                ),
+                  decoration: InputDecoration(
+                    suffixIcon: const Icon(Icons.eco),
+                    labelText: tr('common.amount'),
+                    hintText: '50',
+                  ),
                   validator: (value) => validateInput(value, isDouble: true)),
             ),
             const SizedBox(width: 50),
@@ -2105,10 +2100,10 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
               child: TextFormField(
                 controller: _heightController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Height',
-                  hintText: '50',
-                ),
+                  decoration: InputDecoration(
+                    labelText: tr('common.height'),
+                    hintText: '50',
+                  ),
                   validator: (value) => validateInput(value, isDouble: true)),
             ),
             const SizedBox(width: 50),
@@ -2342,8 +2337,8 @@ class PictureFormState extends State<PictureForm> {
                 child: Row(
                   children: [
                     widget.allowMultiple
-                        ? const Text('No images selected')
-                        : const Text('No image selected'),
+                        ? Text(tr('common.no_images'))
+                        : Text(tr('common.no_image')),
                     _addImageButton(),
                   ],
                 ),
@@ -2402,7 +2397,7 @@ class PictureFormState extends State<PictureForm> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.camera_alt),
-                  title: const Text('Take one with camera'),
+                  title: Text(tr('common.take_image_camera')),
                   onTap: () async {
                     final file = await _getImage(ImageSource.camera);
                     if (!context.mounted) return;
@@ -2411,7 +2406,7 @@ class PictureFormState extends State<PictureForm> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.photo),
-                  title: const Text('Select from gallery'),
+                  title: Text(tr('common.select_image_gallery')),
                   onTap: () async {
                     final file = await _getImage(ImageSource.gallery);
                     if (!context.mounted) return;

@@ -1,0 +1,156 @@
+{
+  "actions": {
+    "choose": "Choose action",
+    "choose_hint": "What action do you want to perform?",
+    "dialog": {
+      "delete_message": "Are you sure you want to delete this action?",
+      "delete_title": "Delete action"
+    },
+    "environments": {
+      "choose": "Choose environment",
+      "description_hint": "Enter a description of the environment action",
+      "none": "No environment actions created yet",
+      "none_for_this": "No actions for this environment"
+    },
+    "none": "No actions",
+    "plants": {
+      "choose": "Choose plant",
+      "description_hint": "Enter a description of the plant action",
+      "none": "No plant actions created yet",
+      "none_for_this": "No actions for this plant"
+    }
+  },
+  "common": {
+    "add": "Add",
+    "actions_performed_today_args": "Performed today: {count}",
+    "amount": "Amount",
+    "banner_image": "Banner image",
+    "cancel": "Cancel",
+    "coco": "Coco",
+    "curing": "Curing",
+    "death": "Death",
+    "delete": "Delete",
+    "delete_args": "{name} has been deleted.",
+    "description": "Description",
+    "dimension": "Dimensions",
+    "dimension_hint": "Enter the dimensions of the environment",
+    "dimension_unknown": "Unknown dimensions",
+    "distance": "Distance",
+    "drying": "Drying",
+    "environment": "Environment",
+    "fertilizing": "Fertilizing",
+    "fertilizers": "Fertilizers",
+    "flowering": "Flowering",
+    "germination": "Germination",
+    "harvesting": "Harvesting",
+    "height": "Height",
+    "height_hint": "Enter the height of the environment",
+    "here": "here",
+    "humidity": "Humidity",
+    "hydroponics": "Hydro",
+    "images_mandatory": "Please select at least one image",
+    "indoor": "Indoor",
+    "length": "Length",
+    "length_hint": "Enter the length of the environment",
+    "light": "Light",
+    "light_distance": "Light distance",
+    "light_hours_per_day": "{count} h per day",
+    "light_none": "No light",
+    "measuring": "Measuring",
+    "measurement": "Measurement",
+    "name": "Name",
+    "name_mandatory": "Please enter a name",
+    "no_description": "No description",
+    "no_image": "No image selected",
+    "no_images": "No images selected",
+    "other": "Other",
+    "outdoor": "Outdoor",
+    "picture": "Picture",
+    "plant": "Plant",
+    "pruning": "Pruning",
+    "replanting": "Replanting",
+    "save": "Save",
+    "seedling": "Seedling",
+    "select_date": "Select a date",
+    "select_image_gallery": "Select an image from the gallery",
+    "soil": "Soil",
+    "sunlight": "Sunlight",
+    "take_image_camera": "Take a picture with the camera",
+    "temperature": "Temperature",
+    "training": "Training",
+    "unit": "Unit",
+    "vegetative": "Vegetative",
+    "watering": "Watering",
+    "watt": "Watt",
+    "watt_hint": "Enter the wattage of the light",
+    "width": "Width",
+    "width_hint": "Enter the width of the environment"
+  },
+  "environments": {
+    "choose": "Choose environment",
+    "choose_light_details": "Choose the details of the light",
+    "choose_light_hours": "Choose the number of light hours per day",
+    "choose_type": "Choose the type of environment",
+    "create": "Create environment",
+    "description_hint": "Enter a description of the environment",
+    "dialog": {
+      "delete_message": "Are you sure you want to delete this environment?",
+      "delete_title": "Delete environment"
+    },
+    "edit": "Edit environment",
+    "name_hint": "Enter the name of the environment",
+    "none": "No environments",
+    "plants": "Plants in this environment",
+    "select": "Select an environment",
+    "select_mandatory": "Please select an environment"
+  },
+  "fertilizers": {
+    "create": "Create fertilizer",
+    "edit": "Edit fertilizer",
+    "mandatory": "Please select a fertilizer",
+    "none": "No fertilizers"
+  },
+  "home": {
+    "actions_today": "Actions today",
+    "environment_actions": "Environment actions",
+    "environment_actions_none_today": "No environment actions performed today",
+    "plant_actions": "Plant actions",
+    "plant_actions_none_today": "No plant actions performed today"
+  },
+  "main": {
+    "add_action": "Perform an action",
+    "add_environment": "Add an environment",
+    "add_plant": "Add a plant",
+    "environments_label": "Environments",
+    "home_label": "Home",
+    "plants_label": "Plants",
+    "statistics_label": "Statistics"
+  },
+  "plants": {
+    "create": "Create plant",
+    "current_lifecycle_state": "Current lifecycle state",
+    "details": "Plant details",
+    "dialog": {
+      "delete_message": "Are you sure you want to delete this plant?",
+      "delete_title": "Delete plant"
+    },
+    "edit": "Edit {name}",
+    "hint_description": "Enter a description of the plant",
+    "hint_name": "Enter the name of the plant",
+    "none": "No plants"
+  },
+  "settings": {
+    "about": {
+      "description": "Information about the app",
+      "title": "About"
+    },
+    "title": "Settings"
+  },
+  "statistics": {
+    "coming_soon": "The statistics feature is in development. Check out the progress "
+  },
+  "validators": {
+    "number": "This field must be a number",
+    "required": "This field is required"
+  }
+}

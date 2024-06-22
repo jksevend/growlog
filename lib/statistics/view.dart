@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,10 +18,11 @@ class StatisticsView extends StatelessWidget {
               style: const TextStyle(fontSize: 16),
               children: <TextSpan>[
                 const TextSpan(text: '🚧 '),
-                const TextSpan(
-                    text: 'The statistics feature is in development. Check out the progress '),
                 TextSpan(
-                  text: 'here',
+                  text: tr('statistics.coming_soon'),
+                ),
+                TextSpan(
+                  text: tr('common.here'),
                   style: const TextStyle(color: Colors.blue),
                   recognizer: _tapRecognizer(),
                 ),

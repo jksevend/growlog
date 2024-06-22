@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
@@ -32,38 +33,39 @@ class PlantOverview extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: StreamBuilder(
-          stream: CombineLatestStream.list([
-            plantsProvider.plants,
-            environmentsProvider.environments,
-          ]),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
+        stream: CombineLatestStream.list([
+          plantsProvider.plants,
+          environmentsProvider.environments,
+        ]),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
 
-            final plants = snapshot.data![0] as Map<String, Plant>;
-            final environments = snapshot.data![1] as Map<String, Environment>;
-            if (plants.isEmpty) {
-              return const Center(
-                child: Text('No plants found'),
-              );
-            }
-            return ListView(
-              shrinkWrap: true,
-              children: plants.values.map(
-                (plant) {
-                  final environment = environments[plant.environmentId];
-                  final plantsInEnvironment =
-                      plants.values.where((p) => p.environmentId == environment?.id).toList();
-                  return LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Card(
-                        child: Column(
-                          children: [
+          final plants = snapshot.data![0] as Map<String, Plant>;
+          final environments = snapshot.data![1] as Map<String, Environment>;
+          if (plants.isEmpty) {
+            return Center(
+              child: Text(tr('plants.none')),
+            );
+          }
+          return ListView(
+            shrinkWrap: true,
+            children: plants.values.map(
+              (plant) {
+                final environment = environments[plant.environmentId];
+                final plantsInEnvironment = plants.values
+                    .where((p) => p.environmentId == environment?.id)
+                    .toList();
+                return LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Card(
+                      child: Column(
+                        children: [
                           plant.bannerImagePath == ''
                               ? Placeholder(
                                   fallbackHeight: constraints.maxWidth / 2,
@@ -72,72 +74,74 @@ class PlantOverview extends StatelessWidget {
                               : GestureDetector(
                                   child: Image.file(
                                     File(plant.bannerImagePath),
-                                width: constraints.maxWidth,
-                                height: constraints.maxWidth / 2,
-                                fit: BoxFit.cover,
-                              ),
-                              onTap: () async {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return Dialog(
-                                      child: InteractiveViewer(
-                                        panEnabled: false,
-                                        // Set it to false
-                                        boundaryMargin: const EdgeInsets.all(100),
-                                        minScale: 1,
-                                        maxScale: 2,
-                                        child: Image.file(
-                                          alignment: Alignment.center,
-                                          File(plant.bannerImagePath),
-                                        ),
-                                      ),
+                                    width: constraints.maxWidth,
+                                    height: constraints.maxWidth / 2,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  onTap: () async {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return Dialog(
+                                          child: InteractiveViewer(
+                                            panEnabled: false,
+                                            // Set it to false
+                                            boundaryMargin:
+                                                const EdgeInsets.all(100),
+                                            minScale: 1,
+                                            maxScale: 2,
+                                            child: Image.file(
+                                              alignment: Alignment.center,
+                                              File(plant.bannerImagePath),
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     );
                                   },
-                                );
+                                ),
+                          ListTile(
+                            leading: Text(
+                              plant.lifeCycleState.icon,
+                              style: const TextStyle(fontSize: 22.0),
+                            ),
+                            title: Text(plant.name),
+                            subtitle: Text(
+                                '${daysSince(plant.createdAt)} days (W${weeksSince(plant.createdAt)})'),
+                            onTap: () async {
+                              debugPrint(
+                                  'Navigate to the plant detail view for ${plant.name}');
+                              await showPlantDetailSheet(
+                                  context,
+                                  plant,
+                                  plantsInEnvironment,
+                                  environment,
+                                  plantsProvider,
+                                  actionsProvider,
+                                  environmentsProvider,
+                                  bottomNavigationKey);
+                            },
+                            trailing: IconButton(
+                              icon: const Icon(Icons.timeline),
+                              onPressed: () {
+                                debugPrint(
+                                    'Navigate to the plant timeline view for ${plant.name}');
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => PlantActionOverview(
+                                          plant: plant,
+                                          actionsProvider: actionsProvider,
+                                        )));
                               },
                             ),
-                            ListTile(
-                              leading: Text(
-                                plant.lifeCycleState.icon,
-                                style: const TextStyle(fontSize: 22.0),
-                              ),
-                              title: Text(plant.name),
-                              subtitle: Text(
-                                  '${daysSince(plant.createdAt)} days (W${weeksSince(plant.createdAt)})'),
-                              onTap: () async {
-                                debugPrint('Navigate to the plant detail view for ${plant.name}');
-                                await showPlantDetailSheet(
-                                    context,
-                                    plant,
-                                    plantsInEnvironment,
-                                    environment,
-                                    plantsProvider,
-                                    actionsProvider,
-                                    environmentsProvider,
-                                    bottomNavigationKey);
-                              },
-                              trailing: IconButton(
-                                icon: const Icon(Icons.timeline),
-                                onPressed: () {
-                                  debugPrint(
-                                      'Navigate to the plant timeline view for ${plant.name}');
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => PlantActionOverview(
-                                            plant: plant,
-                                            actionsProvider: actionsProvider,
-                                          )));
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ).toList(),
-            );
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ).toList(),
+          );
         },
       ),
     );
@@ -166,7 +170,8 @@ class PlantForm extends StatefulWidget {
 }
 
 class _PlantFormState extends State<PlantForm> {
-  final GlobalKey<PictureFormState> _pictureFormKey = GlobalKey<PictureFormState>();
+  final GlobalKey<PictureFormState> _pictureFormKey =
+      GlobalKey<PictureFormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late List<bool> _selectedLifeCycleState;
@@ -177,7 +182,8 @@ class _PlantFormState extends State<PlantForm> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.plant?.name);
-    _descriptionController = TextEditingController(text: widget.plant?.description);
+    _descriptionController =
+        TextEditingController(text: widget.plant?.description);
     _selectedLifeCycleState = _selectedLifeCycleStateFromPlant(widget.plant);
     _selectedMedium = widget.plant?.medium ?? Medium.soil;
   }
@@ -210,13 +216,13 @@ class _PlantFormState extends State<PlantForm> {
                         const Text('Plant details'),
                         TextFormField(
                           controller: _nameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Name',
-                            hintText: 'Enter the name of the plant',
+                          decoration: InputDecoration(
+                            labelText: tr('common.name'),
+                            hintText: tr('plants.hint_name'),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter a name';
+                              return tr('common.name_mandatory');
                             }
                             return null;
                           },
@@ -226,9 +232,9 @@ class _PlantFormState extends State<PlantForm> {
                           controller: _descriptionController,
                           maxLines: null,
                           minLines: 5,
-                          decoration: const InputDecoration(
-                            labelText: 'Description',
-                            hintText: 'Enter a description of the plant',
+                          decoration: InputDecoration(
+                            labelText: tr('common.description'),
+                            hintText: tr('plants.hint_description'),
                           ),
                         ),
                       ],
@@ -241,41 +247,49 @@ class _PlantFormState extends State<PlantForm> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        const Text('Select an environment'),
+                        Text(tr('environments.select')),
                         StreamBuilder<Map<String, Environment>>(
                             stream: widget.environmentsProvider.environments,
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(child: CircularProgressIndicator());
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
                               }
 
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(child: CircularProgressIndicator());
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
                               }
 
                               if (snapshot.hasError) {
-                                return Center(child: Text('Error: ${snapshot.error}'));
+                                return Center(
+                                    child: Text('Error: ${snapshot.error}'));
                               }
 
                               final environments = snapshot.data!;
                               if (environments.isEmpty) {
-                                return const Center(
-                                  child: Text('No environments found'),
+                                return Center(
+                                  child: Text(tr('environments.none')),
                                 );
                               }
-                              _currentEnvironment = environments[environments.keys.first]!;
+                              _currentEnvironment =
+                                  environments[environments.keys.first]!;
                               return DropdownButton<Environment>(
                                 icon: const Icon(Icons.arrow_downward_sharp),
                                 isExpanded: true,
                                 items: environments.values
                                     .map(
-                                      (environment) => DropdownMenuItem<Environment>(
+                                      (environment) =>
+                                          DropdownMenuItem<Environment>(
                                         value: environment,
                                         child: Text(environment.name),
                                       ),
                                     )
                                     .toList(),
-                                onChanged: (Environment? value) => _updateCurrentEnvironment(value),
+                                onChanged: (Environment? value) =>
+                                    _updateCurrentEnvironment(value),
                                 value: _currentEnvironment,
                               );
                             }),
@@ -291,16 +305,18 @@ class _PlantFormState extends State<PlantForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          const Text('Current lifecycle state'),
+                          Text(tr('plants.current_lifecycle_state')),
                           const SizedBox(height: 8.0),
                           ToggleButtons(
                             isSelected: _selectedLifeCycleState,
-                            onPressed: (index) => _onLifeCycleStateSelected(index),
+                            onPressed: (index) =>
+                                _onLifeCycleStateSelected(index),
                             children: LifeCycleState.values
                                 .map(
                                   (state) => Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Text(state.icon, style: const TextStyle(fontSize: 18.0)),
+                                    child: Text(state.icon,
+                                        style: const TextStyle(fontSize: 18.0)),
                                   ),
                                 )
                                 .toList(),
@@ -338,13 +354,15 @@ class _PlantFormState extends State<PlantForm> {
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         children: [
-                          const Text('Banner image'),
+                          Text(tr('common.banner_image')),
                           PictureForm(
                             key: _pictureFormKey,
                             allowMultiple: false,
-                            images: widget.plant?.bannerImagePath == ''
-                                ? <File>[]
-                                : <File>[File(widget.plant!.bannerImagePath)],
+                            images: widget.plant == null
+                                ? []
+                                : widget.plant!.bannerImagePath.isEmpty
+                                    ? []
+                                    : [File(widget.plant!.bannerImagePath)],
                           ),
                         ],
                       ),
@@ -355,7 +373,7 @@ class _PlantFormState extends State<PlantForm> {
                 const SizedBox(height: 16.0),
                 OutlinedButton.icon(
                   onPressed: () async => await _onPlantSaved(),
-                  label: const Text('Save'),
+                  label: Text(tr('common.save')),
                   icon: const Icon(Icons.arrow_right),
                 ),
               ],
@@ -397,8 +415,8 @@ class _PlantFormState extends State<PlantForm> {
     if (widget.formKey.currentState!.validate()) {
       if (_currentEnvironment == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please select an environment'),
+          SnackBar(
+            content: Text(tr('environments.select_mandatory')),
           ),
         );
         return;
@@ -501,7 +519,7 @@ class CreatePlantView extends StatelessWidget {
   Widget build(BuildContext context) {
     return PlantForm(
       formKey: _formKey,
-      title: 'Create plant',
+      title: tr('plants.create'),
       plant: null,
       plantsProvider: plantsProvider,
       environmentsProvider: environmentsProvider,
@@ -528,7 +546,7 @@ class EditPlantView extends StatelessWidget {
   Widget build(BuildContext context) {
     return PlantForm(
       formKey: _formKey,
-      title: 'Edit ${plant.name}',
+      title: tr('plants.edit', namedArgs: {'name': plant.name}),
       plant: plant,
       plantsProvider: plantsProvider,
       environmentsProvider: environmentsProvider,

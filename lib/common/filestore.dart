@@ -28,8 +28,8 @@ Future<void> writeJsonFile({
   await file.writeAsString(json.encode(content));
 }
 
-/// Migrate a field in a JSON object called [jsonContent].
-void migrateField<T>({
+/// Add a field in a JSON object called [jsonContent].
+void addField<T>({
   required Map<String, dynamic> jsonContent,
   required String field,
   required T defaultValue,
@@ -37,9 +37,21 @@ void migrateField<T>({
   if (!jsonContent.containsKey(field)) {
     jsonContent[field] = defaultValue;
   }
+  throw Exception('Field $field already exists.');
 }
 
-/// Migrate a list in a JSON object called [jsonContent].
+/// Delete a field in a JSON object called [jsonContent].
+void deleteField({
+  required Map<String, dynamic> jsonContent,
+  required String field,
+}) {
+  if (jsonContent.containsKey(field)) {
+    jsonContent.remove(field);
+  }
+  throw Exception('Field $field does not exist.');
+}
+
+/// Perform a list of migration functions on a JSON object called [jsonContent].
 Future<void> migrateFileStore({
   required String name,
   required Function(Map<String, dynamic>) migration,

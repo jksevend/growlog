@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
@@ -10,11 +11,11 @@ import 'package:weedy/plants/provider.dart';
 import 'package:weedy/plants/view.dart';
 import 'package:weedy/settings/provider.dart';
 import 'package:weedy/settings/view.dart';
-
-import 'statistics/view.dart';
+import 'package:weedy/statistics/view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
 
   // Migrate settings after initial release
   // Example:
@@ -22,15 +23,26 @@ void main() async {
   //   name: 'settings.json',
   //   migration:
   //     (jsonContent) {
-  //       migrateField<bool>(
+  //       addField<bool>(
   //         jsonContent: jsonContent,
   //         field: 'showAdvertisements',
   //         defaultValue: true,
   //       );
+  //       deleteField(
+  //         jsonContent: jsonContent,
+  //         field: 'showAds',
+  //       );
   //     },
   // );
 
-  runApp(const WeedyApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en', 'US'),
+      child: const WeedyApp(),
+    ),
+  );
 }
 
 class WeedyApp extends StatelessWidget {
@@ -46,12 +58,15 @@ class WeedyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ActionsProvider()),
         ChangeNotifierProvider(create: (_) => FertilizerProvider()),
       ],
-      child: Consumer5<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider,
-          FertilizerProvider>(
-        builder: (context, settingsProvider, plantsProvider, environmentsProvider, actionsProvider,
-            fertilizerProvider, _) {
+      child: Consumer5<SettingsProvider, PlantsProvider, EnvironmentsProvider,
+          ActionsProvider, FertilizerProvider>(
+        builder: (context, settingsProvider, plantsProvider,
+            environmentsProvider, actionsProvider, fertilizerProvider, _) {
           return MaterialApp(
             title: 'Weedy',
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark(),
             themeMode: ThemeMode.system,
@@ -91,7 +106,8 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
-  final GlobalKey<State<BottomNavigationBar>> _bottomNavigationKey = GlobalKey();
+  final GlobalKey<State<BottomNavigationBar>> _bottomNavigationKey =
+      GlobalKey();
   int _selectedIndex = 0;
   late final List<Widget> _pages = [
     HomeView(
@@ -136,29 +152,30 @@ class _MainViewState extends State<MainView> {
       floatingActionButtonLocation: _floatingActionButtonLocation(),
       bottomNavigationBar: BottomNavigationBar(
         key: _bottomNavigationKey,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home),
+            label: tr('main.home_label'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.eco_outlined),
-            activeIcon: Icon(Icons.eco),
-            label: 'Plants',
+            icon: const Icon(Icons.eco_outlined),
+            activeIcon: const Icon(Icons.eco),
+            label: tr('main.plants_label'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.lightbulb_outlined),
-            activeIcon: Icon(Icons.lightbulb),
-            label: 'Environments',
+            icon: const Icon(Icons.lightbulb_outlined),
+            activeIcon: const Icon(Icons.lightbulb),
+            label: tr('main.environments_label'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart_outlined),
-            label: 'Statistics',
+            icon: const Icon(Icons.bar_chart_outlined),
+            label: tr('main.statistics_label'),
           )
         ],
         elevation: 10.0,
-        backgroundColor: Theme.of(context).bottomNavigationBarTheme.backgroundColor,
+        backgroundColor:
+            Theme.of(context).bottomNavigationBarTheme.backgroundColor,
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -187,7 +204,7 @@ class _MainViewState extends State<MainView> {
                     fertilizerProvider: widget.fertilizerProvider,
                   )));
         },
-        tooltip: 'Aktion ausführen',
+        tooltip: tr('main.add_action'),
         child: const Stack(
           children: <Widget>[
             Icon(Icons.bolt, size: 36),
@@ -211,7 +228,7 @@ class _MainViewState extends State<MainView> {
                     environmentsProvider: widget.environmentsProvider,
                   )));
         },
-        tooltip: 'Add Plant',
+        tooltip: tr('main.add_plant'),
         child: const Stack(
           children: <Widget>[
             Icon(Icons.eco, size: 36),
@@ -234,7 +251,7 @@ class _MainViewState extends State<MainView> {
                     environmentsProvider: widget.environmentsProvider,
                   )));
         },
-        tooltip: 'Add Environment',
+        tooltip: tr('main.add_environment'),
         child: const Stack(
           children: <Widget>[
             Icon(Icons.lightbulb, size: 36),

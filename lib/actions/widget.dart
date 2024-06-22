@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/dialog.dart';
 import 'package:weedy/actions/model.dart';
@@ -124,7 +125,7 @@ class _EnvironmentMeasurementActionSheetWidgetState
       final temperature = Temperature.fromJson(widget.action.measurement.measurement);
       return ListTile(
         leading: Text(widget.action.measurement.type.icon, style: const TextStyle(fontSize: 20)),
-        title: const Text('Temperature'),
+        title: Text(tr('common.temperature')),
         subtitle: Text('${temperature.value} ${temperature.unit.symbol}'),
       );
     }
@@ -133,7 +134,7 @@ class _EnvironmentMeasurementActionSheetWidgetState
       final humidity = widget.action.measurement.measurement['humidity'] as double;
       return ListTile(
         leading: Text(widget.action.measurement.type.icon, style: const TextStyle(fontSize: 20)),
-        title: const Text('Humidity'),
+        title: Text(tr('common.humidity')),
         subtitle: Text('$humidity %'),
       );
     }
@@ -151,7 +152,7 @@ class _EnvironmentMeasurementActionSheetWidgetState
       final amount = MeasurementAmount.fromJson(widget.action.measurement.measurement);
       return ListTile(
         leading: Text(widget.action.measurement.type.icon, style: const TextStyle(fontSize: 20)),
-        title: const Text('Light distance'),
+        title: Text(tr('common.light_distance')),
         subtitle: Text('${amount.value}${amount.unit.symbol}'),
       );
     }
@@ -309,7 +310,9 @@ class _BaseEnvironmentActionSheetWidgetState extends State<_BaseEnvironmentActio
           ),
         ),
         const Divider(),
-        Text(widget.action.description == '' ? 'No description' : widget.action.description),
+        Text(widget.action.description == ''
+            ? tr('common.no_description')
+            : widget.action.description),
         const Divider(),
         widget.child,
       ],
@@ -332,7 +335,7 @@ Future<void> _deleteEnvironmentAction(
     Navigator.of(context).pop();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${environmentAction.type.name} has been deleted'),
+        content: Text(tr('common.deleted_args', namedArgs: {'name': environmentAction.type.name})),
       ),
     );
   }

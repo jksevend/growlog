@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
@@ -17,16 +18,16 @@ Future<bool> confirmDeletionOfPlantActionDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Delete ${plantAction.type.name}?'),
-        content: const Text('Are you sure you want to delete this action?'),
+        title: Text(tr('actions.dialog.delete_title')),
+        content: Text(tr('actions.dialog.delete_message')),
         actions: [
           TextButton(
             onPressed: () => _close(context, false),
-            child: const Text('Cancel'),
+            child: Text(tr('common.cancel')),
           ),
           TextButton(
             onPressed: () async => await _deletePlantAction(context, plantAction, actionsProvider),
-            child: const Text('Delete'),
+            child: Text(tr('common.delete')),
           ),
         ],
       );
@@ -59,17 +60,17 @@ Future<bool> confirmDeletionOfEnvironmentActionDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: Text('Delete ${environmentAction.type.name}?'),
-        content: const Text('Are you sure you want to delete this action?'),
+        title: Text(tr('actions.dialog.delete_title')),
+        content: Text(tr('actions.dialog.delete_message')),
         actions: [
           TextButton(
             onPressed: () => _close(context, false),
-            child: const Text('Cancel'),
+            child: Text(tr('common.cancel')),
           ),
           TextButton(
             onPressed: () async =>
                 await _deleteEnvironmentAction(context, environmentAction, actionsProvider),
-            child: const Text('Delete'),
+            child: Text(tr('common.delete')),
           ),
         ],
       );

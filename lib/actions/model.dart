@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -43,13 +44,13 @@ extension EnvironmentMeasurementTypeExtension on EnvironmentMeasurementType {
   String get name {
     switch (this) {
       case EnvironmentMeasurementType.temperature:
-        return 'Temperature';
+        return tr('common.temperature');
       case EnvironmentMeasurementType.humidity:
-        return 'Humidity';
+        return tr('common.humidity');
       case EnvironmentMeasurementType.co2:
         return 'CO2';
       case EnvironmentMeasurementType.lightDistance:
-        return 'Light distance';
+        return tr('common.light_distance');
     }
   }
 
@@ -81,11 +82,11 @@ extension EnvironmentActionTypeExtension on EnvironmentActionType {
   String get name {
     switch (this) {
       case EnvironmentActionType.measurement:
-        return 'Measurement';
+        return tr('common.measurement');
       case EnvironmentActionType.picture:
-        return 'Picture';
+        return tr('common.picture');
       case EnvironmentActionType.other:
-        return 'Other';
+        return tr('common.other');
     }
   }
 
@@ -257,25 +258,25 @@ extension PlantActionTypeExtension on PlantActionType {
   String get name {
     switch (this) {
       case PlantActionType.watering:
-        return 'Watering';
+        return tr('common.watering');
       case PlantActionType.fertilizing:
-        return 'Fertilizing';
+        return tr('common.fertilizing');
       case PlantActionType.pruning:
-        return 'Pruning';
+        return tr('common.pruning');
       case PlantActionType.harvesting:
-        return 'Harvesting';
+        return tr('common.harvesting');
       case PlantActionType.replanting:
-        return 'Replanting';
+        return tr('common.replanting');
       case PlantActionType.training:
-        return 'Training';
+        return tr('common.training');
       case PlantActionType.measuring:
-        return 'Measuring';
+        return tr('common.measuring');
       case PlantActionType.picture:
-        return 'Picture';
+        return tr('common.picture');
       case PlantActionType.death:
-        return 'Death';
+        return tr('common.death');
       case PlantActionType.other:
-        return 'Other';
+        return tr('common.other');
     }
   }
 
@@ -557,7 +558,7 @@ extension PlantMeasurementTypeExtension on PlantMeasurementType {
   String get name {
     switch (this) {
       case PlantMeasurementType.height:
-        return 'Height';
+        return tr('common.height');
       case PlantMeasurementType.pH:
         return 'pH';
       case PlantMeasurementType.ec:

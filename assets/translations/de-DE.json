@@ -1,0 +1,158 @@
+{
+  "actions": {
+    "choose": "Aktion wählen",
+    "choose_hint": "Welche Aktion möchten Sie ausführen?",
+    "dialog": {
+      "delete_message": "Sind Sie sicher, dass Sie diese Aktion löschen möchten?",
+      "delete_title": "Aktion löschen"
+    },
+    "environments": {
+      "choose": "Umgebung wählen",
+      "description_hint": "Geben Sie eine Beschreibung der Umgebungsaktion ein",
+      "none": "Keine Umgebungsaktionen erstellt",
+      "none_for_this": "Keine Aktionen für diese Umgebung"
+    },
+    "none": "Keine Aktionen",
+    "plants": {
+      "choose": "Pflanze wählen",
+      "description_hint": "Geben Sie eine Beschreibung der Pflanzenaktion ein",
+      "none": "Keine Pflanzenaktionen erstellt",
+      "none_for_this": "Keine Aktionen für diese Pflanze"
+    }
+  },
+  "common": {
+    "add": "Hinzufügen",
+    "actions_performed_today_args": "Heute durchgeführt: {count}",
+    "amount": "Menge",
+    "banner_image": "Bannerbild",
+    "cancel": "Abbrechen",
+    "coco": "Kokos",
+    "curing": "Aushärten",
+    "death": "Tod",
+    "delete": "Löschen",
+    "delete_args": "{name} wurde gelöscht.",
+    "description": "Beschreibung",
+    "dimension": "Abmessungen",
+    "dimension_hint": "Geben Sie die Abmessungen der Umgebung ein",
+    "dimension_unknown": "Unbekannte Abmessungen",
+    "distance": "Entfernung",
+    "drying": "Trocknen",
+    "environment": "Umgebung",
+    "fertilizing": "Düngen",
+    "fertilizers": "Dünger",
+    "flowering": "Blüte",
+    "germination": "Keimung",
+    "harvesting": "Ernte",
+    "height": "Höhe",
+    "height_hint": "Geben Sie die Höhe der Umgebung ein",
+    "here": "hier",
+    "humidity": "Feuchtigkeit",
+    "hydroponics": "Hydro",
+    "images_mandatory": "Bitte wählen Sie mindestens ein Bild aus",
+    "indoor": "Innen",
+    "length": "Länge",
+    "length_hint": "Geben Sie die Länge der Umgebung ein",
+    "light": "Licht",
+    "light_distance": "Lichtabstand",
+    "light_hours_per_day": "{count} h pro Tag",
+    "light_none": "Kein Licht",
+    "measuring": "Messen",
+    "measurement": "Messung",
+    "name": "Name",
+    "name_mandatory": "Bitte geben Sie einen Namen ein",
+    "no_description": "Keine Beschreibung",
+    "no_image": "Kein Bild ausgewählt",
+    "no_images": "Keine Bilder ausgewählt",
+    "other": "Andere",
+    "outdoor": "Außen",
+    "picture": "Bild",
+    "plant": "Pflanze",
+    "pruning": "Beschneiden",
+    "replanting": "Umpflanzen",
+    "save": "Speichern",
+    "seedling": "Keimling",
+    "select_date": "Datum wählen",
+    "select_image_gallery": "Wählen Sie ein Bild aus der Galerie",
+    "soil": "Boden",
+    "sunlight": "Sonnenlicht",
+    "take_image_camera": "Machen Sie ein Bild mit der Kamera",
+    "temperature": "Temperatur",
+    "training": "Training",
+    "unit": "Einheit",
+    "vegetative": "Vegetativ",
+    "watering": "Bewässerung",
+    "watt": "Watt",
+    "watt_hint": "Geben Sie die Wattzahl des Lichts ein",
+    "width": "Breite",
+    "width_hint": "Geben Sie die Breite der Umgebung ein"
+  },
+  "environments": {
+    "choose": "Umgebung wählen",
+    "choose_light_details": "Wählen Sie die Details des Lichts",
+    "choose_light_hours": "Wählen Sie die Anzahl der Lichtstunden pro Tag",
+    "choose_type": "Wählen Sie den Umgebungstyp",
+    "create": "Umgebung erstellen",
+    "description_hint": "Geben Sie eine Beschreibung der Umgebung ein",
+    "dialog": {
+      "delete_message": "Sind Sie sicher, dass Sie diese Umgebung löschen möchten?",
+      "delete_title": "Umgebung löschen"
+    },
+    "edit": "Umgebung bearbeiten",
+    "name_hint": "Geben Sie den Namen der Umgebung ein",
+    "none": "Keine Umgebungen",
+    "plants": "Pflanzen in dieser Umgebung",
+    "select": "Wählen Sie eine Umgebung",
+    "select_mandatory": "Bitte wählen Sie eine Umgebung"
+  },
+  "fertilizers": {
+    "create": "Dünger erstellen",
+    "edit": "Dünger bearbeiten",
+    "mandatory": "Bitte wählen Sie einen Dünger",
+    "none": "Keine Dünger"
+  },
+  "home": {
+    "actions_today": "Aktionen heute",
+    "environment_actions": "Umgebungsaktionen",
+    "environment_actions_none_today": "Heute keine Umgebungsaktionen durchgeführt",
+    "plant_actions": "Pflanzenaktionen",
+    "plant_actions_none_today": "Heute keine Pflanzenaktionen durchgeführt"
+  },
+  "main": {
+    "add_action": "Aktion durchführen",
+    "add_environment": "Umgebung hinzufügen",
+    "add_plant": "Pflanze hinzufügen",
+    "environments_label": "Umgebungen",
+    "home_label": "Startseite",
+    "plants_label": "Pflanzen",
+    "statistics_label": "Statistiken"
+  },
+  "plants": {
+    "create": "Pflanze erstellen",
+    "current_lifecycle_state": "Aktueller Lebenszykluszustand",
+    "details": "Pflanzendetails",
+    "dialog": {
+      "delete_message": "Sind Sie sicher, dass Sie diese Pflanze löschen möchten?",
+      "delete_title": "Pflanze löschen"
+    },
+    "edit": "{name} bearbeiten",
+    "form": {
+      "hint_description": "Geben Sie eine Beschreibung der Pflanze ein",
+      "hint_name": "Geben Sie den Namen der Pflanze ein"
+    },
+    "none": "Keine Pflanzen"
+  },
+  "settings": {
+    "about": {
+      "description": "Informationen über die App",
+      "title": "Über"
+    },
+    "title": "Einstellungen"
+  },
+  "statistics": {
+    "coming_soon": "Die Statistikfunktion ist in Entwicklung. Schauen Sie sich den Fortschritt an "
+  },
+  "validators": {
+    "number": "Dieses Feld muss eine Zahl sein",
+    "required": "Dieses Feld ist erforderlich"
+  }
+}

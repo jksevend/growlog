@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
@@ -50,8 +51,8 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
         final environments = snapshot.data![0] as Map<String, Environment>;
         final plants = snapshot.data![1] as Map<String, Plant>;
         if (environments.isEmpty) {
-          return const Center(
-            child: Text('No environments created yet.'),
+          return Center(
+            child: Text(tr('environments.none')),
           );
         }
         return Padding(
@@ -246,15 +247,15 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                       children: [
                         TextFormField(
                           controller: _nameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Name',
-                            hintText: 'Enter the name of the environment',
+                          decoration: InputDecoration(
+                            labelText: tr('common.name'),
+                            hintText: tr('environments.name_hint'),
                           ),
                           focusNode: _nameFocus,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               FocusScope.of(context).requestFocus(_nameFocus);
-                              return 'Please enter a name';
+                              return tr('common.name_mandatory');
                             }
                             return null;
                           },
@@ -264,9 +265,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                           controller: _descriptionController,
                           maxLines: null,
                           minLines: 5,
-                          decoration: const InputDecoration(
-                            labelText: 'Description',
-                            hintText: 'Enter a description of the environment',
+                          decoration: InputDecoration(
+                            labelText: tr('common.description'),
+                            hintText: tr('environments.description_hint'),
                           ),
                         ),
                       ],
@@ -275,7 +276,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                 ),
                 const SizedBox(height: 16.0),
                 Text(
-                    'Choose an environment type: ${_selectedEnvironmentType[0] ? 'Indoor' : 'Outdoor'}'),
+                    '${tr('environments.choose_type')} ${_selectedEnvironmentType[0] ? tr('common.indoor') : tr('common.outdoor')}'),
                 const SizedBox(height: 16.0),
                 ToggleButtons(
                     isSelected: _selectedEnvironmentType,
@@ -300,7 +301,8 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        Text('Choose the amount of light hours: ${_currentLightHours.round()}'),
+                        Text(
+                            '${tr('environments.choose_light_hours')}: ${_currentLightHours.round()}'),
                         Row(
                           children: [
                             const Icon(Icons.nightlight_round_outlined),
@@ -325,7 +327,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
                       children: [
-                        const Text('Banner image'),
+                        Text(tr('common.banner_image')),
                         PictureForm(
                           key: _pictureFormKey,
                           allowMultiple: false,
@@ -348,7 +350,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                           padding: const EdgeInsets.all(8.0),
                           child: Column(
                             children: [
-                              const Text('Choose the light details:'),
+                              Text(tr('environments.choose_light_details')),
                               const SizedBox(height: 16.0),
                               DropdownButton<LightType>(
                                 icon: const Icon(Icons.arrow_downward_sharp),
@@ -370,9 +372,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 child: TextFormField(
                                   controller: _wattController,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Watt',
-                                    hintText: 'Enter the watt of the light',
+                                  decoration: InputDecoration(
+                                    labelText: tr('common.watt'),
+                                    hintText: tr('common.watt_hint'),
                                     suffixIcon: Icon(Icons.electrical_services),
                                   ),
                                   validator: (value) => validateInput(value, isDouble: true),
@@ -391,33 +393,33 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                             key: _dimensionFormKey,
                             child: Column(
                               children: [
-                                const Text('Enter the dimension:'),
+                                Text(tr('common.dimension_hint')),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
                                   controller: _widthController,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Width',
-                                    hintText: 'Enter the width of the environment',
-                                  ),
+                                    decoration: InputDecoration(
+                                      labelText: tr('common.width'),
+                                      hintText: tr('common.width_hint'),
+                                    ),
                                     validator: (value) => validateInput(value, isDouble: true)),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
                                   controller: _lengthController,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Length',
-                                    hintText: 'Enter the length of the environment',
-                                  ),
+                                    decoration: InputDecoration(
+                                      labelText: tr('common.length'),
+                                      hintText: tr('common.length_hint'),
+                                    ),
                                     validator: (value) => validateInput(value, isDouble: true)),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
                                   controller: _heightController,
                                   keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Height',
-                                    hintText: 'Enter the height of the environment',
-                                  ),
+                                    decoration: InputDecoration(
+                                      labelText: tr('common.height'),
+                                      hintText: tr('common.height_hint'),
+                                    ),
                                     validator: (value) => validateInput(value, isDouble: true)),
                               ],
                             ),
@@ -430,7 +432,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                 const SizedBox(height: 16.0),
                 OutlinedButton.icon(
                   onPressed: () async => await _onEnvironmentSaved(),
-                  label: const Text('Save'),
+                  label: Text(tr('common.save')),
                   icon: const Icon(Icons.arrow_right),
                 ),
               ],
@@ -577,7 +579,7 @@ class CreateEnvironmentView extends StatelessWidget {
   Widget build(BuildContext context) {
     return EnvironmentForm(
       formKey: _formKey,
-      title: 'Create environment',
+      title: tr('environments.create'),
       environment: null,
       environmentsProvider: environmentsProvider,
     );
@@ -595,9 +597,10 @@ class EditEnvironmentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final editTranslation = tr('environments.edit');
     return EnvironmentForm(
       formKey: _formKey,
-      title: 'Edit environment ${environment.name}',
+      title: '$editTranslation ${environment.name}',
       environment: environment,
       environmentsProvider: environmentsProvider,
     );
