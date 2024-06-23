@@ -1,9 +1,11 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/view.dart';
+import 'package:weedy/common/filestore.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/environments/view.dart';
 import 'package:weedy/home/view.dart';
@@ -15,7 +17,23 @@ import 'package:weedy/statistics/view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize EasyLocalization
   await EasyLocalization.ensureInitialized();
+
+  // Initialize FlutterSecureStorage
+  final storage = FlutterSecureStorage(aOptions: getAndroidOptions());
+  final uniqueEncryptionKey = await storage.read(key: 'uniqueEncryptionKey');
+  if (uniqueEncryptionKey == null) {
+    final encryptionKey = generateEncryptionKey();
+    await storage.write(key: 'uniqueEncryptionKey', value: encryptionKey);
+  }
+
+  final iv = await storage.read(key: 'iv');
+  if (iv == null) {
+    final ivRaw = generateSecureRandomString(16);
+    await storage.write(key: 'iv', value: ivRaw);
+  }
 
   // Migrate settings after initial release
   // Example:
