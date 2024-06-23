@@ -7,17 +7,21 @@ import 'package:weedy/environments/sheet.dart';
 import 'package:weedy/plants/dialog.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
+import 'package:weedy/plants/transition/model.dart';
+import 'package:weedy/plants/transition/provider.dart';
 import 'package:weedy/plants/view.dart';
 
 /// Shows a bottom sheet with detailed information about a [plant].
 Future<void> showPlantDetailSheet(
   BuildContext context,
   Plant plant,
+  PlantLifecycleTransition lifecycleTransition,
   List<Plant> plants,
   Environment? plantEnvironment,
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
   EnvironmentsProvider environmentsProvider,
+  PlantLifecycleTransitionProvider transitionProvider,
   GlobalKey<State<BottomNavigationBar>> bottomNavigationBarKey,
 ) async {
   await showModalBottomSheet(
@@ -52,36 +56,37 @@ Future<void> showPlantDetailSheet(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: () async =>
-                        _onDeletePlant(context, plant, plantsProvider, actionsProvider),
-                    icon: const Icon(
-                      Icons.delete_forever,
-                      color: Colors.red,
+                      onPressed: () async => _onDeletePlant(
+                          context, plant, plantsProvider, actionsProvider, transitionProvider),
+                      icon: const Icon(
+                        Icons.delete_forever,
+                        color: Colors.red,
+                      ),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () async => _onUpdatePlant(
-                      context,
-                      plant,
-                      plantsProvider,
-                      environmentsProvider,
-                      (updatedPlant) {
-                        setState(
-                          () {
-                            if (updatedPlant != null) {
-                              plant = updatedPlant;
-                            }
-                          },
-                        );
-                      },
+                    IconButton(
+                      onPressed: () async => _onUpdatePlant(
+                        context,
+                        plant,
+                        plantsProvider,
+                        environmentsProvider,
+                        transitionProvider,
+                        (updatedPlant) {
+                          setState(
+                            () {
+                              if (updatedPlant != null) {
+                                plant = updatedPlant;
+                              }
+                            },
+                          );
+                        },
+                      ),
+                      icon: const Icon(
+                        Icons.edit,
+                        color: Colors.amber,
+                      ),
                     ),
-                    icon: const Icon(
-                      Icons.edit,
-                      color: Colors.amber,
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
             ),
             const Divider(),
             // Information about the plants' environment
@@ -106,12 +111,108 @@ Future<void> showPlantDetailSheet(
                     ),
                   ),
             const Divider(),
-          ],
-        );
-      });
+              // Lifecycle transitions
+              ListTile(
+                leading: const Icon(Icons.change_circle_outlined),
+                title: Text(tr('plants.transitions')),
+                subtitle: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: lifecycleTransition.to == null
+                            ? [
+                                Text(lifecycleTransition.from.icon,
+                                    style: const TextStyle(fontSize: 18)),
+                                Text(lifecycleTransition.from.name,
+                                    style: const TextStyle(fontSize: 18)),
+                                Text(tr('plants.transitions_end'),
+                                    style: const TextStyle(fontSize: 18)),
+                              ]
+                            : [
+                                Text(lifecycleTransition.from.icon,
+                                    style: const TextStyle(fontSize: 18)),
+                                Text(lifecycleTransition.from.name,
+                                    style: const TextStyle(fontSize: 18)),
+                                const Icon(Icons.arrow_forward, size: 20),
+                                Text(lifecycleTransition.to!.icon,
+                                    style: const TextStyle(fontSize: 18)),
+                                Text(lifecycleTransition.to!.name,
+                                    style: const TextStyle(fontSize: 18)),
+                              ],
+                      ),
+                      const SizedBox(height: 8),
+                      if (lifecycleTransition.to != null)
+                        OutlinedButton.icon(
+                          icon: const Icon(Icons.arrow_right_alt),
+                          onPressed: () async => _onLifecycleTransition(
+                            plant,
+                            lifecycleTransition,
+                            transitionProvider,
+                            plantsProvider,
+                            (updatedParams) {
+                              final updatedPlant = updatedParams[0] as Plant;
+                              final updatedTransition =
+                                  updatedParams[1] as PlantLifecycleTransition;
+                              setState(() {
+                                plant = updatedPlant;
+                                lifecycleTransition = updatedTransition;
+                              });
+                            },
+                          ),
+                          label:
+                              Text(tr('plants.transition'), style: const TextStyle(fontSize: 14)),
+                        )
+                    ],
+                  ),
+                ),
+              ),
+              const Divider(),
+            ],
+          );
+        },
+      );
     },
   );
 }
+
+/// Transitions the plant to the next lifecycle state.
+Future<void> _onLifecycleTransition(
+  Plant plant,
+  PlantLifecycleTransition lifecycleTransition,
+  PlantLifecycleTransitionProvider transitionProvider,
+  PlantsProvider plantsProvider,
+  Function(List<dynamic>) stateSetter,
+) async {
+  // Advance the lifecycle state of the plant.
+  final nextLifecycleState = LifeCycleState.values[(lifecycleTransition.from.index + 1)];
+  LifeCycleState? nextNextLifecycleState;
+  try {
+    nextNextLifecycleState = LifeCycleState.values[(nextLifecycleState.index + 1)];
+  } catch (e) {
+    nextNextLifecycleState = null;
+  }
+
+  // Add the transition to the provider.
+  final transition = PlantLifecycleTransition(
+    from: nextLifecycleState,
+    to: nextNextLifecycleState,
+    plantId: plant.id,
+    timestamp: DateTime.now(),
+  );
+  await transitionProvider.addTransition(transition);
+
+  // Update the plant in the provider.
+  plant.lifeCycleState = nextLifecycleState;
+  final updatedPlant = await plantsProvider.updatePlant(plant);
+
+  // Update the UI.
+  stateSetter([updatedPlant, transition]);
+}
+
+/// Widget to display the current phase of the plant.
 
 /// Delete the [plant] and all actions associated with it.
 Future<void> _onDeletePlant(
@@ -119,9 +220,10 @@ Future<void> _onDeletePlant(
   Plant plant,
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
+  PlantLifecycleTransitionProvider transitionProvider,
 ) async {
-  final confirmed =
-      await confirmDeletionOfPlantDialog(context, plant, plantsProvider, actionsProvider);
+  final confirmed = await confirmDeletionOfPlantDialog(
+      context, plant, plantsProvider, actionsProvider, transitionProvider);
   if (confirmed == true) {
     if (!context.mounted) {
       return;
@@ -141,13 +243,15 @@ Future<void> _onUpdatePlant(
   Plant plant,
   PlantsProvider plantsProvider,
   EnvironmentsProvider environmentsProvider,
+  PlantLifecycleTransitionProvider transitionProvider,
   Function(Plant?) stateSetter,
 ) async {
   final updatedPlant = await Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => EditPlantView(
           plant: plant,
           plantsProvider: plantsProvider,
-          environmentsProvider: environmentsProvider)));
+          environmentsProvider: environmentsProvider,
+          transitionsProvider: transitionProvider)));
   stateSetter(updatedPlant);
 }
 

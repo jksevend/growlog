@@ -326,7 +326,7 @@ const _$TrainingTypeEnumMap = {
   TrainingType.scrog: 'scrog',
 };
 
-PlantMeasurementAction _$PlantMeasuringActionFromJson(Map<String, dynamic> json) =>
+PlantMeasurementAction _$PlantMeasurementActionFromJson(Map<String, dynamic> json) =>
     PlantMeasurementAction(
       id: json['id'] as String,
       description: json['description'] as String,
@@ -336,7 +336,7 @@ PlantMeasurementAction _$PlantMeasuringActionFromJson(Map<String, dynamic> json)
       measurement: PlantMeasurement.fromJson(json['measurement'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$PlantMeasuringActionToJson(PlantMeasurementAction instance) =>
+Map<String, dynamic> _$PlantMeasurementActionToJson(PlantMeasurementAction instance) =>
     <String, dynamic>{
       'id': instance.id,
       'description': instance.description,

@@ -84,10 +84,11 @@ class PlantsProvider with ChangeNotifier {
   }
 
   /// Updates the [plant] in the provider.
-  Future<void> updatePlant(Plant plant) async {
+  Future<Plant> updatePlant(Plant plant) async {
     final params = await getEncryptionParams();
     final plants = await _plantsMap.first;
     plants[plant.id] = plant;
     await _setPlants(Plants(plants: plants.values.toList()), params);
+    return plant;
   }
 }

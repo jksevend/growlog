@@ -13,6 +13,8 @@ import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 import 'package:weedy/plants/sheet.dart';
+import 'package:weedy/plants/transition/model.dart';
+import 'package:weedy/plants/transition/provider.dart';
 
 /// A widget that displays an overview of all plants.
 class PlantOverview extends StatelessWidget {
@@ -20,6 +22,7 @@ class PlantOverview extends StatelessWidget {
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
+  final PlantLifecycleTransitionProvider transitionsProvider;
   final GlobalKey<State<BottomNavigationBar>> bottomNavigationKey;
 
   const PlantOverview({
@@ -29,6 +32,7 @@ class PlantOverview extends StatelessWidget {
     required this.actionsProvider,
     required this.fertilizerProvider,
     required this.bottomNavigationKey,
+    required this.transitionsProvider,
   });
 
   @override
@@ -39,6 +43,7 @@ class PlantOverview extends StatelessWidget {
         stream: CombineLatestStream.list([
           plantsProvider.plants,
           environmentsProvider.environments,
+          transitionsProvider.transitions,
         ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -51,11 +56,13 @@ class PlantOverview extends StatelessWidget {
 
           final plants = snapshot.data![0] as Map<String, Plant>;
           final environments = snapshot.data![1] as Map<String, Environment>;
+          final transitions = snapshot.data![2] as List<PlantLifecycleTransition>;
           if (plants.isEmpty) {
             return Center(
               child: Text(tr('plants.none')),
             );
           }
+
           return ListView(
             shrinkWrap: true,
             children: plants.values.map(
@@ -63,6 +70,8 @@ class PlantOverview extends StatelessWidget {
                 final environment = environments[plant.environmentId];
                 final plantsInEnvironment =
                     plants.values.where((p) => p.environmentId == environment?.id).toList();
+                final plantSpecificTransitions =
+                    transitions.where((transition) => transition.plantId == plant.id).toList();
                 return LayoutBuilder(
                   builder: (context, constraints) {
                     return Card(
@@ -114,11 +123,14 @@ class PlantOverview extends StatelessWidget {
                               await showPlantDetailSheet(
                                   context,
                                   plant,
+                                  plantSpecificTransitions.firstWhere(
+                                      (transition) => transition.from == plant.lifeCycleState),
                                   plantsInEnvironment,
                                   environment,
                                   plantsProvider,
                                   actionsProvider,
                                   environmentsProvider,
+                                  transitionsProvider,
                                   bottomNavigationKey);
                             },
                             trailing: IconButton(
@@ -155,6 +167,7 @@ class PlantForm extends StatefulWidget {
   final String title;
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
+  final PlantLifecycleTransitionProvider transitionsProvider;
 
   const PlantForm({
     super.key,
@@ -163,6 +176,7 @@ class PlantForm extends StatefulWidget {
     required this.plant,
     required this.plantsProvider,
     required this.environmentsProvider,
+    required this.transitionsProvider,
   });
 
   @override
@@ -287,14 +301,14 @@ class _PlantFormState extends State<PlantForm> {
                     ),
                   ),
                 ),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
+                if (widget.plant == null)
+                  SizedBox(
+                    width: double.infinity,
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
                           Text(tr('plants.current_lifecycle_state')),
                           const SizedBox(height: 8.0),
                           ToggleButtons(
@@ -439,6 +453,21 @@ class _PlantFormState extends State<PlantForm> {
                 : _pictureFormKey.currentState!.images.first,
             createdAt: DateTime.now(),
           );
+
+          // Add an initial transition to the plant if it is new
+          LifeCycleState? nextLifeCycleState;
+          try {
+            nextLifeCycleState = LifeCycleState.values[_lifeCycleState.index + 1];
+          } catch (e) {
+            nextLifeCycleState = null;
+          }
+          final transition = PlantLifecycleTransition(
+            plantId: plant.id,
+            from: plant.lifeCycleState,
+            to: nextLifeCycleState,
+            timestamp: DateTime.now(),
+          );
+          await widget.transitionsProvider.addTransition(transition);
           await widget.plantsProvider
               .addPlant(plant)
               .whenComplete(() => Navigator.of(context).pop());
@@ -494,11 +523,13 @@ class _PlantFormState extends State<PlantForm> {
 class CreatePlantView extends StatelessWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
+  final PlantLifecycleTransitionProvider transitionsProvider;
 
   CreatePlantView({
     super.key,
     required this.plantsProvider,
     required this.environmentsProvider,
+    required this.transitionsProvider,
   });
 
   final _formKey = GlobalKey<FormState>();
@@ -511,6 +542,7 @@ class CreatePlantView extends StatelessWidget {
       plant: null,
       plantsProvider: plantsProvider,
       environmentsProvider: environmentsProvider,
+      transitionsProvider: transitionsProvider,
     );
   }
 }
@@ -520,12 +552,14 @@ class EditPlantView extends StatelessWidget {
   final Plant plant;
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
+  final PlantLifecycleTransitionProvider transitionsProvider;
 
   EditPlantView({
     super.key,
     required this.plant,
     required this.plantsProvider,
     required this.environmentsProvider,
+    required this.transitionsProvider,
   });
 
   final _formKey = GlobalKey<FormState>();
@@ -538,6 +572,7 @@ class EditPlantView extends StatelessWidget {
       plant: plant,
       plantsProvider: plantsProvider,
       environmentsProvider: environmentsProvider,
+      transitionsProvider: transitionsProvider,
     );
   }
 }

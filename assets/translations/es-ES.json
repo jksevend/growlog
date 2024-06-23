@@ -138,11 +138,10 @@
       "delete_title": "Eliminar planta"
     },
     "edit": "Editar {name}",
-    "form": {
-      "hint_description": "Ingresa una descripción de la planta",
-      "hint_name": "Ingresa el nombre de la planta"
-    },
-    "none": "No hay plantas"
+    "none": "No hay plantas",
+    "transitions": "Transición del ciclo de vida",
+    "transition": "Transición",
+    "transitions_end": "Fin del ciclo de vida"
   },
   "settings": {
     "about": {
