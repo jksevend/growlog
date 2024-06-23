@@ -53,7 +53,7 @@ class EnvironmentActionOverview extends StatelessWidget {
           final environmentActions = snapshot.data!;
           if (environmentActions.isEmpty) {
             return Center(
-              child: Text(tr('actions.environment.none')),
+              child: Text(tr('actions.environments.none')),
             );
           }
 
@@ -62,7 +62,7 @@ class EnvironmentActionOverview extends StatelessWidget {
 
           if (specificEnvironmentActions.isEmpty) {
             return Center(
-              child: Text(tr('actions.environment.none_for_this')),
+              child: Text(tr('actions.environments.none_for_this')),
             );
           }
 
@@ -80,13 +80,15 @@ class EnvironmentActionOverview extends StatelessWidget {
                 itemCount: specificEnvironmentActions.length,
                 itemBuilder: (context, index) {
                   final action = specificEnvironmentActions.elementAt(index);
-                  return EnvironmentActionLogItem(
+                  final actionLogItem = EnvironmentActionLogItem(
                     actionsProvider: actionsProvider,
                     environment: environment,
                     action: action,
                     isFirst: index == 0,
                     isLast: index == specificEnvironmentActions.length - 1,
                   );
+
+                  return actionLogItem;
                 },
                 separatorBuilder: (BuildContext context, int index) {
                   return Column(
@@ -175,11 +177,12 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                 ),
               ),
               ListView.separated(
+                shrinkWrap: true,
                 padding: const EdgeInsets.all(8.0),
                 itemCount: specificPlantActions.length,
                 itemBuilder: (context, index) {
                   final action = specificPlantActions.elementAt(index);
-                  return PlantActionLogItem(
+                  final actionLogItem = PlantActionLogItem(
                     fertilizerProvider: widget.fertilizerProvider,
                     actionsProvider: widget.actionsProvider,
                     plant: widget.plant,
@@ -187,6 +190,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                     isFirst: index == 0,
                     isLast: index == specificPlantActions.length - 1,
                   );
+                  return actionLogItem;
                 },
                 separatorBuilder: (BuildContext context, int index) {
                   return Column(
