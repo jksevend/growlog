@@ -613,10 +613,10 @@ class PlantMeasurementAction extends PlantAction {
   });
 
   factory PlantMeasurementAction.fromJson(Map<String, dynamic> json) =>
-      _$PlantMeasuringActionFromJson(json);
+      _$PlantMeasurementActionFromJson(json);
 
   @override
-  Map<String, dynamic> toJson() => _$PlantMeasuringActionToJson(this);
+  Map<String, dynamic> toJson() => _$PlantMeasurementActionToJson(this);
 }
 
 /// A plant death action.

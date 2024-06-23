@@ -140,7 +140,10 @@
     "edit": "Edit {name}",
     "hint_description": "Enter a description of the plant",
     "hint_name": "Enter the name of the plant",
-    "none": "No plants"
+    "none": "No plants",
+    "transitions": "Lifecycle transition",
+    "transition": "Transition",
+    "transitions_end": "End of lifecycle"
   },
   "settings": {
     "about": {

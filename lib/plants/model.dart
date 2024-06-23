@@ -100,7 +100,7 @@ class Plant {
   final String id;
   final String name;
   final String description;
-  final LifeCycleState lifeCycleState;
+  LifeCycleState lifeCycleState;
   final Medium medium;
   final String bannerImagePath;
   final DateTime createdAt;

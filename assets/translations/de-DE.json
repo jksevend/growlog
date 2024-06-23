@@ -138,11 +138,10 @@
       "delete_title": "Pflanze löschen"
     },
     "edit": "{name} bearbeiten",
-    "form": {
-      "hint_description": "Geben Sie eine Beschreibung der Pflanze ein",
-      "hint_name": "Geben Sie den Namen der Pflanze ein"
-    },
-    "none": "Keine Pflanzen"
+    "none": "Keine Pflanzen",
+    "transitions": "Lebenszyklusübergang",
+    "transition": "Übergang",
+    "transitions_end": "Ende des Lebenszyklus"
   },
   "settings": {
     "about": {
