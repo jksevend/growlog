@@ -12,7 +12,7 @@ import 'package:weedy/plants/model.dart';
 /// which will also update the JSON file on the device's file system.
 class PlantsProvider with ChangeNotifier {
   /// The name of the JSON file that holds the plants.
-  static const String _fileName = 'plants.json';
+  static const String _fileName = 'plants.txt';
 
   /// The standard plants that are used if the JSON file does not exist.
   static final Plants _standardPlants = Plants.standard();
@@ -33,51 +33,61 @@ class PlantsProvider with ChangeNotifier {
 
   /// Reads the JSON file from the device's file system and initializes the plants provider.
   void _initialize() async {
+    final params = await getEncryptionParams();
     final plantsJson = await readJsonFile(
       name: _fileName,
       preset: json.encode(_standardPlants.toJson()),
+      params: params,
     );
     _plants = Plants.fromJson(plantsJson);
-    await _setPlants(_plants);
+    await _setPlants(_plants, params);
   }
 
   /// Sets the current plants to [plants] and updates the JSON file on the device's file system.
-  Future<void> _setPlants(Plants plants) async {
+  Future<void> _setPlants(Plants plants, EncryptionParams params) async {
     _plants.plants = plants.plants;
-    await writeJsonFile(name: _fileName, content: plants.toJson());
+    await writeJsonFile(
+      name: _fileName,
+      content: plants.toJson(),
+      params: params,
+    );
     final map = plants.plants.asMap().map((index, plant) => MapEntry(plant.id, plant));
     _plantsMap.sink.add(map);
   }
 
   /// Adds a new [plant] to the provider.
   Future<void> addPlant(Plant plant) async {
+    final params = await getEncryptionParams();
     final plants = await _plantsMap.first;
     plants[plant.id] = plant;
-    await _setPlants(Plants(plants: plants.values.toList()));
+    await _setPlants(Plants(plants: plants.values.toList()), params);
   }
 
   /// Removes the [plant] from the provider.
   Future<void> removePlant(Plant plant) async {
+    final params = await getEncryptionParams();
     final plants = await _plantsMap.first;
     plants.remove(plant.id);
-    await _setPlants(Plants(plants: plants.values.toList()));
+    await _setPlants(Plants(plants: plants.values.toList()), params);
   }
 
   /// Removes all plants in the environment with the given [environmentId].
   Future<void> removePlantsInEnvironment(String environmentId) async {
+    final params = await getEncryptionParams();
     final plants = await _plantsMap.first;
     final plantsToRemove =
         plants.values.where((plant) => plant.environmentId == environmentId).toList();
     for (final plant in plantsToRemove) {
       plant.environmentId = '';
     }
-    await _setPlants(Plants(plants: plants.values.toList()));
+    await _setPlants(Plants(plants: plants.values.toList()), params);
   }
 
   /// Updates the [plant] in the provider.
   Future<void> updatePlant(Plant plant) async {
+    final params = await getEncryptionParams();
     final plants = await _plantsMap.first;
     plants[plant.id] = plant;
-    await _setPlants(Plants(plants: plants.values.toList()));
+    await _setPlants(Plants(plants: plants.values.toList()), params);
   }
 }

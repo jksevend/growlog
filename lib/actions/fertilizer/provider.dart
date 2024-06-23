@@ -11,7 +11,7 @@ import 'package:weedy/common/filestore.dart';
 /// It also allows adding, removing, and updating fertilizers.
 class FertilizerProvider extends ChangeNotifier {
   /// The file name of the fertilizers.
-  static const String _fileName = 'fertilizers.json';
+  static const String _fileName = 'fertilizers.txt';
 
   /// The standard fertilizers.
   static final Fertilizers _standardFertilizers = Fertilizers.standard();
@@ -32,18 +32,24 @@ class FertilizerProvider extends ChangeNotifier {
 
   /// Initializes the provider.
   Future<void> _initialize() async {
+    final params = await getEncryptionParams();
     final fertilizersJson = await readJsonFile(
       name: _fileName,
       preset: json.encode(_standardFertilizers.toJson()),
+      params: params,
     );
     _fertilizers = Fertilizers.fromJson(fertilizersJson);
-    await setFertilizers(_fertilizers);
+    await _setFertilizers(_fertilizers, params);
   }
 
   /// Sets the [fertilizers].
-  Future<void> setFertilizers(Fertilizers fertilizers) async {
+  Future<void> _setFertilizers(Fertilizers fertilizers, EncryptionParams params) async {
     _fertilizers.fertilizers = fertilizers.fertilizers;
-    await writeJsonFile(name: _fileName, content: fertilizers.toJson());
+    await writeJsonFile(
+      name: _fileName,
+      content: fertilizers.toJson(),
+      params: params,
+    );
     final map = fertilizers.fertilizers
         .asMap()
         .map((index, fertilizer) => MapEntry(fertilizer.id, fertilizer));
@@ -52,22 +58,25 @@ class FertilizerProvider extends ChangeNotifier {
 
   /// Adds a [fertilizer].
   Future<void> addFertilizer(Fertilizer fertilizer) async {
+    final params = await getEncryptionParams();
     final fertilizers = await _fertilizersMap.first;
     fertilizers[fertilizer.id] = fertilizer;
-    await setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()));
+    await _setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()), params);
   }
 
   /// Deletes a fertilizer by its [id].
   Future<void> deleteFertilizer(String id) async {
+    final params = await getEncryptionParams();
     final fertilizers = await _fertilizersMap.first;
     fertilizers.remove(id);
-    await setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()));
+    await _setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()), params);
   }
 
   /// Updates a [fertilizer].
   Future<void> updateFertilizer(Fertilizer fertilizer) async {
+    final params = await getEncryptionParams();
     final fertilizers = await _fertilizersMap.first;
     fertilizers[fertilizer.id] = fertilizer;
-    await setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()));
+    await _setFertilizers(Fertilizers(fertilizers: fertilizers.values.toList()), params);
   }
 }

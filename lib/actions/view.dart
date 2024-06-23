@@ -502,7 +502,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  Text(tr('actions.environment.choose')),
+                  Text(tr('actions.environments.choose')),
                   StreamBuilder<Map<String, Environment>>(
                     stream: widget.environmentsProvider.environments,
                     builder: (builder, snapshot) {
@@ -560,7 +560,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     minLines: 5,
                     decoration: InputDecoration(
                       labelText: tr('common.description'),
-                      hintText: tr('actions.environment.description_hint'),
+                      hintText: tr('actions.environments.description_hint'),
                     ),
                   ),
                 ],
