@@ -168,13 +168,14 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                   .where((transition) => transition.plantId == widget.plant.id);
           final combinedActions = [...specificPlantActions, ...specificPlantLifecycleTransitions];
 
-          // Sort the actions by date
+          // Latest actions appear first
           combinedActions.sort((a, b) {
             var aDate = a is PlantAction ? a.createdAt : (a as PlantLifecycleTransition).timestamp;
             var bDate = b is PlantAction ? b.createdAt : (b as PlantLifecycleTransition).timestamp;
-            return aDate.compareTo(bDate);
+            return bDate.compareTo(aDate);
           });
 
+          // Group actions by date
           final groupedByDate =
               combinedActions.fold<Map<DateTime, List<dynamic>>>({}, (map, action) {
             final date = action is PlantAction
@@ -186,13 +187,14 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
             return map;
           });
 
+          // Per latest action the actions are sorted by date descending
           groupedByDate.forEach((date, actions) {
             actions.sort((a, b) {
               var aTime =
                   a is PlantAction ? a.createdAt : (a as PlantLifecycleTransition).timestamp;
               var bTime =
                   b is PlantAction ? b.createdAt : (b as PlantLifecycleTransition).timestamp;
-              return aTime.compareTo(bTime);
+              return bTime.compareTo(aTime);
             });
           });
           return Stack(
