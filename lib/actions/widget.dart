@@ -39,7 +39,6 @@ class PlantActionLogItem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListTile(
-          isThreeLine: true,
           leading: Text(action.type.icon, style: const TextStyle(fontSize: 18)),
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

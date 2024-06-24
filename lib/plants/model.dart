@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'model.g.dart';
@@ -90,6 +91,24 @@ extension LifeCycleStateExtension on LifeCycleState {
         return '🍂';
       case LifeCycleState.curing:
         return '🍁';
+    }
+  }
+
+  /// The color of the life cycle state.
+  Color get color {
+    switch (this) {
+      case LifeCycleState.germination:
+        return Colors.teal;
+      case LifeCycleState.seedling:
+        return Colors.green[700]!;
+      case LifeCycleState.vegetative:
+        return Colors.green[900]!;
+      case LifeCycleState.flowering:
+        return Colors.purple[700]!;
+      case LifeCycleState.drying:
+        return Colors.orange[600]!;
+      case LifeCycleState.curing:
+        return Colors.brown[600]!;
     }
   }
 }

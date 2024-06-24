@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:rxdart/streams.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/dialog.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
@@ -20,6 +21,8 @@ import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
+import 'package:weedy/plants/transition/model.dart';
+import 'package:weedy/plants/transition/provider.dart';
 
 /// An over view of all environment actions.
 class EnvironmentActionOverview extends StatelessWidget {
@@ -120,12 +123,14 @@ class PlantActionOverview extends StatefulWidget {
   final Plant plant;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
+  final PlantLifecycleTransitionProvider plantLifecycleTransitionProvider;
 
   const PlantActionOverview({
     super.key,
     required this.plant,
     required this.actionsProvider,
     required this.fertilizerProvider,
+    required this.plantLifecycleTransitionProvider,
   });
 
   @override
@@ -140,8 +145,11 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
         title: Text(widget.plant.name),
         centerTitle: true,
       ),
-      body: StreamBuilder<List<PlantAction>>(
-        stream: widget.actionsProvider.plantActions,
+      body: StreamBuilder<List<dynamic>>(
+        stream: CombineLatestStream.list([
+          widget.actionsProvider.plantActions,
+          widget.plantLifecycleTransitionProvider.transitions,
+        ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -151,22 +159,42 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          final plantActions = snapshot.data!;
-          if (plantActions.isEmpty) {
-            return Center(
-              child: Text(tr('actions.plants.none')),
-            );
-          }
-
+          // Prepare data
+          final plantActions = snapshot.data![0] as List<PlantAction>;
           final specificPlantActions =
               plantActions.where((action) => action.plantId == widget.plant.id).toList();
+          final specificPlantLifecycleTransitions =
+              (snapshot.data![1] as List<PlantLifecycleTransition>)
+                  .where((transition) => transition.plantId == widget.plant.id);
+          final combinedActions = [...specificPlantActions, ...specificPlantLifecycleTransitions];
 
-          if (specificPlantActions.isEmpty) {
-            return Center(
-              child: Text(tr('actions.plants.none_for_this')),
-            );
-          }
+          // Sort the actions by date
+          combinedActions.sort((a, b) {
+            var aDate = a is PlantAction ? a.createdAt : (a as PlantLifecycleTransition).timestamp;
+            var bDate = b is PlantAction ? b.createdAt : (b as PlantLifecycleTransition).timestamp;
+            return aDate.compareTo(bDate);
+          });
 
+          final groupedByDate =
+              combinedActions.fold<Map<DateTime, List<dynamic>>>({}, (map, action) {
+            final date = action is PlantAction
+                ? action.createdAt
+                : (action as PlantLifecycleTransition).timestamp;
+            final dateKey = DateTime(date.year, date.month, date.day);
+            map[dateKey] = map[dateKey] ?? [];
+            map[dateKey]!.add(action);
+            return map;
+          });
+
+          groupedByDate.forEach((date, actions) {
+            actions.sort((a, b) {
+              var aTime =
+                  a is PlantAction ? a.createdAt : (a as PlantLifecycleTransition).timestamp;
+              var bTime =
+                  b is PlantAction ? b.createdAt : (b as PlantLifecycleTransition).timestamp;
+              return aTime.compareTo(bTime);
+            });
+          });
           return Stack(
             alignment: Alignment.center,
             children: [
@@ -176,44 +204,153 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                   color: Colors.grey,
                 ),
               ),
-              ListView.separated(
-                shrinkWrap: true,
-                padding: const EdgeInsets.all(8.0),
-                itemCount: specificPlantActions.length,
-                itemBuilder: (context, index) {
-                  final action = specificPlantActions.elementAt(index);
-                  final actionLogItem = PlantActionLogItem(
-                    fertilizerProvider: widget.fertilizerProvider,
-                    actionsProvider: widget.actionsProvider,
-                    plant: widget.plant,
-                    action: action,
-                    isFirst: index == 0,
-                    isLast: index == specificPlantActions.length - 1,
-                  );
-                  return actionLogItem;
-                },
-                separatorBuilder: (BuildContext context, int index) {
+              ListView(
+                children: groupedByDate.entries.map((entry) {
+                  var date = entry.key;
+                  var actions = entry.value;
+                  final formattedDate = DateFormat.yMMMd().format(date);
+
                   return Column(
                     children: [
-                      const SizedBox(height: 10),
-                      Container(
-                        width: 35,
-                        height: 35,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            formattedDate,
+                            style: const TextStyle(fontSize: 20),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: actions.length,
+                        itemBuilder: (context, index) {
+                          final action = actions[index];
+                          if (action is PlantAction) {
+                            return PlantActionLogItem(
+                              actionsProvider: widget.actionsProvider,
+                              fertilizerProvider: widget.fertilizerProvider,
+                              plant: widget.plant,
+                              action: action,
+                              isFirst: index == 0,
+                              isLast: index == actions.length - 1,
+                            );
+                          } else {
+                            final transition = action as PlantLifecycleTransition;
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: transition.from.color,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(transition.from.icon,
+                                          style: const TextStyle(fontSize: 20)),
+                                      Flexible(
+                                        flex: 1,
+                                        child: Text(
+                                          _lifecycleMessage(widget.plant.name, transition.from),
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.info_outline),
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: Text(tr('common.lifecycle')),
+                                                content: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text('${tr('common.next_lifecycle')}: '),
+                                                    const SizedBox(height: 10),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          transition.to!.icon,
+                                                          style: const TextStyle(fontSize: 20),
+                                                        ),
+                                                        const SizedBox(width: 10),
+                                                        Text(
+                                                          transition.to!.name,
+                                                          style: const TextStyle(fontSize: 20),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    child: Text(tr('common.ok')),
+                                                    onPressed: () => Navigator.of(context).pop(),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              Container(
+                                width: 35,
+                                height: 35,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          );
+                        },
+                      ),
                     ],
                   );
-                },
+                }).toList(),
               ),
             ],
           );
         },
       ),
     );
+  }
+
+  String _lifecycleMessage(String name, LifeCycleState lifeCycleState) {
+    switch (lifeCycleState) {
+      case LifeCycleState.germination:
+        return tr('common.germination_message', namedArgs: {'name': name});
+      case LifeCycleState.seedling:
+        return tr('common.seedling_message', namedArgs: {'name': name});
+      case LifeCycleState.vegetative:
+        return tr('common.vegetative_message', namedArgs: {'name': name});
+      case LifeCycleState.flowering:
+        return tr('common.flowering_message', namedArgs: {'name': name});
+      case LifeCycleState.drying:
+        return tr('common.lifecycle.drying', namedArgs: {'name': name});
+      case LifeCycleState.curing:
+        return tr('common.lifecycle.curing', namedArgs: {'name': name});
+    }
   }
 }
 
@@ -403,7 +540,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                               ),
                             );
                           }
-                          _currentPlant = plants[plants.keys.first]!;
                           return DropdownButton<Plant>(
                             icon: const Icon(Icons.arrow_downward_sharp),
                             isExpanded: true,
@@ -416,6 +552,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                                 )
                                 .toList(),
                             onChanged: (Plant? value) => _updateCurrentPlant(value),
+                            hint: Text(tr('plants.mandatory')),
                             value: _currentPlant,
                           );
                         }),
@@ -523,7 +660,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                           ),
                         );
                       }
-                      _currentEnvironment = environments[environments.keys.first]!;
                       return DropdownButton<Environment>(
                         icon: const Icon(Icons.arrow_downward_sharp),
                         isExpanded: true,
@@ -536,6 +672,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                             )
                             .toList(),
                         onChanged: (Environment? value) => _updateCurrentEnvironment(value),
+                        hint: Text(tr('environments.mandatory')),
                         value: _currentEnvironment,
                       );
                     },

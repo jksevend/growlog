@@ -142,6 +142,7 @@ class PlantOverview extends StatelessWidget {
                                           plant: plant,
                                           actionsProvider: actionsProvider,
                                           fertilizerProvider: fertilizerProvider,
+                                          plantLifecycleTransitionProvider: transitionsProvider,
                                         )));
                               },
                             ),
