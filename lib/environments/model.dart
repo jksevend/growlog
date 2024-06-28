@@ -101,7 +101,7 @@ class Environment {
     required String description,
     required EnvironmentType type,
     required LightDetails lightDetails,
-    required Dimension dimension,
+    required Dimension? dimension,
     required String bannerImagePath,
   }) {
     return Environment(

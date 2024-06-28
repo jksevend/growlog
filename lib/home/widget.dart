@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/model.dart' as weedy;
 import 'package:weedy/actions/provider.dart';
@@ -73,9 +72,9 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
 ///
 /// In this view actions done today are highlighted.
 class WeekAndMonthView extends StatefulWidget {
-  final ActionsProvider actionsProvider;
+  final List<Widget> actionIndicators;
 
-  const WeekAndMonthView({super.key, required this.actionsProvider});
+  const WeekAndMonthView({super.key, required this.actionIndicators});
 
   @override
   State<WeekAndMonthView> createState() => _WeekAndMonthViewState();
@@ -83,6 +82,32 @@ class WeekAndMonthView extends StatefulWidget {
 
 class _WeekAndMonthViewState extends State<WeekAndMonthView> {
   bool _isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Row(
+            children: [
+              const Spacer(),
+              Text(_currentMonthName()),
+              _buildHeader(),
+            ],
+          ),
+        ),
+        const Divider(),
+        AnimatedCrossFade(
+          firstChild: _buildWeekView(widget.actionIndicators),
+          secondChild: _buildMonthView(widget.actionIndicators),
+          crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 500),
+        ),
+      ],
+    );
+  }
 
   DateTime get _now => DateTime.now();
 
@@ -123,81 +148,6 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
 
   bool _isToday(DateTime date) {
     return date.year == _now.year && date.month == _now.month && date.day == _now.day;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Row(
-            children: [
-              const Spacer(),
-              Text(_currentMonthName()),
-              _buildHeader(),
-            ],
-          ),
-        ),
-        const Divider(),
-        StreamBuilder(
-          stream: CombineLatestStream.list([
-            widget.actionsProvider.plantActions,
-            widget.actionsProvider.environmentActions,
-          ]),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            }
-            if (!snapshot.hasData) {
-              return Center(child: Text(tr('actions.none')));
-            }
-
-            final plantActions = snapshot.data![0] as List<weedy.PlantAction>;
-            final environmentActions = snapshot.data![1] as List<weedy.EnvironmentAction>;
-
-            List<weedy.Action> allActions = [...plantActions, ...environmentActions];
-            allActions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-            final List<weedy.Action> fourLatestActions =
-                allActions.where((action) => action.isToday()).take(4).toList();
-
-            final List<Widget> actionIndicators = fourLatestActions.map((action) {
-              if (action is weedy.PlantAction) {
-                return Container(
-                  width: 5,
-                  height: 5,
-                  decoration: const BoxDecoration(
-                    color: Colors.green,
-                    shape: BoxShape.circle,
-                  ),
-                );
-              } else if (action is weedy.EnvironmentAction) {
-                return Container(
-                  width: 5,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.yellow[900],
-                    shape: BoxShape.circle,
-                  ),
-                );
-              }
-              throw Exception('Unknown action type');
-            }).toList();
-
-            return AnimatedCrossFade(
-              firstChild: _buildWeekView(actionIndicators),
-              secondChild: _buildMonthView(actionIndicators),
-              crossFadeState: _isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 500),
-            );
-          },
-        ),
-      ],
-    );
   }
 
   Widget _buildHeader() {

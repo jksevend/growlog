@@ -528,37 +528,53 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
           Navigator.of(context).pop();
         });
       } else {
-        environment = widget.environment!.copyWith(
-          name: _nameController.text,
-          description: _descriptionController.text,
-          type: _selectedEnvironmentType[0] ? EnvironmentType.indoor : EnvironmentType.outdoor,
-          lightDetails: LightDetails(
-            lightHours: _currentLightHours.toInt(),
-            lights: [
-              Light(
-                id: const Uuid().v4().toString(),
-                type: _currentLightType,
-                watt: double.parse(_wattController.text),
-              ),
-            ],
-          ),
-          dimension: Dimension(
-              width: MeasurementAmount(
-                value: double.parse(_widthController.text),
-                unit: MeasurementUnit.cm,
-              ),
-              length: MeasurementAmount(
-                value: double.parse(_lengthController.text),
-                unit: MeasurementUnit.cm,
-              ),
-              height: MeasurementAmount(
-                value: double.parse(_heightController.text),
-                unit: MeasurementUnit.cm,
-              )),
-          bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
-              ? ''
-              : _pictureFormKey.currentState!.images.first,
-        );
+        if (_selectedEnvironmentType[0]) {
+          environment = widget.environment!.copyWith(
+            name: _nameController.text,
+            description: _descriptionController.text,
+            type: _selectedEnvironmentType[0] ? EnvironmentType.indoor : EnvironmentType.outdoor,
+            lightDetails: LightDetails(
+              lightHours: _currentLightHours.toInt(),
+              lights: [
+                Light(
+                  id: const Uuid().v4().toString(),
+                  type: _currentLightType,
+                  watt: double.parse(_wattController.text),
+                ),
+              ],
+            ),
+            dimension: Dimension(
+                width: MeasurementAmount(
+                  value: double.parse(_widthController.text),
+                  unit: MeasurementUnit.cm,
+                ),
+                length: MeasurementAmount(
+                  value: double.parse(_lengthController.text),
+                  unit: MeasurementUnit.cm,
+                ),
+                height: MeasurementAmount(
+                  value: double.parse(_heightController.text),
+                  unit: MeasurementUnit.cm,
+                )),
+            bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                ? ''
+                : _pictureFormKey.currentState!.images.first,
+          );
+        } else {
+          environment = widget.environment!.copyWith(
+            name: _nameController.text,
+            description: _descriptionController.text,
+            type: _selectedEnvironmentType[0] ? EnvironmentType.indoor : EnvironmentType.outdoor,
+            lightDetails: LightDetails(
+              lightHours: _currentLightHours.toInt(),
+              lights: [],
+            ),
+            dimension: null,
+            bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
+                ? ''
+                : _pictureFormKey.currentState!.images.first,
+          );
+        }
         await widget.environmentsProvider.updateEnvironment(environment).whenComplete(() {
           Navigator.of(context).pop(environment);
         });

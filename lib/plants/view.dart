@@ -111,9 +111,12 @@ class PlantOverview extends StatelessWidget {
                                   },
                                 ),
                           ListTile(
-                            leading: Text(
-                              plant.lifeCycleState.icon,
-                              style: const TextStyle(fontSize: 22.0),
+                            leading: Hero(
+                              tag: plant.id,
+                              child: Text(
+                                plant.lifeCycleState.icon,
+                                style: const TextStyle(fontSize: 22.0),
+                              ),
                             ),
                             title: Text(plant.name),
                             subtitle: Text(

@@ -142,7 +142,17 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.plant.name),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Hero(
+              tag: widget.plant.id,
+              child: Text(widget.plant.lifeCycleState.icon),
+            ),
+            const SizedBox(width: 10),
+            Text(widget.plant.name),
+          ],
+        ),
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(
@@ -572,7 +582,7 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                       ],
                     ),
                     const Divider(),
-                    TextFormField(
+                    TextField(
                       controller: _plantActionDescriptionTextController,
                       maxLines: null,
                       minLines: 5,

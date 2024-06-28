@@ -2,7 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/streams.dart';
 import 'package:weedy/actions/fertilizer/provider.dart';
-import 'package:weedy/actions/model.dart';
+import 'package:weedy/actions/model.dart' as weedy;
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
@@ -53,8 +53,8 @@ class _HomeViewState extends State<HomeView> {
         // Extract data
         var plants = snapshot.data![0] as Map<String, Plant>;
         var environments = snapshot.data![1] as Map<String, Environment>;
-        var plantActions = snapshot.data![2] as List<PlantAction>;
-        var environmentActions = snapshot.data![3] as List<EnvironmentAction>;
+        var plantActions = snapshot.data![2] as List<weedy.PlantAction>;
+        var environmentActions = snapshot.data![3] as List<weedy.EnvironmentAction>;
 
         // Filter actions performed today
         var todayPlantActions =
@@ -65,6 +65,34 @@ class _HomeViewState extends State<HomeView> {
         var todayPlantActionsPerformed = todayPlantActions.length;
         var todayEnvironmentActionsPerformed = todayEnvironmentActions.length;
 
+        List<weedy.Action> allActions = [...plantActions, ...environmentActions];
+        allActions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        final List<weedy.Action> fourLatestActions =
+            allActions.where((action) => action.isToday()).take(4).toList();
+
+        final List<Widget> actionIndicators = fourLatestActions.map((action) {
+          if (action is weedy.PlantAction) {
+            return Container(
+              width: 5,
+              height: 5,
+              decoration: const BoxDecoration(
+                color: Colors.green,
+                shape: BoxShape.circle,
+              ),
+            );
+          } else if (action is weedy.EnvironmentAction) {
+            return Container(
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.yellow[900],
+                shape: BoxShape.circle,
+              ),
+            );
+          }
+          throw Exception('Unknown action type');
+        }).toList();
+
         return Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
           child: ListView(
@@ -72,7 +100,7 @@ class _HomeViewState extends State<HomeView> {
             children: [
               Card(
                 child: WeekAndMonthView(
-                  actionsProvider: widget.actionsProvider,
+                  actionIndicators: actionIndicators,
                 ),
               ),
               Card(
