@@ -7,6 +7,7 @@ import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
+import 'package:weedy/plants/provider.dart';
 
 /// An item of a list of plant actions
 class PlantActionLogHomeWidget extends StatelessWidget {
@@ -14,6 +15,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
   final weedy.PlantAction action;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
+  final PlantsProvider plantsProvider;
 
   const PlantActionLogHomeWidget({
     super.key,
@@ -21,6 +23,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
     required this.action,
     required this.actionsProvider,
     required this.fertilizerProvider,
+    required this.plantsProvider,
   });
 
   @override
@@ -33,7 +36,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
         subtitle: Text(action.formattedDate),
         onTap: () async {
           await showPlantActionDetailSheet(
-              context, action, plant, actionsProvider, fertilizerProvider);
+              context, action, plant, actionsProvider, fertilizerProvider, plantsProvider);
         },
       ),
     );

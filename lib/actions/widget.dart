@@ -14,11 +14,13 @@ import 'package:weedy/common/temperature.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
+import 'package:weedy/plants/provider.dart';
 
 /// A list item to display a [PlantAction].
 class PlantActionLogItem extends StatelessWidget {
   final FertilizerProvider fertilizerProvider;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
   final Plant plant;
   final PlantAction action;
   final bool isFirst;
@@ -28,6 +30,7 @@ class PlantActionLogItem extends StatelessWidget {
     super.key,
     required this.fertilizerProvider,
     required this.actionsProvider,
+    required this.plantsProvider,
     required this.plant,
     required this.action,
     required this.isFirst,
@@ -65,7 +68,7 @@ class PlantActionLogItem extends StatelessWidget {
           ),
           onTap: () async {
             await showPlantActionDetailSheet(
-                context, action, plant, actionsProvider, fertilizerProvider);
+                context, action, plant, actionsProvider, fertilizerProvider, plantsProvider);
           },
         ),
       ),
@@ -601,12 +604,16 @@ class _BasePlantActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
   final Widget child;
 
   const _BasePlantActionSheetWidget({
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
     required this.child,
   });
 
@@ -644,7 +651,15 @@ class _BasePlantActionSheetWidgetState extends State<_BasePlantActionSheetWidget
                 icon: const Icon(Icons.delete_forever, color: Colors.red),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => EditPlantActionView(
+                            action: widget.action,
+                            actionsProvider: widget.actionsProvider,
+                            plantsProvider: widget.plantsProvider,
+                            fertilizerProvider: widget.fertilizerProvider,
+                          )));
+                },
                 icon: Icon(
                   Icons.edit,
                   color: Colors.yellow,
@@ -689,12 +704,16 @@ class PlantWateringActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantWateringAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantWateringActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -708,6 +727,8 @@ class _PlantWateringActionSheetWidgetState extends State<PlantWateringActionShee
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
+        plantsProvider: widget.plantsProvider,
+        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.water_amount')),
           subtitle: Text('${widget.action.amount.amount} ${widget.action.amount.unit.name}'),
@@ -721,6 +742,7 @@ class PlantFertilizingActionSheetWidget extends StatefulWidget {
   final PlantFertilizingAction action;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
+  final PlantsProvider plantsProvider;
 
   const PlantFertilizingActionSheetWidget({
     super.key,
@@ -728,6 +750,7 @@ class PlantFertilizingActionSheetWidget extends StatefulWidget {
     required this.action,
     required this.actionsProvider,
     required this.fertilizerProvider,
+    required this.plantsProvider,
   });
 
   @override
@@ -742,6 +765,8 @@ class _PlantFertilizingActionSheetWidgetState extends State<PlantFertilizingActi
       plant: widget.plant,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
+      plantsProvider: widget.plantsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
       child: StreamBuilder<Map<String, Fertilizer>>(
         stream: widget.fertilizerProvider.fertilizers,
         builder: (context, snapshot) {
@@ -805,12 +830,16 @@ class PlantPruningActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantPruningAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantPruningActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -824,6 +853,8 @@ class _PlantPruningActionSheetWidgetState extends State<PlantPruningActionSheetW
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
+        plantsProvider: widget.plantsProvider,
+        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.pruning')),
           subtitle: Text(widget.action.pruningType.name),
@@ -836,12 +867,16 @@ class PlantTrainingActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantTrainingAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantTrainingActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -855,6 +890,8 @@ class _PlantTrainingActionSheetWidgetState extends State<PlantTrainingActionShee
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
+        plantsProvider: widget.plantsProvider,
+        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.training')),
           subtitle: Text(widget.action.trainingType.name),
@@ -867,12 +904,16 @@ class PlantReplantingActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantReplantingAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantReplantingActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -886,6 +927,8 @@ class _PlantReplantingActionSheetWidgetState extends State<PlantReplantingAction
       plant: widget.plant,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
+      plantsProvider: widget.plantsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
       child: Container(),
     );
   }
@@ -896,12 +939,16 @@ class PlantHarvestingActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantHarvestingAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantHarvestingActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -915,6 +962,8 @@ class _PlantHarvestingActionSheetWidgetState extends State<PlantHarvestingAction
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
+        plantsProvider: widget.plantsProvider,
+        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.harvesting')),
           subtitle: Text('${widget.action.amount.amount} ${widget.action.amount.unit.name}'),
@@ -927,12 +976,16 @@ class PlantDeathActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantDeathAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantDeathActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -946,6 +999,8 @@ class _PlantDeathActionSheetWidgetState extends State<PlantDeathActionSheetWidge
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
+        plantsProvider: widget.plantsProvider,
+        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.death')),
         ));
@@ -957,12 +1012,16 @@ class PlantPictureActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantPictureAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantPictureActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -976,6 +1035,8 @@ class _PlantPictureActionSheetWidgetState extends State<PlantPictureActionSheetW
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
+        plantsProvider: widget.plantsProvider,
+        fertilizerProvider: widget.fertilizerProvider,
         child: SizedBox(
           height: 300,
           child: GridView.builder(
@@ -1026,12 +1087,16 @@ class PlantOtherActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantOtherAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantOtherActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -1045,6 +1110,8 @@ class _PlantOtherActionSheetWidgetState extends State<PlantOtherActionSheetWidge
       plant: widget.plant,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
+      plantsProvider: widget.plantsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
       child: Container(),
     );
   }
@@ -1055,12 +1122,16 @@ class PlantMeasurementActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantMeasurementAction action;
   final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
 
   const PlantMeasurementActionSheetWidget({
     super.key,
     required this.plant,
     required this.action,
     required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
   });
 
   @override
@@ -1075,6 +1146,8 @@ class _PlantMeasurementActionSheetWidgetState extends State<PlantMeasurementActi
       plant: widget.plant,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
+      plantsProvider: widget.plantsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
       child: _measurementWidget(),
     );
   }

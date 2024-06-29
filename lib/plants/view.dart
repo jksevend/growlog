@@ -159,6 +159,7 @@ class PlantOverview extends StatelessWidget {
                                     Navigator.of(context).push(MaterialPageRoute(
                                         builder: (context) => PlantActionOverview(
                                               plant: plant,
+                                              plantsProvider: plantsProvider,
                                               actionsProvider: actionsProvider,
                                               fertilizerProvider: fertilizerProvider,
                                               plantLifecycleTransitionProvider: transitionsProvider,

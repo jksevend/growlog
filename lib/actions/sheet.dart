@@ -6,6 +6,7 @@ import 'package:weedy/actions/widget.dart';
 import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
+import 'package:weedy/plants/provider.dart';
 
 /// Show a bottom sheet with the details of the [plantAction].
 Future<void> showPlantActionDetailSheet(
@@ -14,6 +15,7 @@ Future<void> showPlantActionDetailSheet(
   Plant plant,
   ActionsProvider actionsProvider,
   FertilizerProvider fertilizerProvider,
+  PlantsProvider plantsProvider,
 ) async {
   await showModalBottomSheet(
     context: context,
@@ -23,6 +25,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 
@@ -32,6 +36,7 @@ Future<void> showPlantActionDetailSheet(
           plant: plant,
           actionsProvider: actionsProvider,
           fertilizerProvider: fertilizerProvider,
+          plantsProvider: plantsProvider,
         );
       }
 
@@ -40,6 +45,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 
@@ -48,6 +55,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 
@@ -56,6 +65,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 
@@ -64,6 +75,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 
@@ -72,6 +85,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction as PlantOtherAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 
@@ -80,6 +95,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 
@@ -88,6 +105,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 
@@ -96,6 +115,8 @@ Future<void> showPlantActionDetailSheet(
           action: plantAction,
           plant: plant,
           actionsProvider: actionsProvider,
+          plantsProvider: plantsProvider,
+          fertilizerProvider: fertilizerProvider,
         );
       }
 

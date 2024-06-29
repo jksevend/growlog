@@ -157,6 +157,7 @@ class EnvironmentActionOverview extends StatelessWidget {
 /// An over view of all plant actions.
 class PlantActionOverview extends StatefulWidget {
   final Plant plant;
+  final PlantsProvider plantsProvider;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
   final PlantLifecycleTransitionProvider plantLifecycleTransitionProvider;
@@ -164,6 +165,7 @@ class PlantActionOverview extends StatefulWidget {
   const PlantActionOverview({
     super.key,
     required this.plant,
+    required this.plantsProvider,
     required this.actionsProvider,
     required this.fertilizerProvider,
     required this.plantLifecycleTransitionProvider,
@@ -278,6 +280,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                           final action = actions[index];
                           if (action is PlantAction) {
                             return PlantActionLogItem(
+                              plantsProvider: widget.plantsProvider,
                               actionsProvider: widget.actionsProvider,
                               fertilizerProvider: widget.fertilizerProvider,
                               plant: widget.plant,
@@ -868,9 +871,14 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
 
 /// A form to display the amount of water used for watering the plant.
 class PlantWateringForm extends StatefulWidget {
+  final PlantWateringAction? action;
   final GlobalKey<FormState> formKey;
 
-  const PlantWateringForm({super.key, required this.formKey});
+  const PlantWateringForm({
+    super.key,
+    required this.action,
+    required this.formKey,
+  });
 
   @override
   State<PlantWateringForm> createState() => _PlantWateringFormState();
@@ -883,8 +891,15 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
   @override
   void initState() {
     super.initState();
-    _waterAmountController = TextEditingController();
-    _waterAmountUnit = LiquidUnit.ml;
+    if (widget.action != null) {
+      final watering = widget.action!.amount;
+      _waterAmountController = TextEditingController(text: watering.amount.toString());
+      _waterAmountUnit = watering.unit;
+    } else {
+      // Set default values
+      _waterAmountController = TextEditingController();
+      _waterAmountUnit = LiquidUnit.ml;
+    }
   }
 
   @override
@@ -964,11 +979,13 @@ class _PlantWateringFormState extends State<PlantWateringForm> {
 
 /// A form to display the amount of fertilizer used for fertilizing the plant.
 class PlantFertilizingForm extends StatefulWidget {
+  final PlantFertilizingAction? action;
   final GlobalKey<FormState> formKey;
   final FertilizerProvider fertilizerProvider;
 
   const PlantFertilizingForm({
     super.key,
+    required this.action,
     required this.formKey,
     required this.fertilizerProvider,
   });
@@ -985,8 +1002,14 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
   @override
   void initState() {
     super.initState();
-    _fertilizerAmountController = TextEditingController();
-    _liquidUnit = LiquidUnit.ml;
+    if (widget.action != null) {
+      final amount = widget.action!.fertilization;
+      _fertilizerAmountController = TextEditingController(text: amount.amount.amount.toString());
+      _liquidUnit = amount.amount.unit;
+    } else {
+      _fertilizerAmountController = TextEditingController();
+      _liquidUnit = LiquidUnit.ml;
+    }
   }
 
   @override
@@ -1049,7 +1072,9 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
                   );
                 }
 
-                _currentFertilizer = fertilizers.entries.first.value;
+                _currentFertilizer = widget.action == null
+                    ? fertilizers.entries.first.value
+                    : fertilizers[widget.action!.fertilization.fertilizerId];
                 return SizedBox(
                   height: 50,
                   width: double.infinity,
@@ -1163,7 +1188,9 @@ class _PlantFertilizingFormState extends State<PlantFertilizingForm> {
 
 /// A form to display the type of pruning done on the plant.
 class PlantPruningForm extends StatefulWidget {
-  const PlantPruningForm({super.key});
+  final PlantPruningAction? action;
+
+  const PlantPruningForm({super.key, required this.action});
 
   @override
   State<PlantPruningForm> createState() => _PlantPruningFormState();
@@ -1175,7 +1202,11 @@ class _PlantPruningFormState extends State<PlantPruningForm> {
   @override
   void initState() {
     super.initState();
-    _pruningType = PruningType.topping;
+    if (widget.action != null) {
+      _pruningType = widget.action!.pruningType;
+    } else {
+      _pruningType = PruningType.topping;
+    }
   }
 
   /// The pruning type.
@@ -1211,9 +1242,10 @@ class _PlantPruningFormState extends State<PlantPruningForm> {
 
 /// A form to display the amount of the plant harvested.
 class PlantHarvestingForm extends StatefulWidget {
+  final PlantHarvestingAction? action;
   final GlobalKey<FormState> formKey;
 
-  const PlantHarvestingForm({super.key, required this.formKey});
+  const PlantHarvestingForm({super.key, required this.action, required this.formKey});
 
   @override
   State<PlantHarvestingForm> createState() => _PlantHarvestingFormState();
@@ -1226,8 +1258,14 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
   @override
   void initState() {
     super.initState();
-    _harvestAmountController = TextEditingController();
-    _weightUnit = WeightUnit.g;
+    if (widget.action != null) {
+      final harvest = widget.action!.amount;
+      _harvestAmountController = TextEditingController(text: harvest.amount.toString());
+      _weightUnit = harvest.unit;
+    } else {
+      _harvestAmountController = TextEditingController();
+      _weightUnit = WeightUnit.g;
+    }
   }
 
   @override
@@ -1307,7 +1345,9 @@ class _PlantHarvestingFormState extends State<PlantHarvestingForm> {
 
 /// A form to display the type of training done on the plant.
 class PlantTrainingForm extends StatefulWidget {
-  const PlantTrainingForm({super.key});
+  final PlantTrainingAction? action;
+
+  const PlantTrainingForm({super.key, required this.action});
 
   @override
   State<PlantTrainingForm> createState() => _PlantTrainingFormState();
@@ -1319,7 +1359,11 @@ class _PlantTrainingFormState extends State<PlantTrainingForm> {
   @override
   void initState() {
     super.initState();
-    _trainingType = TrainingType.lst;
+    if (widget.action != null) {
+      _trainingType = widget.action!.trainingType;
+    } else {
+      _trainingType = TrainingType.lst;
+    }
   }
 
   /// The training type.
@@ -1354,6 +1398,7 @@ class _PlantTrainingFormState extends State<PlantTrainingForm> {
 
 /// A form to display different types of plant measurements.
 class PlantMeasurementForm extends StatefulWidget {
+  final PlantMeasurementAction? action;
   final GlobalKey<PlantHeightMeasurementFormState> plantMeasurementWidgetKey;
   final GlobalKey<PlantECMeasurementFormState> plantECMeasurementFormKey;
   final GlobalKey<PlantPHMeasurementFormState> plantPHMeasurementFormKey;
@@ -1361,6 +1406,7 @@ class PlantMeasurementForm extends StatefulWidget {
 
   const PlantMeasurementForm({
     super.key,
+    required this.action,
     required this.plantMeasurementWidgetKey,
     required this.plantECMeasurementFormKey,
     required this.plantPHMeasurementFormKey,
@@ -1377,7 +1423,11 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
   @override
   void initState() {
     super.initState();
-    _measurementType = PlantMeasurementType.height;
+    if (widget.action != null) {
+      _measurementType = widget.action!.measurement.type;
+    } else {
+      _measurementType = PlantMeasurementType.height;
+    }
   }
 
   /// The current measurement type.
@@ -1429,21 +1479,25 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
       case PlantMeasurementType.height:
         return PlantHeightMeasurementForm(
           key: widget.plantMeasurementWidgetKey,
+          action: widget.action,
           formKey: GlobalKey<FormState>(),
         );
       case PlantMeasurementType.pH:
         return PlantPHMeasurementForm(
           key: widget.plantPHMeasurementFormKey,
+          action: widget.action,
           formKey: GlobalKey<FormState>(),
         );
       case PlantMeasurementType.ec:
         return PlantECMeasurementForm(
           key: widget.plantECMeasurementFormKey,
+          action: widget.action,
           formKey: GlobalKey<FormState>(),
         );
       case PlantMeasurementType.ppm:
         return PlantPPMMeasurementForm(
           key: widget.plantPPMMeasurementFormKey,
+          action: widget.action,
           formKey: GlobalKey<FormState>(),
         );
     }
@@ -1452,9 +1506,10 @@ class _PlantMeasurementFormState extends State<PlantMeasurementForm> {
 
 /// A form to display the height measurement of the plant.
 class PlantHeightMeasurementForm extends StatefulWidget {
+  final PlantMeasurementAction? action;
   final GlobalKey<FormState> formKey;
 
-  const PlantHeightMeasurementForm({super.key, required this.formKey});
+  const PlantHeightMeasurementForm({super.key, required this.action, required this.formKey});
 
   @override
   State<PlantHeightMeasurementForm> createState() => PlantHeightMeasurementFormState();
@@ -1467,8 +1522,14 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
   @override
   void initState() {
     super.initState();
-    _heightController = TextEditingController();
-    _heightUnit = MeasurementUnit.cm;
+    if (widget.action != null) {
+      final height = MeasurementAmount.fromJson(widget.action!.measurement.measurement);
+      _heightController = TextEditingController(text: height.value.toString());
+      _heightUnit = height.measurementUnit;
+    } else {
+      _heightController = TextEditingController();
+      _heightUnit = MeasurementUnit.cm;
+    }
   }
 
   @override
@@ -1547,9 +1608,10 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
 
 /// A form to display the pH measurement of the plant.
 class PlantPHMeasurementForm extends StatefulWidget {
+  final PlantMeasurementAction? action;
   final GlobalKey<FormState> formKey;
 
-  const PlantPHMeasurementForm({super.key, required this.formKey});
+  const PlantPHMeasurementForm({super.key, required this.action, required this.formKey});
 
   @override
   State<PlantPHMeasurementForm> createState() => PlantPHMeasurementFormState();
@@ -1561,7 +1623,12 @@ class PlantPHMeasurementFormState extends State<PlantPHMeasurementForm> {
   @override
   void initState() {
     super.initState();
-    _phController = TextEditingController();
+    if (widget.action != null) {
+      final ph = widget.action!.measurement.measurement['ph'] as double;
+      _phController = TextEditingController(text: ph.toString());
+    } else {
+      _phController = TextEditingController();
+    }
   }
 
   @override
@@ -1599,9 +1666,10 @@ class PlantPHMeasurementFormState extends State<PlantPHMeasurementForm> {
 
 /// A form to display the EC measurement of the plant.
 class PlantECMeasurementForm extends StatefulWidget {
+  final PlantMeasurementAction? action;
   final GlobalKey<FormState> formKey;
 
-  const PlantECMeasurementForm({super.key, required this.formKey});
+  const PlantECMeasurementForm({super.key, required this.action, required this.formKey});
 
   @override
   State<PlantECMeasurementForm> createState() => PlantECMeasurementFormState();
@@ -1613,7 +1681,12 @@ class PlantECMeasurementFormState extends State<PlantECMeasurementForm> {
   @override
   void initState() {
     super.initState();
-    _ecController = TextEditingController();
+    if (widget.action != null) {
+      final ec = widget.action!.measurement.measurement['ec'] as double;
+      _ecController = TextEditingController(text: ec.toString());
+    } else {
+      _ecController = TextEditingController();
+    }
   }
 
   @override
@@ -1651,9 +1724,10 @@ class PlantECMeasurementFormState extends State<PlantECMeasurementForm> {
 
 /// A form to display the PPM measurement of the plant.
 class PlantPPMMeasurementForm extends StatefulWidget {
+  final PlantMeasurementAction? action;
   final GlobalKey<FormState> formKey;
 
-  const PlantPPMMeasurementForm({super.key, required this.formKey});
+  const PlantPPMMeasurementForm({super.key, required this.action, required this.formKey});
 
   @override
   State<PlantPPMMeasurementForm> createState() => PlantPPMMeasurementFormState();
@@ -1665,7 +1739,12 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
   @override
   void initState() {
     super.initState();
-    _ppmController = TextEditingController();
+    if (widget.action != null) {
+      final ppm = widget.action!.measurement.measurement['ppm'] as double;
+      _ppmController = TextEditingController(text: ppm.toString());
+    } else {
+      _ppmController = TextEditingController();
+    }
   }
 
   @override
@@ -1997,6 +2076,131 @@ class CreatePlantActionView extends StatefulWidget {
 }
 
 class _CreatePlantActionViewState extends State<CreatePlantActionView> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(tr('actions.plants.create')),
+      ),
+      body: PlantActionForm(
+        title: tr('actions.plants.create'),
+        action: null,
+        actionsProvider: widget.actionsProvider,
+        plantsProvider: widget.plantsProvider,
+        fertilizerProvider: widget.fertilizerProvider,
+      ),
+    );
+  }
+}
+
+class EditPlantActionView extends StatefulWidget {
+  final PlantAction action;
+  final PlantsProvider plantsProvider;
+  final ActionsProvider actionsProvider;
+  final FertilizerProvider fertilizerProvider;
+
+  const EditPlantActionView({
+    super.key,
+    required this.action,
+    required this.plantsProvider,
+    required this.actionsProvider,
+    required this.fertilizerProvider,
+  });
+
+  @override
+  State<EditPlantActionView> createState() => _EditPlantActionViewState();
+}
+
+class _EditPlantActionViewState extends State<EditPlantActionView> {
+  @override
+  Widget build(BuildContext context) {
+    return PlantActionForm(
+      title: tr('actions.plants.edit'),
+      action: widget.action,
+      actionsProvider: widget.actionsProvider,
+      plantsProvider: widget.plantsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
+    );
+  }
+}
+
+/// A view to create an environment action.
+class CreateEnvironmentActionView extends StatefulWidget {
+  final ActionsProvider actionsProvider;
+  final EnvironmentsProvider environmentsProvider;
+
+  const CreateEnvironmentActionView({
+    super.key,
+    required this.actionsProvider,
+    required this.environmentsProvider,
+  });
+
+  @override
+  State<CreateEnvironmentActionView> createState() => _CreateEnvironmentActionViewState();
+}
+
+class _CreateEnvironmentActionViewState extends State<CreateEnvironmentActionView> {
+  @override
+  Widget build(BuildContext context) {
+    return EnvironmentActionForm(
+      title: tr('actions.environments.create'),
+      action: null,
+      actionsProvider: widget.actionsProvider,
+      environmentsProvider: widget.environmentsProvider,
+    );
+  }
+}
+
+/// A view to edit an environment action.
+class EditEnvironmentActionView extends StatefulWidget {
+  final EnvironmentAction action;
+  final ActionsProvider actionsProvider;
+  final EnvironmentsProvider environmentsProvider;
+
+  const EditEnvironmentActionView({
+    super.key,
+    required this.action,
+    required this.actionsProvider,
+    required this.environmentsProvider,
+  });
+
+  @override
+  State<EditEnvironmentActionView> createState() => _EditEnvironmentActionViewState();
+}
+
+class _EditEnvironmentActionViewState extends State<EditEnvironmentActionView> {
+  @override
+  Widget build(BuildContext context) {
+    return EnvironmentActionForm(
+      title: tr('actions.environments.edit'),
+      action: widget.action,
+      actionsProvider: widget.actionsProvider,
+      environmentsProvider: widget.environmentsProvider,
+    );
+  }
+}
+
+class PlantActionForm extends StatefulWidget {
+  final String title;
+  final PlantAction? action;
+  final ActionsProvider actionsProvider;
+  final PlantsProvider plantsProvider;
+  final FertilizerProvider fertilizerProvider;
+
+  const PlantActionForm({
+    super.key,
+    required this.title,
+    required this.action,
+    required this.actionsProvider,
+    required this.plantsProvider,
+    required this.fertilizerProvider,
+  });
+
+  @override
+  State<PlantActionForm> createState() => _PlantActionFormState();
+}
+
+class _PlantActionFormState extends State<PlantActionForm> {
   /// Plant actions widget keys
 
   final GlobalKey<_PlantMeasurementFormState> _plantMeasuringFormKey = GlobalKey();
@@ -2016,14 +2220,31 @@ class _CreatePlantActionViewState extends State<CreatePlantActionView> {
 
   Plant? _currentPlant;
   late PlantActionType _currentPlantActionType = PlantActionType.watering;
-  late TextEditingController _plantActionDescriptionTextController = TextEditingController();
+  late final TextEditingController _plantActionDescriptionTextController = TextEditingController();
   DateTime _plantActionDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.action != null) {
+      final action = widget.action!;
+      _currentPlantActionType = action.type;
+      _plantActionDate = action.createdAt;
+      _plantActionDescriptionTextController.text = action.description;
+    }
+  }
+
+  @override
+  void dispose() {
+    _plantActionDescriptionTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(tr('actions.plants.create')),
+        title: Text(widget.title),
       ),
       body: SingleChildScrollView(
         child: SizedBox(
@@ -2054,6 +2275,24 @@ class _CreatePlantActionViewState extends State<CreatePlantActionView> {
                                 child: Center(
                                   child: Text(tr('plants.none')),
                                 ),
+                              );
+                            }
+                            if (widget.action != null) {
+                              _currentPlant = plants[widget.action!.plantId];
+                              return DropdownButton<Plant>(
+                                icon: const Icon(Icons.arrow_downward_sharp),
+                                isExpanded: true,
+                                items: plants.values
+                                    .map(
+                                      (plant) => DropdownMenuItem<Plant>(
+                                        value: plant,
+                                        child: Text(plant.name),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (Plant? value) => _updateCurrentPlant(value),
+                                hint: Text(tr('plants.mandatory')),
+                                value: _currentPlant,
                               );
                             }
                             return DropdownButton<Plant>(
@@ -2212,32 +2451,38 @@ class _CreatePlantActionViewState extends State<CreatePlantActionView> {
       case PlantActionType.watering:
         return PlantWateringForm(
           key: _plantWateringWidgetKey,
+          action: widget.action as PlantWateringAction?,
           formKey: GlobalKey<FormState>(),
         );
       case PlantActionType.fertilizing:
         return PlantFertilizingForm(
           key: _plantFertilizingFormKey,
+          action: widget.action as PlantFertilizingAction?,
           formKey: GlobalKey<FormState>(),
           fertilizerProvider: widget.fertilizerProvider,
         );
       case PlantActionType.pruning:
         return PlantPruningForm(
           key: _plantPruningFormKey,
+          action: widget.action as PlantPruningAction?,
         );
       case PlantActionType.replanting:
         return Container();
       case PlantActionType.training:
         return PlantTrainingForm(
           key: _plantTrainingFormKey,
+          action: widget.action as PlantTrainingAction?,
         );
       case PlantActionType.harvesting:
         return PlantHarvestingForm(
           key: _plantHarvestingFormKey,
           formKey: GlobalKey<FormState>(),
+          action: widget.action as PlantHarvestingAction?,
         );
       case PlantActionType.measuring:
         return PlantMeasurementForm(
           key: _plantMeasuringFormKey,
+          action: widget.action as PlantMeasurementAction?,
           plantMeasurementWidgetKey: _plantHeightMeasurementWidgetKey,
           plantPHMeasurementFormKey: _plantPHMeasurementWidgetKey,
           plantECMeasurementFormKey: _plantECMeasurementWidgetKey,
@@ -2557,62 +2802,6 @@ class _CreatePlantActionViewState extends State<CreatePlantActionView> {
   }
 }
 
-/// A view to create an environment action.
-class CreateEnvironmentActionView extends StatefulWidget {
-  final ActionsProvider actionsProvider;
-  final EnvironmentsProvider environmentsProvider;
-
-  const CreateEnvironmentActionView({
-    super.key,
-    required this.actionsProvider,
-    required this.environmentsProvider,
-  });
-
-  @override
-  State<CreateEnvironmentActionView> createState() => _CreateEnvironmentActionViewState();
-}
-
-class _CreateEnvironmentActionViewState extends State<CreateEnvironmentActionView> {
-  @override
-  Widget build(BuildContext context) {
-    return EnvironmentActionForm(
-      title: tr('actions.environments.create'),
-      action: null,
-      actionsProvider: widget.actionsProvider,
-      environmentsProvider: widget.environmentsProvider,
-    );
-  }
-}
-
-/// A view to edit an environment action.
-class EditEnvironmentActionView extends StatefulWidget {
-  final EnvironmentAction action;
-  final ActionsProvider actionsProvider;
-  final EnvironmentsProvider environmentsProvider;
-
-  const EditEnvironmentActionView({
-    super.key,
-    required this.action,
-    required this.actionsProvider,
-    required this.environmentsProvider,
-  });
-
-  @override
-  State<EditEnvironmentActionView> createState() => _EditEnvironmentActionViewState();
-}
-
-class _EditEnvironmentActionViewState extends State<EditEnvironmentActionView> {
-  @override
-  Widget build(BuildContext context) {
-    return EnvironmentActionForm(
-      title: tr('actions.environments.edit'),
-      action: widget.action,
-      actionsProvider: widget.actionsProvider,
-      environmentsProvider: widget.environmentsProvider,
-    );
-  }
-}
-
 /// A general environment action form.
 class EnvironmentActionForm extends StatefulWidget {
   final String title;
@@ -2704,22 +2893,10 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
                           );
                         }
                         if (widget.action != null) {
-                          return StreamBuilder<Map<String, Environment>>(
-                              stream: widget.environmentsProvider.environments,
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return const Center(child: CircularProgressIndicator());
-                                }
-                                if (snapshot.hasError) {
-                                  return Center(child: Text('Error: ${snapshot.error}'));
-                                }
-
-                                final environments = snapshot.data as Map<String, Environment>;
-                                final environment = environments[widget.action!.environmentId];
-                                _currentEnvironment = environment;
-                                return DropdownButton<Environment>(
-                                  icon: const Icon(Icons.arrow_downward_sharp),
-                                  isExpanded: true,
+                          _currentEnvironment = environments[widget.action!.environmentId];
+                          DropdownButton<Environment>(
+                            icon: const Icon(Icons.arrow_downward_sharp),
+                            isExpanded: true,
                                   items: environments.values
                                       .map(
                                         (e) => DropdownMenuItem<Environment>(
@@ -2733,7 +2910,6 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
                                   hint: Text(tr('environments.mandatory')),
                                   value: _currentEnvironment,
                                 );
-                              });
                         }
                         return DropdownButton<Environment>(
                           icon: const Icon(Icons.arrow_downward_sharp),
