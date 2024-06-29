@@ -2703,6 +2703,38 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
                             ),
                           );
                         }
+                        if (widget.action != null) {
+                          return StreamBuilder<Map<String, Environment>>(
+                              stream: widget.environmentsProvider.environments,
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+                                if (snapshot.hasError) {
+                                  return Center(child: Text('Error: ${snapshot.error}'));
+                                }
+
+                                final environments = snapshot.data as Map<String, Environment>;
+                                final environment = environments[widget.action!.environmentId];
+                                _currentEnvironment = environment;
+                                return DropdownButton<Environment>(
+                                  icon: const Icon(Icons.arrow_downward_sharp),
+                                  isExpanded: true,
+                                  items: environments.values
+                                      .map(
+                                        (e) => DropdownMenuItem<Environment>(
+                                          value: e,
+                                          child: Text(e.name),
+                                        ),
+                                      )
+                                      .toList(),
+                                  onChanged: (Environment? value) =>
+                                      _updateCurrentEnvironment(value),
+                                  hint: Text(tr('environments.mandatory')),
+                                  value: _currentEnvironment,
+                                );
+                              });
+                        }
                         return DropdownButton<Environment>(
                           icon: const Icon(Icons.arrow_downward_sharp),
                           isExpanded: true,
