@@ -2078,17 +2078,12 @@ class CreatePlantActionView extends StatefulWidget {
 class _CreatePlantActionViewState extends State<CreatePlantActionView> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(tr('actions.plants.create')),
-      ),
-      body: PlantActionForm(
-        title: tr('actions.plants.create'),
+    return PlantActionForm(
+      title: tr('actions.plants.create'),
         action: null,
         actionsProvider: widget.actionsProvider,
         plantsProvider: widget.plantsProvider,
         fertilizerProvider: widget.fertilizerProvider,
-      ),
     );
   }
 }
@@ -2489,10 +2484,13 @@ class _PlantActionFormState extends State<PlantActionForm> {
           plantPPMMeasurementFormKey: _plantPPMMeasurementWidgetKey,
         );
       case PlantActionType.picture:
+        final pictureAction = widget.action as PlantPictureAction?;
         return PictureForm(
           key: _plantPictureFormState,
           allowMultiple: true,
-          images: const [],
+          images: pictureAction == null
+              ? []
+              : pictureAction.images.map((image) => File(image)).toList(),
         );
       case PlantActionType.death:
       case PlantActionType.other:
@@ -3021,10 +3019,13 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
           environmentCO2FormKey: _environmentCO2WidgetKey,
         );
       case EnvironmentActionType.picture:
+        final pictureAction = widget.action as EnvironmentPictureAction?;
         return PictureForm(
           key: _environmentPictureFormState,
           allowMultiple: true,
-          images: const [],
+          images: pictureAction == null
+              ? []
+              : pictureAction.images.map((image) => File(image)).toList(),
         );
       case EnvironmentActionType.other:
         return Container();
