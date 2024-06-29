@@ -4,6 +4,7 @@ import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/widget.dart';
 import 'package:weedy/environments/model.dart';
+import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
 
 /// Show a bottom sheet with the details of the [plantAction].
@@ -109,6 +110,7 @@ Future<void> showEnvironmentActionDetailSheet(
   EnvironmentAction environmentAction,
   Environment environment,
   ActionsProvider actionsProvider,
+  EnvironmentsProvider environmentsProvider,
 ) async {
   await showModalBottomSheet(
     context: context,
@@ -118,6 +120,7 @@ Future<void> showEnvironmentActionDetailSheet(
           action: environmentAction,
           environment: environment,
           actionsProvider: actionsProvider,
+          environmentsProvider: environmentsProvider,
         );
       }
 
@@ -126,6 +129,7 @@ Future<void> showEnvironmentActionDetailSheet(
           action: environmentAction,
           environment: environment,
           actionsProvider: actionsProvider,
+          environmentsProvider: environmentsProvider,
         );
       }
 
@@ -134,6 +138,7 @@ Future<void> showEnvironmentActionDetailSheet(
           action: environmentAction,
           environment: environment,
           actionsProvider: actionsProvider,
+          environmentsProvider: environmentsProvider,
         );
       }
 

@@ -5,6 +5,7 @@ import 'package:weedy/actions/model.dart' as weedy;
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/environments/model.dart';
+import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
 
 /// An item of a list of plant actions
@@ -44,12 +45,14 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
   final Environment environment;
   final weedy.EnvironmentAction action;
   final ActionsProvider actionsProvider;
+  final EnvironmentsProvider environmentsProvider;
 
   const EnvironmentActionLogHomeWidget({
     super.key,
     required this.environment,
     required this.action,
     required this.actionsProvider,
+    required this.environmentsProvider,
   });
 
   @override
@@ -61,7 +64,13 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
         title: Text(environment.name),
         subtitle: Text(action.formattedDate),
         onTap: () async {
-          await showEnvironmentActionDetailSheet(context, action, environment, actionsProvider);
+          await showEnvironmentActionDetailSheet(
+            context,
+            action,
+            environment,
+            actionsProvider,
+            environmentsProvider,
+          );
         },
       ),
     );

@@ -136,18 +136,36 @@ class PlantOverview extends StatelessWidget {
                                   transitionsProvider,
                                   bottomNavigationKey);
                             },
-                            trailing: IconButton(
-                              icon: const Icon(Icons.timeline),
-                              onPressed: () {
-                                debugPrint('Navigate to the plant timeline view for ${plant.name}');
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => PlantActionOverview(
-                                          plant: plant,
-                                          actionsProvider: actionsProvider,
-                                          fertilizerProvider: fertilizerProvider,
-                                          plantLifecycleTransitionProvider: transitionsProvider,
-                                        )));
-                              },
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.bolt_outlined),
+                                  onPressed: () {
+                                    debugPrint('Navigate to the plant edit view for ${plant.name}');
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => CreatePlantActionView(
+                                              plantsProvider: plantsProvider,
+                                              actionsProvider: actionsProvider,
+                                              fertilizerProvider: fertilizerProvider,
+                                            )));
+                                  },
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.timeline),
+                                  onPressed: () {
+                                    debugPrint(
+                                        'Navigate to the plant timeline view for ${plant.name}');
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => PlantActionOverview(
+                                              plant: plant,
+                                              actionsProvider: actionsProvider,
+                                              fertilizerProvider: fertilizerProvider,
+                                              plantLifecycleTransitionProvider: transitionsProvider,
+                                            )));
+                                  },
+                                ),
+                              ],
                             ),
                           ),
                         ],

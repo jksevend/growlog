@@ -8,14 +8,18 @@
     },
     "environments": {
       "choose": "Umgebung wählen",
+      "create": "Umgebungsaktion erstellen",
       "description_hint": "Geben Sie eine Beschreibung der Umgebungsaktion ein",
+      "edit": "Umgebungsaktion bearbeiten",
       "none": "Keine Umgebungsaktionen erstellt",
       "none_for_this": "Keine Aktionen für diese Umgebung"
     },
     "none": "Keine Aktionen",
     "plants": {
       "choose": "Pflanze wählen",
+      "create": "Pflanzenaktion erstellen",
       "description_hint": "Geben Sie eine Beschreibung der Pflanzenaktion ein",
+      "edit": "Pflanzenaktion bearbeiten",
       "none": "Keine Pflanzenaktionen erstellt",
       "none_for_this": "Keine Aktionen für diese Pflanze"
     }

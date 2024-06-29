@@ -28,11 +28,13 @@ import 'package:weedy/plants/transition/provider.dart';
 class EnvironmentActionOverview extends StatelessWidget {
   final Environment environment;
   final ActionsProvider actionsProvider;
+  final EnvironmentsProvider environmentsProvider;
 
   const EnvironmentActionOverview({
     super.key,
     required this.environment,
     required this.actionsProvider,
+    required this.environmentsProvider,
   });
 
   @override
@@ -69,6 +71,18 @@ class EnvironmentActionOverview extends StatelessWidget {
             );
           }
 
+          final groupedByDate = specificEnvironmentActions
+              .fold<Map<DateTime, List<EnvironmentAction>>>({}, (map, action) {
+            final dateKey =
+                DateTime(action.createdAt.year, action.createdAt.month, action.createdAt.day);
+            map[dateKey] = map[dateKey] ?? [];
+            map[dateKey]!.add(action);
+            return map;
+          });
+
+          groupedByDate.forEach((date, actions) {
+            actions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          });
           return Stack(
             alignment: Alignment.center,
             children: [
@@ -78,37 +92,59 @@ class EnvironmentActionOverview extends StatelessWidget {
                   color: Colors.grey,
                 ),
               ),
-              ListView.separated(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: specificEnvironmentActions.length,
-                itemBuilder: (context, index) {
-                  final action = specificEnvironmentActions.elementAt(index);
-                  final actionLogItem = EnvironmentActionLogItem(
-                    actionsProvider: actionsProvider,
-                    environment: environment,
-                    action: action,
-                    isFirst: index == 0,
-                    isLast: index == specificEnvironmentActions.length - 1,
-                  );
+              ListView(
+                children: groupedByDate.entries.map((entry) {
+                  var date = entry.key;
+                  var actions = entry.value;
+                  final formattedDate = DateFormat.yMMMd().format(date);
 
-                  return actionLogItem;
-                },
-                separatorBuilder: (BuildContext context, int index) {
                   return Column(
                     children: [
-                      const SizedBox(height: 10),
-                      Container(
-                        width: 35,
-                        height: 35,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey,
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            formattedDate,
+                            style: const TextStyle(fontSize: 20),
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: actions.length,
+                        itemBuilder: (context, index) {
+                          final action = actions[index];
+                          return EnvironmentActionLogItem(
+                            environmentsProvider: environmentsProvider,
+                            actionsProvider: actionsProvider,
+                            environment: environment,
+                            action: action,
+                            isFirst: index == 0,
+                            isLast: index == actions.length - 1,
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              const SizedBox(height: 10),
+                              Container(
+                                width: 35,
+                                height: 35,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
+                          );
+                        },
+                      ),
                     ],
                   );
-                },
+                }).toList(),
               ),
             ],
           );
@@ -390,61 +426,6 @@ class _ChooseActionViewState extends State<ChooseActionView> {
   /// Index 0 is for plant actions, and index 1 is for environment actions.
   final List<bool> _choices = [true, false];
 
-  /// Environment actions widget keys
-
-  final GlobalKey<_EnvironmentMeasurementFormState> _environmentMeasurementFormKey = GlobalKey();
-  final GlobalKey<EnvironmentTemperatureMeasurementFormState> _environmentTemperatureWidgetKey =
-      GlobalKey();
-  final GlobalKey<EnvironmentHumidityMeasurementFormState> _environmentHumidityWidgetKey =
-      GlobalKey();
-  final GlobalKey<EnvironmentLightDistanceMeasurementFormState> _environmentLightDistanceWidgetKey =
-      GlobalKey();
-  final GlobalKey<EnvironmentCO2MeasurementFormState> _environmentCO2WidgetKey = GlobalKey();
-  final GlobalKey<PictureFormState> _environmentPictureFormState = GlobalKey();
-
-  /// Plant actions widget keys
-
-  final GlobalKey<_PlantMeasurementFormState> _plantMeasuringFormKey = GlobalKey();
-  final GlobalKey<_PlantWateringFormState> _plantWateringWidgetKey = GlobalKey();
-  final GlobalKey<_PlantFertilizingFormState> _plantFertilizingFormKey = GlobalKey();
-  final GlobalKey<_PlantPruningFormState> _plantPruningFormKey = GlobalKey();
-  final GlobalKey<_PlantHarvestingFormState> _plantHarvestingFormKey = GlobalKey();
-  final GlobalKey<_PlantTrainingFormState> _plantTrainingFormKey = GlobalKey();
-  final GlobalKey<PictureFormState> _plantPictureFormState = GlobalKey();
-
-  final GlobalKey<PlantHeightMeasurementFormState> _plantHeightMeasurementWidgetKey = GlobalKey();
-  final GlobalKey<PlantPHMeasurementFormState> _plantPHMeasurementWidgetKey = GlobalKey();
-  final GlobalKey<PlantECMeasurementFormState> _plantECMeasurementWidgetKey = GlobalKey();
-  final GlobalKey<PlantPPMMeasurementFormState> _plantPPMMeasurementWidgetKey = GlobalKey();
-
-  /// Plant form information
-
-  Plant? _currentPlant;
-  late PlantActionType _currentPlantActionType = PlantActionType.watering;
-  late TextEditingController _plantActionDescriptionTextController = TextEditingController();
-  final DateTime _plantActionDate = DateTime.now();
-
-  /// Environment form information
-
-  Environment? _currentEnvironment;
-  late EnvironmentActionType _currentEnvironmentActionType = EnvironmentActionType.measurement;
-  late TextEditingController _environmentActionDescriptionTextController = TextEditingController();
-  final DateTime _environmentActionDate = DateTime.now();
-
-  @override
-  void initState() {
-    super.initState();
-    _plantActionDescriptionTextController = TextEditingController();
-    _environmentActionDescriptionTextController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _plantActionDescriptionTextController.dispose();
-    _environmentActionDescriptionTextController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -455,54 +436,73 @@ class _ChooseActionViewState extends State<ChooseActionView> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        Text(tr('actions.choose_hint')),
-                        const SizedBox(height: 10),
-                        ToggleButtons(
-                          constraints: const BoxConstraints(minWidth: 100),
-                          isSelected: _choices,
-                          onPressed: (int index) => _onToggleButtonsPressed(index),
-                          children: [
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.eco,
-                                  size: 50,
-                                  color: Colors.green[900],
-                                ),
-                                Text(tr('common.plant')),
-                              ],
-                            ),
-                            Column(
-                              children: [
-                                Icon(
-                                  Icons.lightbulb,
-                                  size: 50,
-                                  color: Colors.yellow[900],
-                                ),
-                                Text(tr('common.environment')),
-                              ],
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text(tr('actions.choose_hint')),
+                      const SizedBox(height: 10),
+                      ToggleButtons(
+                        constraints: const BoxConstraints(minWidth: 100),
+                        isSelected: _choices,
+                        onPressed: (int index) => _onToggleButtonsPressed(index),
+                        children: [
+                          Column(
+                            children: [
+                              Icon(
+                                Icons.eco,
+                                size: 50,
+                                color: Colors.green[900],
+                              ),
+                              Text(tr('common.plant')),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Icon(
+                                Icons.lightbulb,
+                                size: 50,
+                                color: Colors.yellow[900],
+                              ),
+                              Text(tr('common.environment')),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const Divider(),
-              _actionForm(context),
-            ],
-          ),
+            ),
+            OutlinedButton(
+                onPressed: () {
+                  if (_choices[0]) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => CreatePlantActionView(
+                          plantsProvider: widget.plantsProvider,
+                          actionsProvider: widget.actionsProvider,
+                          fertilizerProvider: widget.fertilizerProvider,
+                        ),
+                      ),
+                    );
+                  } else {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CreateEnvironmentActionView(
+                        environmentsProvider: widget.environmentsProvider,
+                        actionsProvider: widget.actionsProvider,
+                      ),
+                    ));
+                  }
+                },
+                child: Text('Next'))
+          ],
         ),
       ),
     );
@@ -517,810 +517,18 @@ class _ChooseActionViewState extends State<ChooseActionView> {
       }
     });
   }
-
-  /// The form for the plant actions.
-  Widget _actionForm(final BuildContext context) {
-    if (_choices[0]) {
-      // Plant actions
-      return SizedBox(
-        width: double.infinity,
-        child: Column(
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Text(tr('actions.plants.choose')),
-                    StreamBuilder<Map<String, Plant>>(
-                        stream: widget.plantsProvider.plants,
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-
-                          if (snapshot.hasError) {
-                            return Center(child: Text('Error: ${snapshot.error}'));
-                          }
-
-                          final plants = snapshot.data!;
-                          if (plants.isEmpty) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Center(
-                                child: Text(tr('plants.none')),
-                              ),
-                            );
-                          }
-                          return DropdownButton<Plant>(
-                            icon: const Icon(Icons.arrow_downward_sharp),
-                            isExpanded: true,
-                            items: plants.values
-                                .map(
-                                  (plant) => DropdownMenuItem<Plant>(
-                                    value: plant,
-                                    child: Text(plant.name),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (Plant? value) => _updateCurrentPlant(value),
-                            hint: Text(tr('plants.mandatory')),
-                            value: _currentPlant,
-                          );
-                        }),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        const Icon(Icons.calendar_month),
-                        Text('${tr('common.select_date')}: '),
-                        TextButton(
-                          onPressed: () => _selectDate(context, _plantActionDate),
-                          child: Text(
-                            '${_plantActionDate.toLocal()}'.split(' ')[0],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Divider(),
-                    TextField(
-                      controller: _plantActionDescriptionTextController,
-                      maxLines: null,
-                      minLines: 5,
-                      decoration: InputDecoration(
-                        labelText: tr('common.description'),
-                        hintText: tr('actions.plants.description_hint'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const Divider(),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Column(
-                      children: [
-                        DropdownButton<PlantActionType>(
-                          icon: const Icon(Icons.arrow_downward_sharp),
-                          value: _currentPlantActionType,
-                          isExpanded: true,
-                          items: PlantActionType.values
-                              .map(
-                                (action) => DropdownMenuItem<PlantActionType>(
-                                  value: action,
-                                  child: Row(
-                                    children: [
-                                      Text(action.icon),
-                                      const SizedBox(width: 10),
-                                      Text(action.name),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              .toList(),
-                          onChanged: (PlantActionType? value) =>
-                              _updateCurrentPlantActionType(value),
-                        ),
-                      ],
-                    ),
-                    _plantActionForm(),
-                  ],
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: OutlinedButton.icon(
-                onPressed: () async => await _onPlantActionCreated(),
-                label: Text(tr('common.save')),
-                icon: const Icon(Icons.save),
-              ),
-            ),
-          ],
-        ),
-      );
-    } else {
-      // Environment actions
-      return Column(
-        children: [
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  Text(tr('actions.environments.choose')),
-                  StreamBuilder<Map<String, Environment>>(
-                    stream: widget.environmentsProvider.environments,
-                    builder: (builder, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      }
-
-                      final environments = snapshot.data!;
-                      if (environments.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Center(
-                            child: Text(tr('environments.none')),
-                          ),
-                        );
-                      }
-                      return DropdownButton<Environment>(
-                        icon: const Icon(Icons.arrow_downward_sharp),
-                        isExpanded: true,
-                        items: environments.values
-                            .map(
-                              (e) => DropdownMenuItem<Environment>(
-                                value: e,
-                                child: Text(e.name),
-                              ),
-                            )
-                            .toList(),
-                        onChanged: (Environment? value) => _updateCurrentEnvironment(value),
-                        hint: Text(tr('environments.mandatory')),
-                        value: _currentEnvironment,
-                      );
-                    },
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      const Icon(Icons.calendar_month),
-                      Text('${tr('common.select_date')}: '),
-                      TextButton(
-                        onPressed: () => _selectDate(context, _environmentActionDate),
-                        child: Text(
-                          '${_environmentActionDate.toLocal()}'.split(' ')[0],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  TextFormField(
-                    controller: _environmentActionDescriptionTextController,
-                    maxLines: null,
-                    minLines: 5,
-                    decoration: InputDecoration(
-                      labelText: tr('common.description'),
-                      hintText: tr('actions.environments.description_hint'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const Divider(),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  DropdownButton<EnvironmentActionType>(
-                    icon: const Icon(Icons.arrow_downward_sharp),
-                    value: _currentEnvironmentActionType,
-                    isExpanded: true,
-                    items: EnvironmentActionType.values
-                        .map(
-                          (action) => DropdownMenuItem<EnvironmentActionType>(
-                            value: action,
-                            child: Row(
-                              children: [
-                                Text(
-                                  action.icon,
-                                ),
-                                const SizedBox(width: 10),
-                                Text(action.name),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (EnvironmentActionType? value) =>
-                        _updateCurrentEnvironmentActionType(value),
-                  ),
-                  _environmentActionForm(),
-                ],
-              ),
-            ),
-          ),
-          const Divider(),
-          Align(
-            alignment: Alignment.centerRight,
-            child: OutlinedButton.icon(
-              onPressed: () async => await _onEnvironmentActionCreated(),
-              label: Text(tr('common.save')),
-              icon: const Icon(Icons.save),
-            ),
-          ),
-        ],
-      );
-    }
-  }
-
-  /// Update the current plant.
-  void _updateCurrentPlant(Plant? plant) {
-    setState(() {
-      _currentPlant = plant!;
-    });
-  }
-
-  /// Update the current plant action type.
-  void _updateCurrentPlantActionType(PlantActionType? actionType) {
-    setState(() {
-      _currentPlantActionType = actionType!;
-    });
-  }
-
-  void _showImageSelectionMandatorySnackbar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Icon(
-                Icons.error,
-                color: Colors.red,
-              ),
-            ),
-            Text(
-              tr('common.images_mandatory'),
-            ),
-          ],
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  /// Open up a date picker to select a date.
-  Future<void> _selectDate(BuildContext context, DateTime date) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: date,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
-    if (picked != null && picked != date) {
-      setState(() {
-        date = picked;
-      });
-    }
-  }
-
-  /// The specific plant action form.
-  Widget _plantActionForm() {
-    switch (_currentPlantActionType) {
-      case PlantActionType.watering:
-        return PlantWateringForm(
-          key: _plantWateringWidgetKey,
-          formKey: GlobalKey<FormState>(),
-        );
-      case PlantActionType.fertilizing:
-        return PlantFertilizingForm(
-          key: _plantFertilizingFormKey,
-          formKey: GlobalKey<FormState>(),
-          fertilizerProvider: widget.fertilizerProvider,
-        );
-      case PlantActionType.pruning:
-        return PlantPruningForm(
-          key: _plantPruningFormKey,
-        );
-      case PlantActionType.replanting:
-        return Container();
-      case PlantActionType.training:
-        return PlantTrainingForm(
-          key: _plantTrainingFormKey,
-        );
-      case PlantActionType.harvesting:
-        return PlantHarvestingForm(
-          key: _plantHarvestingFormKey,
-          formKey: GlobalKey<FormState>(),
-        );
-      case PlantActionType.measuring:
-        return PlantMeasurementForm(
-          key: _plantMeasuringFormKey,
-          plantMeasurementWidgetKey: _plantHeightMeasurementWidgetKey,
-          plantPHMeasurementFormKey: _plantPHMeasurementWidgetKey,
-          plantECMeasurementFormKey: _plantECMeasurementWidgetKey,
-          plantPPMMeasurementFormKey: _plantPPMMeasurementWidgetKey,
-        );
-      case PlantActionType.picture:
-        return PictureForm(
-          key: _plantPictureFormState,
-          allowMultiple: true,
-          images: const [],
-        );
-      case PlantActionType.death:
-      case PlantActionType.other:
-        return Container();
-    }
-  }
-
-  /// The callback for creating a new [PlantAction].
-  Future<void> _onPlantActionCreated() async {
-    // If no plant is selected, show a snackbar and return.
-    if (_currentPlant == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.error,
-                  color: Colors.red,
-                ),
-              ),
-              Text(
-                tr('plants.none'),
-              ),
-            ],
-          ),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
-
-    final currentPlant = _currentPlant!;
-    final PlantAction action;
-
-    // CHeck the current plant action type, check the form validity and create the action.
-    if (_currentPlantActionType == PlantActionType.watering) {
-      final isValid = _plantWateringWidgetKey.currentState!.isValid;
-      if (!isValid) {
-        return;
-      }
-      final watering = _plantWateringWidgetKey.currentState!.watering;
-      action = PlantWateringAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-        amount: watering,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-    if (_currentPlantActionType == PlantActionType.fertilizing) {
-      // In case of fertilizing, check if the form has fertilizers.
-      final hasFertilizer = _plantFertilizingFormKey.currentState!.hasFertilizers;
-      if (!hasFertilizer) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Icon(
-                    Icons.error,
-                    color: Colors.red,
-                  ),
-                ),
-                Text(
-                  tr('fertilizers.none'),
-                ),
-              ],
-            ),
-            duration: const Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-      final isValid = _plantFertilizingFormKey.currentState!.isValid;
-      if (!isValid) {
-        return;
-      }
-      final fertilization = _plantFertilizingFormKey.currentState!.fertilization;
-      action = PlantFertilizingAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-        fertilization: fertilization,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-    if (_currentPlantActionType == PlantActionType.pruning) {
-      final pruning = _plantPruningFormKey.currentState!.pruningType;
-      action = PlantPruningAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-        pruningType: pruning,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-
-    if (_currentPlantActionType == PlantActionType.harvesting) {
-      final isValid = _plantHarvestingFormKey.currentState!.isValid;
-      if (!isValid) {
-        return;
-      }
-      final harvesting = _plantHarvestingFormKey.currentState!.harvest;
-      action = PlantHarvestingAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-        amount: harvesting,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-
-    if (_currentPlantActionType == PlantActionType.training) {
-      final training = _plantTrainingFormKey.currentState!.trainingType;
-      action = PlantTrainingAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-        trainingType: training,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-
-    // In case of measuring, check the measurement type and create the action.
-    if (_currentPlantActionType == PlantActionType.measuring) {
-      final currentPlantMeasurementType = _plantMeasuringFormKey.currentState!.measurementType;
-      if (currentPlantMeasurementType == PlantMeasurementType.height) {
-        final isValid = _plantHeightMeasurementWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final height = _plantHeightMeasurementWidgetKey.currentState!.height;
-        action = PlantMeasurementAction(
-          id: const Uuid().v4().toString(),
-          description: _plantActionDescriptionTextController.text,
-          plantId: currentPlant.id,
-          type: _currentPlantActionType,
-          createdAt: _plantActionDate,
-          measurement: PlantMeasurement(
-            type: currentPlantMeasurementType,
-            measurement: height.toJson(),
-          ),
-        );
-        await widget.actionsProvider
-            .addPlantAction(action)
-            .whenComplete(() => Navigator.of(context).pop());
-        return;
-      } else if (currentPlantMeasurementType == PlantMeasurementType.pH) {
-        final isValid = _plantPHMeasurementWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final ph = _plantPHMeasurementWidgetKey.currentState!.ph;
-        action = PlantMeasurementAction(
-          id: const Uuid().v4().toString(),
-          description: _plantActionDescriptionTextController.text,
-          plantId: currentPlant.id,
-          type: _currentPlantActionType,
-          createdAt: _plantActionDate,
-          measurement: PlantMeasurement(
-            type: currentPlantMeasurementType,
-            measurement: Map<String, dynamic>.from({'ph': ph}),
-          ),
-        );
-        await widget.actionsProvider
-            .addPlantAction(action)
-            .whenComplete(() => Navigator.of(context).pop());
-        return;
-      } else if (currentPlantMeasurementType == PlantMeasurementType.ec) {
-        final isValid = _plantECMeasurementWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final ec = _plantECMeasurementWidgetKey.currentState!.ec;
-        action = PlantMeasurementAction(
-          id: const Uuid().v4().toString(),
-          description: _plantActionDescriptionTextController.text,
-          plantId: currentPlant.id,
-          type: _currentPlantActionType,
-          createdAt: _plantActionDate,
-          measurement: PlantMeasurement(
-            type: currentPlantMeasurementType,
-            measurement: Map<String, dynamic>.from({'ec': ec}),
-          ),
-        );
-        await widget.actionsProvider
-            .addPlantAction(action)
-            .whenComplete(() => Navigator.of(context).pop());
-        return;
-      } else if (currentPlantMeasurementType == PlantMeasurementType.ppm) {
-        final isValid = _plantPPMMeasurementWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final ppm = _plantPPMMeasurementWidgetKey.currentState!.ppm;
-        action = PlantMeasurementAction(
-          id: const Uuid().v4().toString(),
-          description: _plantActionDescriptionTextController.text,
-          plantId: currentPlant.id,
-          type: _currentPlantActionType,
-          createdAt: _plantActionDate,
-          measurement: PlantMeasurement(
-            type: currentPlantMeasurementType,
-            measurement: Map<String, dynamic>.from({'ppm': ppm}),
-          ),
-        );
-        await widget.actionsProvider
-            .addPlantAction(action)
-            .whenComplete(() => Navigator.of(context).pop());
-        return;
-      } else {
-        throw Exception('Unknown plant measurement type: $currentPlantMeasurementType');
-      }
-    }
-
-    if (_currentPlantActionType == PlantActionType.picture) {
-      final images = _plantPictureFormState.currentState!.images;
-      if (images.isEmpty) {
-        _showImageSelectionMandatorySnackbar();
-        return;
-      }
-      final action = PlantPictureAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-        images: images,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-
-    if (_currentPlantActionType == PlantActionType.replanting) {
-      action = PlantReplantingAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-
-    if (_currentPlantActionType == PlantActionType.death) {
-      action = PlantDeathAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-
-    if (_currentPlantActionType == PlantActionType.other) {
-      action = PlantOtherAction(
-        id: const Uuid().v4().toString(),
-        description: _plantActionDescriptionTextController.text,
-        plantId: currentPlant.id,
-        type: _currentPlantActionType,
-        createdAt: _plantActionDate,
-      );
-      await widget.actionsProvider
-          .addPlantAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-
-    throw Exception('Unknown action type: $_currentPlantActionType');
-  }
-
-  /// Update the current environment.
-  void _updateCurrentEnvironment(Environment? environment) {
-    setState(() {
-      _currentEnvironment = environment!;
-    });
-  }
-
-  /// Update the current environment action type.
-  void _updateCurrentEnvironmentActionType(EnvironmentActionType? actionType) {
-    setState(() {
-      _currentEnvironmentActionType = actionType!;
-    });
-  }
-
-  /// The specific environment action form.
-  Widget _environmentActionForm() {
-    switch (_currentEnvironmentActionType) {
-      case EnvironmentActionType.measurement:
-        return EnvironmentMeasurementForm(
-          key: _environmentMeasurementFormKey,
-          environmentTemperatureFormKey: _environmentTemperatureWidgetKey,
-          environmentHumidityFormKey: _environmentHumidityWidgetKey,
-          environmentLightDistanceFormKey: _environmentLightDistanceWidgetKey,
-          environmentCO2FormKey: _environmentCO2WidgetKey,
-        );
-      case EnvironmentActionType.picture:
-        return PictureForm(
-          key: _environmentPictureFormState,
-          allowMultiple: true,
-          images: const [],
-        );
-      case EnvironmentActionType.other:
-        return Container();
-    }
-  }
-
-  /// The callback for creating a new [EnvironmentAction].
-  Future<void> _onEnvironmentActionCreated() async {
-    if (_currentEnvironment == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.error,
-                  color: Colors.red,
-                ),
-              ),
-              Text(
-                tr('environments.none'),
-              ),
-            ],
-          ),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-      return;
-    }
-    final currentEnvironment = _currentEnvironment!;
-    if (_currentEnvironmentActionType == EnvironmentActionType.measurement) {
-      EnvironmentMeasurement measurement;
-      final currentEnvironmentMeasurementType =
-          _environmentMeasurementFormKey.currentState!.measurementType;
-      if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.temperature) {
-        final isValid = _environmentTemperatureWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final temperature = _environmentTemperatureWidgetKey.currentState!.temperature;
-        measurement = EnvironmentMeasurement(
-          type: currentEnvironmentMeasurementType,
-          measurement: temperature.toJson(),
-        );
-      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.humidity) {
-        final isValid = _environmentHumidityWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final humidity = _environmentHumidityWidgetKey.currentState!.humidity;
-        measurement = EnvironmentMeasurement(
-            type: currentEnvironmentMeasurementType,
-            measurement: Map<String, dynamic>.from({'humidity': humidity}));
-      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.lightDistance) {
-        final isValid = _environmentLightDistanceWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final distance = _environmentLightDistanceWidgetKey.currentState!.distance;
-        measurement = EnvironmentMeasurement(
-          type: currentEnvironmentMeasurementType,
-          measurement: distance.toJson(),
-        );
-      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.co2) {
-        final isValid = _environmentCO2WidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final co2 = _environmentCO2WidgetKey.currentState!.co2;
-        measurement = EnvironmentMeasurement(
-            type: currentEnvironmentMeasurementType,
-            measurement: Map<String, dynamic>.from({'co2': co2}));
-      } else {
-        throw Exception('Unknown environment measurement type: $currentEnvironmentMeasurementType');
-      }
-      final action = EnvironmentMeasurementAction(
-        id: const Uuid().v4().toString(),
-        description: _environmentActionDescriptionTextController.text,
-        environmentId: currentEnvironment.id,
-        type: _currentEnvironmentActionType,
-        measurement: measurement,
-        createdAt: _environmentActionDate,
-      );
-      await widget.actionsProvider
-          .addEnvironmentAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-
-    if (_currentEnvironmentActionType == EnvironmentActionType.picture) {
-      final images = _environmentPictureFormState.currentState!.images;
-      if (images.isEmpty) {
-        _showImageSelectionMandatorySnackbar();
-        return;
-      }
-      final action = EnvironmentPictureAction(
-        id: const Uuid().v4().toString(),
-        description: _environmentActionDescriptionTextController.text,
-        environmentId: currentEnvironment.id,
-        type: _currentEnvironmentActionType,
-        createdAt: _environmentActionDate,
-        images: images,
-      );
-      await widget.actionsProvider
-          .addEnvironmentAction(action)
-          .whenComplete(() => Navigator.of(context).pop());
-      return;
-    }
-    final action = EnvironmentOtherAction(
-      id: const Uuid().v4().toString(),
-      description: _environmentActionDescriptionTextController.text,
-      environmentId: currentEnvironment.id,
-      type: _currentEnvironmentActionType,
-      createdAt: _environmentActionDate,
-    );
-    await widget.actionsProvider
-        .addEnvironmentAction(action)
-        .whenComplete(() => Navigator.of(context).pop());
-  }
 }
 
 /// A form to display the CO2 measurement in the environment.
 class EnvironmentCO2Form extends StatefulWidget {
   final GlobalKey<FormState> formKey;
+  final EnvironmentMeasurementAction? action;
 
-  const EnvironmentCO2Form({super.key, required this.formKey});
+  const EnvironmentCO2Form({
+    super.key,
+    required this.formKey,
+    this.action,
+  });
 
   @override
   State<EnvironmentCO2Form> createState() => EnvironmentCO2MeasurementFormState();
@@ -1332,7 +540,12 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
   @override
   void initState() {
     super.initState();
-    _co2Controller = TextEditingController();
+    if (widget.action != null) {
+      final co2 = widget.action!.measurement.measurement['co2'] as double;
+      _co2Controller = TextEditingController(text: co2.toString());
+    } else {
+      _co2Controller = TextEditingController();
+    }
   }
 
   @override
@@ -1372,8 +585,13 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
 /// A form to display the distance of the light in the environment.
 class EnvironmentLightDistanceForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
+  final EnvironmentMeasurementAction? action;
 
-  const EnvironmentLightDistanceForm({super.key, required this.formKey});
+  const EnvironmentLightDistanceForm({
+    super.key,
+    required this.formKey,
+    this.action,
+  });
 
   @override
   State<EnvironmentLightDistanceForm> createState() =>
@@ -1387,8 +605,14 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
   @override
   void initState() {
     super.initState();
-    _distanceController = TextEditingController();
-    _distanceUnit = MeasurementUnit.cm;
+    if (widget.action != null) {
+      final distance = MeasurementAmount.fromJson(widget.action!.measurement.measurement);
+      _distanceController = TextEditingController(text: distance.value.toString());
+      _distanceUnit = distance.measurementUnit;
+    } else {
+      _distanceController = TextEditingController();
+      _distanceUnit = MeasurementUnit.cm;
+    }
   }
 
   @override
@@ -1401,7 +625,7 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
   MeasurementAmount get distance {
     return MeasurementAmount(
       value: double.parse(_distanceController.text),
-      unit: _distanceUnit,
+      measurementUnit: _distanceUnit,
     );
   }
 
@@ -1469,9 +693,14 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
 
 /// A form to display the humidity measurement in the environment.
 class EnvironmentHumidityForm extends StatefulWidget {
+  final EnvironmentMeasurementAction? action;
   final GlobalKey<FormState> formKey;
 
-  const EnvironmentHumidityForm({super.key, required this.formKey});
+  const EnvironmentHumidityForm({
+    super.key,
+    required this.formKey,
+    this.action,
+  });
 
   @override
   State<EnvironmentHumidityForm> createState() => EnvironmentHumidityMeasurementFormState();
@@ -1483,7 +712,12 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
   @override
   void initState() {
     super.initState();
-    _humidityController = TextEditingController();
+    if (widget.action != null) {
+      final humidity = widget.action!.measurement.measurement['humidity'] as double;
+      _humidityController = TextEditingController(text: humidity.toString());
+    } else {
+      _humidityController = TextEditingController();
+    }
   }
 
   @override
@@ -1525,9 +759,14 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
 
 /// A form to display the temperature measurement in the environment.
 class EnvironmentTemperatureForm extends StatefulWidget {
+  final EnvironmentMeasurementAction? action;
   final GlobalKey<FormState> formKey;
 
-  const EnvironmentTemperatureForm({super.key, required this.formKey});
+  const EnvironmentTemperatureForm({
+    super.key,
+    required this.formKey,
+    this.action,
+  });
 
   @override
   State<EnvironmentTemperatureForm> createState() => EnvironmentTemperatureMeasurementFormState();
@@ -1540,8 +779,14 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
   @override
   void initState() {
     super.initState();
-    _temperatureController = TextEditingController();
-    _temperatureUnit = TemperatureUnit.celsius;
+    if (widget.action != null) {
+      final temperature = Temperature.fromJson(widget.action!.measurement.measurement);
+      _temperatureController = TextEditingController(text: temperature.value.toString());
+      _temperatureUnit = temperature.temperatureUnit;
+    } else {
+      _temperatureController = TextEditingController();
+      _temperatureUnit = TemperatureUnit.celsius;
+    }
   }
 
   @override
@@ -1554,7 +799,7 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
   Temperature get temperature {
     return Temperature(
       value: double.parse(_temperatureController.text),
-      unit: _temperatureUnit,
+      temperatureUnit: _temperatureUnit,
     );
   }
 
@@ -1599,7 +844,7 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
                       .map(
                         (unit) => DropdownMenuItem(
                           value: unit,
-                          child: Text(unit.name),
+                          child: Text(unit.symbol),
                         ),
                       )
                       .toList(),
@@ -2236,7 +1481,7 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
   MeasurementAmount get height {
     return MeasurementAmount(
       value: double.parse(_heightController.text),
-      unit: _heightUnit,
+      measurementUnit: _heightUnit,
     );
   }
 
@@ -2278,7 +1523,7 @@ class PlantHeightMeasurementFormState extends State<PlantHeightMeasurementForm> 
                       .map(
                         (unit) => DropdownMenuItem(
                           value: unit,
-                          child: Text(unit.name),
+                          child: Text(unit.symbol),
                         ),
                       )
                       .toList(),
@@ -2619,6 +1864,7 @@ class PictureFormState extends State<PictureForm> {
 
 /// A form to display the type of the environment measurement.
 class EnvironmentMeasurementForm extends StatefulWidget {
+  final EnvironmentMeasurementAction? action;
   final GlobalKey<EnvironmentCO2MeasurementFormState> environmentCO2FormKey;
   final GlobalKey<EnvironmentHumidityMeasurementFormState> environmentHumidityFormKey;
   final GlobalKey<EnvironmentLightDistanceMeasurementFormState> environmentLightDistanceFormKey;
@@ -2626,6 +1872,7 @@ class EnvironmentMeasurementForm extends StatefulWidget {
 
   const EnvironmentMeasurementForm({
     super.key,
+    required this.action,
     required this.environmentCO2FormKey,
     required this.environmentHumidityFormKey,
     required this.environmentLightDistanceFormKey,
@@ -2642,7 +1889,22 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
   @override
   void initState() {
     super.initState();
-    _measurementType = EnvironmentMeasurementType.temperature;
+    if (widget.action != null) {
+      final measurement = widget.action!.measurement;
+      if (measurement.measurement.containsKey('temperatureUnit')) {
+        _measurementType = EnvironmentMeasurementType.temperature;
+      } else if (measurement.measurement.containsKey('humidity')) {
+        _measurementType = EnvironmentMeasurementType.humidity;
+      } else if (measurement.measurement.containsKey('co2')) {
+        _measurementType = EnvironmentMeasurementType.co2;
+      } else if (measurement.measurement.containsKey('measurementUnit    ')) {
+        _measurementType = EnvironmentMeasurementType.lightDistance;
+      } else {
+        throw Exception('Unknown measurement type');
+      }
+    } else {
+      _measurementType = EnvironmentMeasurementType.temperature;
+    }
   }
 
   /// The current measurement type.
@@ -2692,23 +1954,1036 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
       case EnvironmentMeasurementType.temperature:
         return EnvironmentTemperatureForm(
           key: widget.environmentTemperatureFormKey,
+          action: widget.action,
           formKey: GlobalKey<FormState>(),
         );
       case EnvironmentMeasurementType.humidity:
         return EnvironmentHumidityForm(
           key: widget.environmentHumidityFormKey,
+          action: widget.action,
           formKey: GlobalKey<FormState>(),
         );
       case EnvironmentMeasurementType.co2:
         return EnvironmentCO2Form(
           key: widget.environmentCO2FormKey,
+          action: widget.action,
           formKey: GlobalKey<FormState>(),
         );
       case EnvironmentMeasurementType.lightDistance:
         return EnvironmentLightDistanceForm(
           key: widget.environmentLightDistanceFormKey,
+          action: widget.action,
           formKey: GlobalKey<FormState>(),
         );
+    }
+  }
+}
+
+/// A view to create a plant action.
+class CreatePlantActionView extends StatefulWidget {
+  final PlantsProvider plantsProvider;
+  final ActionsProvider actionsProvider;
+  final FertilizerProvider fertilizerProvider;
+
+  const CreatePlantActionView({
+    super.key,
+    required this.plantsProvider,
+    required this.actionsProvider,
+    required this.fertilizerProvider,
+  });
+
+  @override
+  State<CreatePlantActionView> createState() => _CreatePlantActionViewState();
+}
+
+class _CreatePlantActionViewState extends State<CreatePlantActionView> {
+  /// Plant actions widget keys
+
+  final GlobalKey<_PlantMeasurementFormState> _plantMeasuringFormKey = GlobalKey();
+  final GlobalKey<_PlantWateringFormState> _plantWateringWidgetKey = GlobalKey();
+  final GlobalKey<_PlantFertilizingFormState> _plantFertilizingFormKey = GlobalKey();
+  final GlobalKey<_PlantPruningFormState> _plantPruningFormKey = GlobalKey();
+  final GlobalKey<_PlantHarvestingFormState> _plantHarvestingFormKey = GlobalKey();
+  final GlobalKey<_PlantTrainingFormState> _plantTrainingFormKey = GlobalKey();
+  final GlobalKey<PictureFormState> _plantPictureFormState = GlobalKey();
+
+  final GlobalKey<PlantHeightMeasurementFormState> _plantHeightMeasurementWidgetKey = GlobalKey();
+  final GlobalKey<PlantPHMeasurementFormState> _plantPHMeasurementWidgetKey = GlobalKey();
+  final GlobalKey<PlantECMeasurementFormState> _plantECMeasurementWidgetKey = GlobalKey();
+  final GlobalKey<PlantPPMMeasurementFormState> _plantPPMMeasurementWidgetKey = GlobalKey();
+
+  /// Plant form information
+
+  Plant? _currentPlant;
+  late PlantActionType _currentPlantActionType = PlantActionType.watering;
+  late TextEditingController _plantActionDescriptionTextController = TextEditingController();
+  DateTime _plantActionDate = DateTime.now();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(tr('actions.plants.create')),
+      ),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            children: [
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text(tr('actions.plants.choose')),
+                      StreamBuilder<Map<String, Plant>>(
+                          stream: widget.plantsProvider.plants,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+
+                            if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            }
+
+                            final plants = snapshot.data!;
+                            if (plants.isEmpty) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: Text(tr('plants.none')),
+                                ),
+                              );
+                            }
+                            return DropdownButton<Plant>(
+                              icon: const Icon(Icons.arrow_downward_sharp),
+                              isExpanded: true,
+                              items: plants.values
+                                  .map(
+                                    (plant) => DropdownMenuItem<Plant>(
+                                      value: plant,
+                                      child: Text(plant.name),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (Plant? value) => _updateCurrentPlant(value),
+                              hint: Text(tr('plants.mandatory')),
+                              value: _currentPlant,
+                            );
+                          }),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          const Icon(Icons.calendar_month),
+                          Text('${tr('common.select_date')}: '),
+                          TextButton(
+                            onPressed: () => _selectDate(
+                              context,
+                              (date) {
+                                setState(() {
+                                  _plantActionDate = date;
+                                });
+                              },
+                            ),
+                            child: Text(
+                              '${_plantActionDate.toLocal()}'.split(' ')[0],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+                      TextField(
+                        controller: _plantActionDescriptionTextController,
+                        maxLines: null,
+                        minLines: 5,
+                        decoration: InputDecoration(
+                          labelText: tr('common.description'),
+                          hintText: tr('actions.plants.description_hint'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const Divider(),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Column(
+                        children: [
+                          DropdownButton<PlantActionType>(
+                            icon: const Icon(Icons.arrow_downward_sharp),
+                            value: _currentPlantActionType,
+                            isExpanded: true,
+                            items: PlantActionType.values
+                                .map(
+                                  (action) => DropdownMenuItem<PlantActionType>(
+                                    value: action,
+                                    child: Row(
+                                      children: [
+                                        Text(action.icon),
+                                        const SizedBox(width: 10),
+                                        Text(action.name),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (PlantActionType? value) =>
+                                _updateCurrentPlantActionType(value),
+                          ),
+                        ],
+                      ),
+                      _plantActionForm(),
+                    ],
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: OutlinedButton.icon(
+                  onPressed: () async => await _onPlantActionCreated(),
+                  label: Text(tr('common.save')),
+                  icon: const Icon(Icons.save),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Update the current plant.
+  void _updateCurrentPlant(Plant? plant) {
+    setState(() {
+      _currentPlant = plant!;
+    });
+  }
+
+  /// Update the current plant action type.
+  void _updateCurrentPlantActionType(PlantActionType? actionType) {
+    setState(() {
+      _currentPlantActionType = actionType!;
+    });
+  }
+
+  /// Show a snackbar if no images are selected.
+  void _showImageSelectionMandatorySnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.error,
+                color: Colors.red,
+              ),
+            ),
+            Text(
+              tr('common.images_mandatory'),
+            ),
+          ],
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  /// Open up a date picker to select a date.
+  Future<void> _selectDate(BuildContext context, Function(DateTime) dateCallback) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null) {
+      dateCallback(picked);
+    }
+  }
+
+  /// The specific plant action form.
+  Widget _plantActionForm() {
+    switch (_currentPlantActionType) {
+      case PlantActionType.watering:
+        return PlantWateringForm(
+          key: _plantWateringWidgetKey,
+          formKey: GlobalKey<FormState>(),
+        );
+      case PlantActionType.fertilizing:
+        return PlantFertilizingForm(
+          key: _plantFertilizingFormKey,
+          formKey: GlobalKey<FormState>(),
+          fertilizerProvider: widget.fertilizerProvider,
+        );
+      case PlantActionType.pruning:
+        return PlantPruningForm(
+          key: _plantPruningFormKey,
+        );
+      case PlantActionType.replanting:
+        return Container();
+      case PlantActionType.training:
+        return PlantTrainingForm(
+          key: _plantTrainingFormKey,
+        );
+      case PlantActionType.harvesting:
+        return PlantHarvestingForm(
+          key: _plantHarvestingFormKey,
+          formKey: GlobalKey<FormState>(),
+        );
+      case PlantActionType.measuring:
+        return PlantMeasurementForm(
+          key: _plantMeasuringFormKey,
+          plantMeasurementWidgetKey: _plantHeightMeasurementWidgetKey,
+          plantPHMeasurementFormKey: _plantPHMeasurementWidgetKey,
+          plantECMeasurementFormKey: _plantECMeasurementWidgetKey,
+          plantPPMMeasurementFormKey: _plantPPMMeasurementWidgetKey,
+        );
+      case PlantActionType.picture:
+        return PictureForm(
+          key: _plantPictureFormState,
+          allowMultiple: true,
+          images: const [],
+        );
+      case PlantActionType.death:
+      case PlantActionType.other:
+        return Container();
+    }
+  }
+
+  /// The callback for creating a new [PlantAction].
+  Future<void> _onPlantActionCreated() async {
+    // If no plant is selected, show a snackbar and return.
+    if (_currentPlant == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+              ),
+              Text(
+                tr('plants.none'),
+              ),
+            ],
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    final currentPlant = _currentPlant!;
+    final PlantAction action;
+
+    // CHeck the current plant action type, check the form validity and create the action.
+    if (_currentPlantActionType == PlantActionType.watering) {
+      final isValid = _plantWateringWidgetKey.currentState!.isValid;
+      if (!isValid) {
+        return;
+      }
+      final watering = _plantWateringWidgetKey.currentState!.watering;
+      action = PlantWateringAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+        amount: watering,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+    if (_currentPlantActionType == PlantActionType.fertilizing) {
+      // In case of fertilizing, check if the form has fertilizers.
+      final hasFertilizer = _plantFertilizingFormKey.currentState!.hasFertilizers;
+      if (!hasFertilizer) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.error,
+                    color: Colors.red,
+                  ),
+                ),
+                Text(
+                  tr('fertilizers.none'),
+                ),
+              ],
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+        return;
+      }
+      final isValid = _plantFertilizingFormKey.currentState!.isValid;
+      if (!isValid) {
+        return;
+      }
+      final fertilization = _plantFertilizingFormKey.currentState!.fertilization;
+      action = PlantFertilizingAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+        fertilization: fertilization,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+    if (_currentPlantActionType == PlantActionType.pruning) {
+      final pruning = _plantPruningFormKey.currentState!.pruningType;
+      action = PlantPruningAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+        pruningType: pruning,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+
+    if (_currentPlantActionType == PlantActionType.harvesting) {
+      final isValid = _plantHarvestingFormKey.currentState!.isValid;
+      if (!isValid) {
+        return;
+      }
+      final harvesting = _plantHarvestingFormKey.currentState!.harvest;
+      action = PlantHarvestingAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+        amount: harvesting,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+
+    if (_currentPlantActionType == PlantActionType.training) {
+      final training = _plantTrainingFormKey.currentState!.trainingType;
+      action = PlantTrainingAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+        trainingType: training,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+
+    // In case of measuring, check the measurement type and create the action.
+    if (_currentPlantActionType == PlantActionType.measuring) {
+      final currentPlantMeasurementType = _plantMeasuringFormKey.currentState!.measurementType;
+      if (currentPlantMeasurementType == PlantMeasurementType.height) {
+        final isValid = _plantHeightMeasurementWidgetKey.currentState!.isValid;
+        if (!isValid) {
+          return;
+        }
+        final height = _plantHeightMeasurementWidgetKey.currentState!.height;
+        action = PlantMeasurementAction(
+          id: const Uuid().v4().toString(),
+          description: _plantActionDescriptionTextController.text,
+          plantId: currentPlant.id,
+          type: _currentPlantActionType,
+          createdAt: _plantActionDate,
+          measurement: PlantMeasurement(
+            type: currentPlantMeasurementType,
+            measurement: height.toJson(),
+          ),
+        );
+        await widget.actionsProvider
+            .addPlantAction(action)
+            .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+        return;
+      } else if (currentPlantMeasurementType == PlantMeasurementType.pH) {
+        final isValid = _plantPHMeasurementWidgetKey.currentState!.isValid;
+        if (!isValid) {
+          return;
+        }
+        final ph = _plantPHMeasurementWidgetKey.currentState!.ph;
+        action = PlantMeasurementAction(
+          id: const Uuid().v4().toString(),
+          description: _plantActionDescriptionTextController.text,
+          plantId: currentPlant.id,
+          type: _currentPlantActionType,
+          createdAt: _plantActionDate,
+          measurement: PlantMeasurement(
+            type: currentPlantMeasurementType,
+            measurement: Map<String, dynamic>.from({'ph': ph}),
+          ),
+        );
+        await widget.actionsProvider
+            .addPlantAction(action)
+            .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+        return;
+      } else if (currentPlantMeasurementType == PlantMeasurementType.ec) {
+        final isValid = _plantECMeasurementWidgetKey.currentState!.isValid;
+        if (!isValid) {
+          return;
+        }
+        final ec = _plantECMeasurementWidgetKey.currentState!.ec;
+        action = PlantMeasurementAction(
+          id: const Uuid().v4().toString(),
+          description: _plantActionDescriptionTextController.text,
+          plantId: currentPlant.id,
+          type: _currentPlantActionType,
+          createdAt: _plantActionDate,
+          measurement: PlantMeasurement(
+            type: currentPlantMeasurementType,
+            measurement: Map<String, dynamic>.from({'ec': ec}),
+          ),
+        );
+        await widget.actionsProvider
+            .addPlantAction(action)
+            .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+        return;
+      } else if (currentPlantMeasurementType == PlantMeasurementType.ppm) {
+        final isValid = _plantPPMMeasurementWidgetKey.currentState!.isValid;
+        if (!isValid) {
+          return;
+        }
+        final ppm = _plantPPMMeasurementWidgetKey.currentState!.ppm;
+        action = PlantMeasurementAction(
+          id: const Uuid().v4().toString(),
+          description: _plantActionDescriptionTextController.text,
+          plantId: currentPlant.id,
+          type: _currentPlantActionType,
+          createdAt: _plantActionDate,
+          measurement: PlantMeasurement(
+            type: currentPlantMeasurementType,
+            measurement: Map<String, dynamic>.from({'ppm': ppm}),
+          ),
+        );
+        await widget.actionsProvider
+            .addPlantAction(action)
+            .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+        return;
+      } else {
+        throw Exception('Unknown plant measurement type: $currentPlantMeasurementType');
+      }
+    }
+
+    if (_currentPlantActionType == PlantActionType.picture) {
+      final images = _plantPictureFormState.currentState!.images;
+      if (images.isEmpty) {
+        _showImageSelectionMandatorySnackbar();
+        return;
+      }
+      final action = PlantPictureAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+        images: images,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+
+    if (_currentPlantActionType == PlantActionType.replanting) {
+      action = PlantReplantingAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+
+    if (_currentPlantActionType == PlantActionType.death) {
+      action = PlantDeathAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+
+    if (_currentPlantActionType == PlantActionType.other) {
+      action = PlantOtherAction(
+        id: const Uuid().v4().toString(),
+        description: _plantActionDescriptionTextController.text,
+        plantId: currentPlant.id,
+        type: _currentPlantActionType,
+        createdAt: _plantActionDate,
+      );
+      await widget.actionsProvider
+          .addPlantAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+
+    throw Exception('Unknown action type: $_currentPlantActionType');
+  }
+}
+
+/// A view to create an environment action.
+class CreateEnvironmentActionView extends StatefulWidget {
+  final ActionsProvider actionsProvider;
+  final EnvironmentsProvider environmentsProvider;
+
+  const CreateEnvironmentActionView({
+    super.key,
+    required this.actionsProvider,
+    required this.environmentsProvider,
+  });
+
+  @override
+  State<CreateEnvironmentActionView> createState() => _CreateEnvironmentActionViewState();
+}
+
+class _CreateEnvironmentActionViewState extends State<CreateEnvironmentActionView> {
+  @override
+  Widget build(BuildContext context) {
+    return EnvironmentActionForm(
+      title: tr('actions.environments.create'),
+      action: null,
+      actionsProvider: widget.actionsProvider,
+      environmentsProvider: widget.environmentsProvider,
+    );
+  }
+}
+
+/// A view to edit an environment action.
+class EditEnvironmentActionView extends StatefulWidget {
+  final EnvironmentAction action;
+  final ActionsProvider actionsProvider;
+  final EnvironmentsProvider environmentsProvider;
+
+  const EditEnvironmentActionView({
+    super.key,
+    required this.action,
+    required this.actionsProvider,
+    required this.environmentsProvider,
+  });
+
+  @override
+  State<EditEnvironmentActionView> createState() => _EditEnvironmentActionViewState();
+}
+
+class _EditEnvironmentActionViewState extends State<EditEnvironmentActionView> {
+  @override
+  Widget build(BuildContext context) {
+    return EnvironmentActionForm(
+      title: tr('actions.environments.edit'),
+      action: widget.action,
+      actionsProvider: widget.actionsProvider,
+      environmentsProvider: widget.environmentsProvider,
+    );
+  }
+}
+
+/// A general environment action form.
+class EnvironmentActionForm extends StatefulWidget {
+  final String title;
+  final EnvironmentAction? action;
+  final ActionsProvider actionsProvider;
+  final EnvironmentsProvider environmentsProvider;
+
+  const EnvironmentActionForm({
+    super.key,
+    required this.title,
+    required this.action,
+    required this.actionsProvider,
+    required this.environmentsProvider,
+  });
+
+  @override
+  State<EnvironmentActionForm> createState() => _EnvironmentActionFormState();
+}
+
+class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
+  /// Environment actions widget keys
+
+  final GlobalKey<_EnvironmentMeasurementFormState> _environmentMeasurementFormKey = GlobalKey();
+  final GlobalKey<EnvironmentTemperatureMeasurementFormState> _environmentTemperatureWidgetKey =
+      GlobalKey();
+  final GlobalKey<EnvironmentHumidityMeasurementFormState> _environmentHumidityWidgetKey =
+      GlobalKey();
+  final GlobalKey<EnvironmentLightDistanceMeasurementFormState> _environmentLightDistanceWidgetKey =
+      GlobalKey();
+  final GlobalKey<EnvironmentCO2MeasurementFormState> _environmentCO2WidgetKey = GlobalKey();
+  final GlobalKey<PictureFormState> _environmentPictureFormState = GlobalKey();
+
+  Environment? _currentEnvironment;
+  late EnvironmentActionType _currentEnvironmentActionType = EnvironmentActionType.measurement;
+  late final TextEditingController _environmentActionDescriptionTextController =
+      TextEditingController();
+  DateTime _environmentActionDate = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.action != null) {
+      final action = widget.action!;
+      _currentEnvironmentActionType = action.type;
+      _environmentActionDate = action.createdAt;
+      _environmentActionDescriptionTextController.text = action.description;
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _environmentActionDescriptionTextController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    Text(tr('actions.environments.choose')),
+                    StreamBuilder<Map<String, Environment>>(
+                      stream: widget.environmentsProvider.environments,
+                      builder: (builder, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+
+                        if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        }
+
+                        final environments = snapshot.data!;
+                        if (environments.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Center(
+                              child: Text(tr('environments.none')),
+                            ),
+                          );
+                        }
+                        return DropdownButton<Environment>(
+                          icon: const Icon(Icons.arrow_downward_sharp),
+                          isExpanded: true,
+                          items: environments.values
+                              .map(
+                                (e) => DropdownMenuItem<Environment>(
+                                  value: e,
+                                  child: Text(e.name),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (Environment? value) => _updateCurrentEnvironment(value),
+                          hint: Text(tr('environments.mandatory')),
+                          value: _currentEnvironment,
+                        );
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        const Icon(Icons.calendar_month),
+                        Text('${tr('common.select_date')}: '),
+                        TextButton(
+                          onPressed: () => _selectDate(context, (date) {
+                            setState(() {
+                              _environmentActionDate = date;
+                            });
+                          }),
+                          child: Text(
+                            '${_environmentActionDate.toLocal()}'.split(' ')[0],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(),
+                    TextFormField(
+                      controller: _environmentActionDescriptionTextController,
+                      maxLines: null,
+                      minLines: 5,
+                      decoration: InputDecoration(
+                        labelText: tr('common.description'),
+                        hintText: tr('actions.environments.description_hint'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    DropdownButton<EnvironmentActionType>(
+                      icon: const Icon(Icons.arrow_downward_sharp),
+                      value: _currentEnvironmentActionType,
+                      isExpanded: true,
+                      items: EnvironmentActionType.values
+                          .map(
+                            (action) => DropdownMenuItem<EnvironmentActionType>(
+                              value: action,
+                              child: Row(
+                                children: [
+                                  Text(
+                                    action.icon,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text(action.name),
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (EnvironmentActionType? value) =>
+                          _updateCurrentEnvironmentActionType(value),
+                    ),
+                    _environmentActionForm(),
+                  ],
+                ),
+              ),
+            ),
+            const Divider(),
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: () async => await _onEnvironmentActionCreated(),
+                label: Text(tr('common.save')),
+                icon: const Icon(Icons.save),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// The specific environment action form.
+  Widget _environmentActionForm() {
+    switch (_currentEnvironmentActionType) {
+      case EnvironmentActionType.measurement:
+        return EnvironmentMeasurementForm(
+          key: _environmentMeasurementFormKey,
+          action: widget.action as EnvironmentMeasurementAction?,
+          environmentTemperatureFormKey: _environmentTemperatureWidgetKey,
+          environmentHumidityFormKey: _environmentHumidityWidgetKey,
+          environmentLightDistanceFormKey: _environmentLightDistanceWidgetKey,
+          environmentCO2FormKey: _environmentCO2WidgetKey,
+        );
+      case EnvironmentActionType.picture:
+        return PictureForm(
+          key: _environmentPictureFormState,
+          allowMultiple: true,
+          images: const [],
+        );
+      case EnvironmentActionType.other:
+        return Container();
+    }
+  }
+
+  /// Update the current environment.
+  void _updateCurrentEnvironment(Environment? environment) {
+    setState(() {
+      _currentEnvironment = environment!;
+    });
+  }
+
+  /// Update the current environment action type.
+  void _updateCurrentEnvironmentActionType(EnvironmentActionType? actionType) {
+    setState(() {
+      _currentEnvironmentActionType = actionType!;
+    });
+  }
+
+  /// The callback for creating a new [EnvironmentAction].
+  Future<void> _onEnvironmentActionCreated() async {
+    if (_currentEnvironment == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.error,
+                  color: Colors.red,
+                ),
+              ),
+              Text(
+                tr('environments.none'),
+              ),
+            ],
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+    final currentEnvironment = _currentEnvironment!;
+    if (_currentEnvironmentActionType == EnvironmentActionType.measurement) {
+      EnvironmentMeasurement measurement;
+      final currentEnvironmentMeasurementType =
+          _environmentMeasurementFormKey.currentState!.measurementType;
+      if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.temperature) {
+        final isValid = _environmentTemperatureWidgetKey.currentState!.isValid;
+        if (!isValid) {
+          return;
+        }
+        final temperature = _environmentTemperatureWidgetKey.currentState!.temperature;
+        measurement = EnvironmentMeasurement(
+          type: currentEnvironmentMeasurementType,
+          measurement: temperature.toJson(),
+        );
+      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.humidity) {
+        final isValid = _environmentHumidityWidgetKey.currentState!.isValid;
+        if (!isValid) {
+          return;
+        }
+        final humidity = _environmentHumidityWidgetKey.currentState!.humidity;
+        measurement = EnvironmentMeasurement(
+            type: currentEnvironmentMeasurementType,
+            measurement: Map<String, dynamic>.from({'humidity': humidity}));
+      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.lightDistance) {
+        final isValid = _environmentLightDistanceWidgetKey.currentState!.isValid;
+        if (!isValid) {
+          return;
+        }
+        final distance = _environmentLightDistanceWidgetKey.currentState!.distance;
+        measurement = EnvironmentMeasurement(
+          type: currentEnvironmentMeasurementType,
+          measurement: distance.toJson(),
+        );
+      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.co2) {
+        final isValid = _environmentCO2WidgetKey.currentState!.isValid;
+        if (!isValid) {
+          return;
+        }
+        final co2 = _environmentCO2WidgetKey.currentState!.co2;
+        measurement = EnvironmentMeasurement(
+            type: currentEnvironmentMeasurementType,
+            measurement: Map<String, dynamic>.from({'co2': co2}));
+      } else {
+        throw Exception('Unknown environment measurement type: $currentEnvironmentMeasurementType');
+      }
+      final action = EnvironmentMeasurementAction(
+        id: const Uuid().v4().toString(),
+        description: _environmentActionDescriptionTextController.text,
+        environmentId: currentEnvironment.id,
+        type: _currentEnvironmentActionType,
+        measurement: measurement,
+        createdAt: _environmentActionDate,
+      );
+      await widget.actionsProvider
+          .addEnvironmentAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+
+    if (_currentEnvironmentActionType == EnvironmentActionType.picture) {
+      final images = _environmentPictureFormState.currentState!.images;
+      if (images.isEmpty) {
+        _showImageSelectionMandatorySnackbar();
+        return;
+      }
+      final action = EnvironmentPictureAction(
+        id: const Uuid().v4().toString(),
+        description: _environmentActionDescriptionTextController.text,
+        environmentId: currentEnvironment.id,
+        type: _currentEnvironmentActionType,
+        createdAt: _environmentActionDate,
+        images: images,
+      );
+      await widget.actionsProvider
+          .addEnvironmentAction(action)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+      return;
+    }
+    final action = EnvironmentOtherAction(
+      id: const Uuid().v4().toString(),
+      description: _environmentActionDescriptionTextController.text,
+      environmentId: currentEnvironment.id,
+      type: _currentEnvironmentActionType,
+      createdAt: _environmentActionDate,
+    );
+    await widget.actionsProvider
+        .addEnvironmentAction(action)
+        .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+  }
+
+  /// Show a snackbar if no images are selected.
+  void _showImageSelectionMandatorySnackbar() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Icon(
+                Icons.error,
+                color: Colors.red,
+              ),
+            ),
+            Text(
+              tr('common.images_mandatory'),
+            ),
+          ],
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  /// Open up a date picker to select a date.
+  Future<void> _selectDate(BuildContext context, Function(DateTime) dateCallback) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null) {
+      dateCallback(picked);
     }
   }
 }

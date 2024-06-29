@@ -117,15 +117,31 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                                 widget.plantsProvider,
                                 widget.actionsProvider);
                           },
-                          trailing: IconButton(
-                            icon: const Icon(Icons.timeline),
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => EnvironmentActionOverview(
-                                        environment: environment,
-                                        actionsProvider: widget.actionsProvider,
-                                      )));
-                            },
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.bolt),
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => CreateEnvironmentActionView(
+                                            environmentsProvider: widget.environmentsProvider,
+                                            actionsProvider: widget.actionsProvider,
+                                          )));
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.timeline),
+                                onPressed: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => EnvironmentActionOverview(
+                                            environment: environment,
+                                            actionsProvider: widget.actionsProvider,
+                                            environmentsProvider: widget.environmentsProvider,
+                                          )));
+                                },
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -491,15 +507,15 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
               dimension: Dimension(
                   width: MeasurementAmount(
                     value: double.parse(_widthController.text),
-                    unit: MeasurementUnit.cm,
+                    measurementUnit: MeasurementUnit.cm,
                   ),
                   length: MeasurementAmount(
                     value: double.parse(_lengthController.text),
-                    unit: MeasurementUnit.cm,
+                    measurementUnit: MeasurementUnit.cm,
                   ),
                   height: MeasurementAmount(
                     value: double.parse(_heightController.text),
-                    unit: MeasurementUnit.cm,
+                    measurementUnit: MeasurementUnit.cm,
                   )),
               bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
                   ? ''
@@ -546,15 +562,15 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
             dimension: Dimension(
                 width: MeasurementAmount(
                   value: double.parse(_widthController.text),
-                  unit: MeasurementUnit.cm,
+                  measurementUnit: MeasurementUnit.cm,
                 ),
                 length: MeasurementAmount(
                   value: double.parse(_lengthController.text),
-                  unit: MeasurementUnit.cm,
+                  measurementUnit: MeasurementUnit.cm,
                 ),
                 height: MeasurementAmount(
                   value: double.parse(_heightController.text),
-                  unit: MeasurementUnit.cm,
+                  measurementUnit: MeasurementUnit.cm,
                 )),
             bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
                 ? ''

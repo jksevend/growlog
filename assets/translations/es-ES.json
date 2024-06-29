@@ -8,14 +8,18 @@
     },
     "environments": {
       "choose": "Elegir entorno",
+      "create": "Crear acción de entorno",
       "description_hint": "Ingresa una descripción de la acción del entorno",
+      "edit": "Editar acción de entorno",
       "none": "No se han creado acciones de entorno",
       "none_for_this": "No hay acciones para este entorno"
     },
     "none": "No hay acciones",
     "plants": {
       "choose": "Elegir planta",
+      "create": "Crear acción de planta",
       "description_hint": "Ingresa una descripción de la acción de la planta",
+      "edit": "Editar acción de planta",
       "none": "No se han creado acciones de plantas",
       "none_for_this": "No hay acciones para esta planta"
     }

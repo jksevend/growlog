@@ -94,9 +94,9 @@ Future<void> showEnvironmentDetailSheet(
                       environment.dimension == null
                           ? Text(tr('common.dimension_unknown'))
                           : Text(
-                              '${environment.dimension!.width.value}${environment.dimension!.width.unit.symbol} x '
-                              '${environment.dimension!.length.value}${environment.dimension!.length.unit.symbol} x '
-                              '${environment.dimension!.height.value}${environment.dimension!.height.unit.symbol}'),
+                              '${environment.dimension!.width.value}${environment.dimension!.width.measurementUnit.symbol} x '
+                              '${environment.dimension!.length.value}${environment.dimension!.length.measurementUnit.symbol} x '
+                              '${environment.dimension!.height.value}${environment.dimension!.height.measurementUnit.symbol}'),
                     ],
                   ),
                 ),
