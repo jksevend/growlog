@@ -64,7 +64,7 @@ Future<void> showEnvironmentDetailSheet(
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.eco, color: Colors.green),
-                  title: Text(tr('environment.plants')),
+                  title: Text(tr('environments.plants')),
                   subtitle: Text(plants.length.toString()),
                 ),
                 const Divider(),

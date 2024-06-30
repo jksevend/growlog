@@ -32,6 +32,9 @@
     "cancel": "Abbrechen",
     "close": "Schließen",
     "coco": "Kokos",
+    "confirm": "Bestätigen",
+    "confirm_discard_title": "Änderungen verwerfen?",
+    "confirm_discard_description": "Sind Sie sicher, dass Sie die Änderungen verwerfen möchten?",
     "curing": "Aushärten",
     "curing_message": "{name} wird ausgehärtet",
     "death": "Tod",
@@ -152,6 +155,8 @@
       "delete_title": "Pflanze löschen"
     },
     "edit": "{name} bearbeiten",
+    "hint_name": "Geben Sie den Namen der Pflanze ein",
+    "hint_description": "Geben Sie eine Beschreibung der Pflanze ein",
     "mandatory": "Bitte wählen Sie eine Pflanze",
     "none": "Keine Pflanzen",
     "transitions": "Lebenszyklusübergang",

@@ -32,6 +32,9 @@
     "cancel": "Cancelar",
     "close": "Cerrar",
     "coco": "Coco",
+    "confirm": "Confirmar",
+    "confirm_discard_title": "¿Descartar cambios?",
+    "confirm_discard_description": "¿Estás seguro de que quieres descartar los cambios?",
     "curing": "Curado",
     "curing_message": "{name} está curando",
     "death": "Muerte",
@@ -152,6 +155,8 @@
       "delete_title": "Eliminar planta"
     },
     "edit": "Editar {name}",
+    "hint_name": "Ingrese el nombre de la planta",
+    "hint_description": "Ingrese una descripción de la planta",
     "mandatory": "Por favor seleccione una planta",
     "none": "No hay plantas",
     "transitions": "Transición del ciclo de vida",

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,6 +15,7 @@ import 'package:weedy/actions/fertilizer/sheet.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/widget.dart';
+import 'package:weedy/common/dialog.dart';
 import 'package:weedy/common/measurement.dart';
 import 'package:weedy/common/temperature.dart';
 import 'package:weedy/common/validators.dart';
@@ -526,11 +528,13 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 class EnvironmentCO2Form extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final EnvironmentMeasurementAction? action;
+  final Function(bool, double) changeCallback;
 
   const EnvironmentCO2Form({
     super.key,
     required this.formKey,
-    this.action,
+    required this.action,
+    required this.changeCallback,
   });
 
   @override
@@ -580,6 +584,17 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
           hintText: '50',
         ),
         validator: (value) => validateInput(value, isDouble: true),
+        onChanged: (value) {
+          if (double.tryParse(value) == null) {
+            return;
+          }
+
+          if (widget.action == null || widget.action!.measurement.measurement['co2'] != co2) {
+            widget.changeCallback(true, co2);
+          } else {
+            widget.changeCallback(false, co2);
+          }
+        },
       ),
     );
   }
@@ -589,11 +604,13 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
 class EnvironmentLightDistanceForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final EnvironmentMeasurementAction? action;
+  final Function(bool, MeasurementAmount) changeCallback;
 
   const EnvironmentLightDistanceForm({
     super.key,
     required this.formKey,
-    this.action,
+    required this.action,
+    required this.changeCallback,
   });
 
   @override
@@ -656,6 +673,17 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
                   hintText: '50',
                 ),
                 validator: (value) => validateInput(value, isDouble: true),
+                onChanged: (value) {
+                  if (double.tryParse(value) == null) {
+                    return;
+                  }
+
+                  if (widget.action == null || widget.action!.measurement.measurement != distance) {
+                    widget.changeCallback(true, distance);
+                  } else {
+                    widget.changeCallback(false, distance);
+                  }
+                },
               ),
             ),
             const SizedBox(width: 50),
@@ -690,6 +718,14 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
   void _updateMeasurementUnit(MeasurementUnit? value) {
     setState(() {
       _distanceUnit = value!;
+      if (widget.action != null) {
+        final distance = MeasurementAmount.fromJson(widget.action!.measurement.measurement);
+        if (distance.measurementUnit != _distanceUnit) {
+          widget.changeCallback(true, distance);
+        } else {
+          widget.changeCallback(false, distance);
+        }
+      }
     });
   }
 }
@@ -698,11 +734,13 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
 class EnvironmentHumidityForm extends StatefulWidget {
   final EnvironmentMeasurementAction? action;
   final GlobalKey<FormState> formKey;
+  final Function(bool, double) changeCallback;
 
   const EnvironmentHumidityForm({
     super.key,
     required this.formKey,
-    this.action,
+    required this.action,
+    required this.changeCallback,
   });
 
   @override
@@ -754,6 +792,18 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
             hintText: '50',
           ),
           validator: (value) => validateInput(value, isDouble: true),
+          onChanged: (value) {
+            if (double.tryParse(value) == null) {
+              return;
+            }
+
+            if (widget.action == null ||
+                widget.action!.measurement.measurement['humidity'] != humidity) {
+              widget.changeCallback(true, humidity);
+            } else {
+              widget.changeCallback(false, humidity);
+            }
+          },
         ),
       ),
     );
@@ -764,11 +814,13 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
 class EnvironmentTemperatureForm extends StatefulWidget {
   final EnvironmentMeasurementAction? action;
   final GlobalKey<FormState> formKey;
+  final Function(bool, Temperature) changeCallback;
 
   const EnvironmentTemperatureForm({
     super.key,
     required this.formKey,
-    this.action,
+    required this.action,
+    required this.changeCallback,
   });
 
   @override
@@ -779,11 +831,14 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
   late TextEditingController _temperatureController;
   late TemperatureUnit _temperatureUnit;
 
+  late final Temperature _initialTemperature;
+
   @override
   void initState() {
     super.initState();
     if (widget.action != null) {
       final temperature = Temperature.fromJson(widget.action!.measurement.measurement);
+      _initialTemperature = temperature;
       _temperatureController = TextEditingController(text: temperature.value.toString());
       _temperatureUnit = temperature.temperatureUnit;
     } else {
@@ -831,6 +886,21 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
                   hintText: '25',
                 ),
                 validator: (value) => validateInput(value, isDouble: true),
+                onFieldSubmitted: widget.action == null
+                    ? null
+                    : (value) {
+                        _checkTemperature();
+                      },
+                onTapOutside: widget.action == null
+                    ? null
+                    : (focusNode) {
+                        _checkTemperature();
+                      },
+                onEditingComplete: widget.action == null
+                    ? null
+                    : () {
+                        _checkTemperature();
+                      },
               ),
             ),
             const SizedBox(width: 50),
@@ -861,10 +931,31 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
     );
   }
 
+  void _checkTemperature() {
+    if (double.tryParse(_temperatureController.text) == null) {
+      return;
+    }
+
+    if (widget.action != null) {
+      if (_initialTemperature.value != double.parse(_temperatureController.text)) {
+        widget.changeCallback(true, temperature);
+      } else {
+        widget.changeCallback(false, temperature);
+      }
+    }
+  }
+
   /// Update the temperature unit.
   void _updateTemperatureUnit(TemperatureUnit? value) {
     setState(() {
       _temperatureUnit = value!;
+      if (widget.action != null) {
+        if (_initialTemperature.temperatureUnit != _temperatureUnit) {
+          widget.changeCallback(true, temperature);
+        } else {
+          widget.changeCallback(false, temperature);
+        }
+      }
     });
   }
 }
@@ -1781,14 +1872,18 @@ class PlantPPMMeasurementFormState extends State<PlantPPMMeasurementForm> {
 }
 
 /// A form to take pictures.
-class PictureForm extends StatefulWidget {
+class PictureForm<T> extends StatefulWidget {
+  final T? value;
   final bool allowMultiple;
   final List<File> images;
+  final Function(bool, List<File>) changeCallback;
 
   const PictureForm({
     super.key,
+    required this.value,
     required this.allowMultiple,
     required this.images,
+    required this.changeCallback,
   });
 
   @override
@@ -1839,7 +1934,7 @@ class PictureFormState extends State<PictureForm> {
                         return Column(
                           children: [
                             IconButton(
-                              onPressed: () => _removeImage(index),
+                              onPressed: () => _removeImage(index, image),
                               icon: const Icon(Icons.clear, color: Colors.red),
                             ),
                             Image.file(
@@ -1851,8 +1946,7 @@ class PictureFormState extends State<PictureForm> {
                         );
                       },
                     ),
-                    if (widget.allowMultiple) const VerticalDivider(),
-                    _addImageButton(),
+                    if (widget.allowMultiple) _addImageButton(),
                   ],
                 ),
               ),
@@ -1861,9 +1955,24 @@ class PictureFormState extends State<PictureForm> {
   }
 
   /// Remove an image.
-  void _removeImage(int index) {
+  void _removeImage(int index, File image) {
     setState(() {
+      if (widget.value == null) {
+        for (final tempImage in _images) {
+          // We only save app images
+          if (tempImage.path.contains('app_flutter')) {
+            if (image.path == tempImage.path) {
+              tempImage.delete();
+            }
+          }
+        }
+      }
       _images.removeAt(index);
+      if (widget.allowMultiple) {
+        widget.changeCallback(true, _images);
+      } else {
+        widget.changeCallback(false, _images);
+      }
     });
   }
 
@@ -1904,6 +2013,7 @@ class PictureFormState extends State<PictureForm> {
 
         setState(() {
           _images.add(image);
+          widget.changeCallback(true, _images);
         });
       },
       icon: const Icon(Icons.add_a_photo),
@@ -1948,6 +2058,7 @@ class EnvironmentMeasurementForm extends StatefulWidget {
   final GlobalKey<EnvironmentHumidityMeasurementFormState> environmentHumidityFormKey;
   final GlobalKey<EnvironmentLightDistanceMeasurementFormState> environmentLightDistanceFormKey;
   final GlobalKey<EnvironmentTemperatureMeasurementFormState> environmentTemperatureFormKey;
+  final Function(bool, dynamic) changeCallback;
 
   const EnvironmentMeasurementForm({
     super.key,
@@ -1956,6 +2067,7 @@ class EnvironmentMeasurementForm extends StatefulWidget {
     required this.environmentHumidityFormKey,
     required this.environmentLightDistanceFormKey,
     required this.environmentTemperatureFormKey,
+    required this.changeCallback,
   });
 
   @override
@@ -1964,7 +2076,6 @@ class EnvironmentMeasurementForm extends StatefulWidget {
 
 class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm> {
   late EnvironmentMeasurementType _measurementType;
-
   @override
   void initState() {
     super.initState();
@@ -2013,7 +2124,9 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
                 ),
               )
               .toList(),
-          onChanged: (EnvironmentMeasurementType? value) => _updateMeasurementType(value),
+          onChanged: widget.action != null
+              ? null
+              : (EnvironmentMeasurementType? value) => _updateMeasurementType(value),
         ),
         _environmentActionMeasurementForm(),
       ],
@@ -2035,24 +2148,28 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
           key: widget.environmentTemperatureFormKey,
           action: widget.action,
           formKey: GlobalKey<FormState>(),
+          changeCallback: widget.changeCallback,
         );
       case EnvironmentMeasurementType.humidity:
         return EnvironmentHumidityForm(
           key: widget.environmentHumidityFormKey,
           action: widget.action,
           formKey: GlobalKey<FormState>(),
+          changeCallback: widget.changeCallback,
         );
       case EnvironmentMeasurementType.co2:
         return EnvironmentCO2Form(
           key: widget.environmentCO2FormKey,
           action: widget.action,
           formKey: GlobalKey<FormState>(),
+          changeCallback: widget.changeCallback,
         );
       case EnvironmentMeasurementType.lightDistance:
         return EnvironmentLightDistanceForm(
           key: widget.environmentLightDistanceFormKey,
           action: widget.action,
           formKey: GlobalKey<FormState>(),
+          changeCallback: widget.changeCallback,
         );
     }
   }
@@ -2118,7 +2235,6 @@ class _EditPlantActionViewState extends State<EditPlantActionView> {
     );
   }
 }
-
 /// A view to create an environment action.
 class CreateEnvironmentActionView extends StatefulWidget {
   final ActionsProvider actionsProvider;
@@ -2135,13 +2251,45 @@ class CreateEnvironmentActionView extends StatefulWidget {
 }
 
 class _CreateEnvironmentActionViewState extends State<CreateEnvironmentActionView> {
+  bool _hasChanged = false;
+  List<File> _images = [];
+
   @override
   Widget build(BuildContext context) {
-    return EnvironmentActionForm(
-      title: tr('actions.environments.create'),
-      action: null,
-      actionsProvider: widget.actionsProvider,
-      environmentsProvider: widget.environmentsProvider,
+    return PopScope(
+      canPop: !_hasChanged,
+      onPopInvoked: (didPop) async {
+        if (didPop) {
+          return;
+        }
+        if (_hasChanged) {
+          final confirmed = await discardChangesDialog(context);
+          if (confirmed && context.mounted) {
+            // Delete all images that were added.
+            for (var image in _images) {
+              if (image.path.contains('app_flutter')) {
+                image.delete();
+              }
+            }
+            int count = 0;
+            Navigator.of(context).popUntil((route) {
+              return count++ == 2;
+            });
+          }
+        }
+      },
+      child: EnvironmentActionForm(
+        title: tr('actions.environments.create'),
+        action: null,
+        actionsProvider: widget.actionsProvider,
+        environmentsProvider: widget.environmentsProvider,
+        changeCallback: (changed, images) {
+          setState(() {
+            _hasChanged = changed;
+            _images = images;
+          });
+        },
+      ),
     );
   }
 }
@@ -2164,13 +2312,42 @@ class EditEnvironmentActionView extends StatefulWidget {
 }
 
 class _EditEnvironmentActionViewState extends State<EditEnvironmentActionView> {
+  bool _hasChanged = false;
+  List<File> _images = [];
+
   @override
   Widget build(BuildContext context) {
-    return EnvironmentActionForm(
-      title: tr('actions.environments.edit'),
-      action: widget.action,
-      actionsProvider: widget.actionsProvider,
-      environmentsProvider: widget.environmentsProvider,
+    return PopScope(
+      canPop: !_hasChanged,
+      onPopInvoked: (didPop) async {
+        if (didPop) {
+          return;
+        }
+        if (_hasChanged) {
+          final confirmed = await discardChangesDialog(context);
+          if (confirmed && context.mounted) {
+            // Delete all images that were added.
+            for (var image in _images) {
+              if (image.path.contains('app_flutter')) {
+                image.delete();
+              }
+            }
+            Navigator.of(context).pop();
+          }
+        }
+      },
+      child: EnvironmentActionForm(
+        title: tr('actions.environments.edit'),
+        action: widget.action,
+        actionsProvider: widget.actionsProvider,
+        environmentsProvider: widget.environmentsProvider,
+        changeCallback: (changed, images) async {
+          setState(() {
+            _hasChanged = changed;
+            _images = images;
+          });
+        },
+      ),
     );
   }
 }
@@ -2487,11 +2664,12 @@ class _PlantActionFormState extends State<PlantActionForm> {
         final pictureAction = widget.action as PlantPictureAction?;
         return PictureForm(
           key: _plantPictureFormState,
-          allowMultiple: true,
-          images: pictureAction == null
-              ? []
-              : pictureAction.images.map((image) => File(image)).toList(),
-        );
+            value: pictureAction,
+            allowMultiple: true,
+            images: pictureAction == null
+                ? []
+                : pictureAction.images.map((image) => File(image)).toList(),
+            changeCallback: (hasImages, images) {});
       case PlantActionType.death:
       case PlantActionType.other:
         return Container();
@@ -2806,6 +2984,7 @@ class EnvironmentActionForm extends StatefulWidget {
   final EnvironmentAction? action;
   final ActionsProvider actionsProvider;
   final EnvironmentsProvider environmentsProvider;
+  final Function(bool, List<File>)? changeCallback;
 
   const EnvironmentActionForm({
     super.key,
@@ -2813,6 +2992,7 @@ class EnvironmentActionForm extends StatefulWidget {
     required this.action,
     required this.actionsProvider,
     required this.environmentsProvider,
+    required this.changeCallback,
   });
 
   @override
@@ -2838,14 +3018,24 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
       TextEditingController();
   DateTime _environmentActionDate = DateTime.now();
 
+  late final EnvironmentAction _initialAction;
+
   @override
   void initState() {
     super.initState();
     if (widget.action != null) {
+      _initialAction = widget.action!;
       final action = widget.action!;
       _currentEnvironmentActionType = action.type;
       _environmentActionDate = action.createdAt;
       _environmentActionDescriptionTextController.text = action.description;
+
+      // Postframe callback to update the current environment.
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final environments = await widget.environmentsProvider.environments.first;
+        final environment = environments[action.environmentId];
+        _currentEnvironment = environment;
+      });
     }
   }
 
@@ -2861,15 +3051,21 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Text(tr('actions.environments.choose')),
+      body: bodyWidget(),
+    );
+  }
+
+  Widget bodyWidget() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text(tr('actions.environments.choose')),
+                  if (widget.action == null)
                     StreamBuilder<Map<String, Environment>>(
                       stream: widget.environmentsProvider.environments,
                       builder: (builder, snapshot) {
@@ -2890,25 +3086,6 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
                             ),
                           );
                         }
-                        if (widget.action != null) {
-                          _currentEnvironment = environments[widget.action!.environmentId];
-                          DropdownButton<Environment>(
-                            icon: const Icon(Icons.arrow_downward_sharp),
-                            isExpanded: true,
-                                  items: environments.values
-                                      .map(
-                                        (e) => DropdownMenuItem<Environment>(
-                                          value: e,
-                                          child: Text(e.name),
-                                        ),
-                                      )
-                                      .toList(),
-                                  onChanged: (Environment? value) =>
-                                      _updateCurrentEnvironment(value),
-                                  hint: Text(tr('environments.mandatory')),
-                                  value: _currentEnvironment,
-                                );
-                        }
                         return DropdownButton<Environment>(
                           icon: const Icon(Icons.arrow_downward_sharp),
                           isExpanded: true,
@@ -2926,38 +3103,50 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
                         );
                       },
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        const Icon(Icons.calendar_month),
-                        Text('${tr('common.select_date')}: '),
-                        TextButton(
-                          onPressed: () => _selectDate(context, (date) {
-                            setState(() {
-                              _environmentActionDate = date;
-                            });
-                          }),
-                          child: Text(
-                            '${_environmentActionDate.toLocal()}'.split(' ')[0],
-                          ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      const Icon(Icons.calendar_month),
+                      Text('${tr('common.select_date')}: '),
+                      TextButton(
+                        onPressed: () => _selectDate(context, (date) {
+                          setState(() {
+                            _environmentActionDate = date;
+                          });
+                        }),
+                        child: Text(
+                          '${_environmentActionDate.toLocal()}'.split(' ')[0],
                         ),
-                      ],
-                    ),
-                    const Divider(),
-                    TextFormField(
-                      controller: _environmentActionDescriptionTextController,
-                      maxLines: null,
-                      minLines: 5,
-                      decoration: InputDecoration(
-                        labelText: tr('common.description'),
-                        hintText: tr('actions.environments.description_hint'),
                       ),
+                    ],
+                  ),
+                  const Divider(),
+                  TextFormField(
+                    controller: _environmentActionDescriptionTextController,
+                    maxLines: null,
+                    minLines: 5,
+                    decoration: InputDecoration(
+                      labelText: tr('common.description'),
+                      hintText: tr('actions.environments.description_hint'),
                     ),
-                  ],
-                ),
+                    onChanged: (value) {
+                      if (widget.changeCallback != null) {
+                        if (widget.action != null) {
+                          if (_initialAction.description != value) {
+                            widget.changeCallback!(true, []);
+                          } else {
+                            widget.changeCallback!(false, []);
+                          }
+                        }
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
-            const Divider(),
+          ),
+          const Divider(),
+          if (widget.action == null)
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -2986,22 +3175,26 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
                       onChanged: (EnvironmentActionType? value) =>
                           _updateCurrentEnvironmentActionType(value),
                     ),
-                    _environmentActionForm(),
                   ],
                 ),
               ),
             ),
-            const Divider(),
-            Align(
-              alignment: Alignment.centerRight,
-              child: OutlinedButton.icon(
-                onPressed: () async => await _onEnvironmentActionCreated(),
-                label: Text(tr('common.save')),
-                icon: const Icon(Icons.save),
-              ),
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _environmentActionForm(),
             ),
-          ],
-        ),
+          ),
+          const Divider(),
+          Align(
+            alignment: Alignment.centerRight,
+            child: OutlinedButton.icon(
+              onPressed: () async => await _onEnvironmentActionCreated(),
+              label: Text(tr('common.save')),
+              icon: const Icon(Icons.save),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -3017,15 +3210,68 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
           environmentHumidityFormKey: _environmentHumidityWidgetKey,
           environmentLightDistanceFormKey: _environmentLightDistanceWidgetKey,
           environmentCO2FormKey: _environmentCO2WidgetKey,
+          changeCallback: (changed, measurement) {
+            if (widget.changeCallback != null) {
+              if (widget.action != null) {
+                if (changed) {
+                  widget.changeCallback!(true, []);
+                } else {
+                  widget.changeCallback!(false, []);
+                }
+              }
+            }
+          },
         );
       case EnvironmentActionType.picture:
         final pictureAction = widget.action as EnvironmentPictureAction?;
         return PictureForm(
           key: _environmentPictureFormState,
+          value: pictureAction,
           allowMultiple: true,
           images: pictureAction == null
               ? []
               : pictureAction.images.map((image) => File(image)).toList(),
+          changeCallback: (hasImages, images) {
+            if (widget.changeCallback != null) {
+              if (images.isNotEmpty) {
+                // Creation case - pictures were
+                // taken but now user decided to leave the creation screen.
+                if (pictureAction == null && images.isNotEmpty) {
+                  widget.changeCallback!(true, images);
+                  return;
+                }
+
+                // Find the differences between the current images and the new images.
+                final newImages =
+                    images.where((image) => !pictureAction!.images.contains(image.path));
+                if (newImages.isNotEmpty) {
+                  widget.changeCallback!(true, newImages.toList());
+                  return;
+                }
+
+                // First case, action created without pictures, now pictures added
+                // and user wants to save the action.
+                Function eq = const ListEquality().equals;
+                if (eq(pictureAction!.images, images)) {
+                  widget.changeCallback!(true, images);
+                } else {
+                  widget.changeCallback!(false, images);
+                }
+              } else {
+                if (pictureAction == null) {
+                  widget.changeCallback!(false, images);
+                  return;
+                }
+                // Second case, action created with pictures, now pictures removed
+                // and user wants to save the action.
+                if (pictureAction.images.isNotEmpty) {
+                  widget.changeCallback!(true, images);
+                } else {
+                  widget.changeCallback!(false, images);
+                }
+              }
+            }
+          },
         );
       case EnvironmentActionType.other:
         return Container();
@@ -3071,94 +3317,183 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
       return;
     }
     final currentEnvironment = _currentEnvironment!;
-    if (_currentEnvironmentActionType == EnvironmentActionType.measurement) {
-      EnvironmentMeasurement measurement;
-      final currentEnvironmentMeasurementType =
-          _environmentMeasurementFormKey.currentState!.measurementType;
-      if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.temperature) {
-        final isValid = _environmentTemperatureWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final temperature = _environmentTemperatureWidgetKey.currentState!.temperature;
-        measurement = EnvironmentMeasurement(
-          type: currentEnvironmentMeasurementType,
-          measurement: temperature.toJson(),
-        );
-      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.humidity) {
-        final isValid = _environmentHumidityWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final humidity = _environmentHumidityWidgetKey.currentState!.humidity;
-        measurement = EnvironmentMeasurement(
+    if (widget.action == null) {
+      if (_currentEnvironmentActionType == EnvironmentActionType.measurement) {
+        EnvironmentMeasurement measurement;
+        final currentEnvironmentMeasurementType =
+            _environmentMeasurementFormKey.currentState!.measurementType;
+        if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.temperature) {
+          final isValid = _environmentTemperatureWidgetKey.currentState!.isValid;
+          if (!isValid) {
+            return;
+          }
+          final temperature = _environmentTemperatureWidgetKey.currentState!.temperature;
+          measurement = EnvironmentMeasurement(
             type: currentEnvironmentMeasurementType,
-            measurement: Map<String, dynamic>.from({'humidity': humidity}));
-      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.lightDistance) {
-        final isValid = _environmentLightDistanceWidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final distance = _environmentLightDistanceWidgetKey.currentState!.distance;
-        measurement = EnvironmentMeasurement(
-          type: currentEnvironmentMeasurementType,
-          measurement: distance.toJson(),
-        );
-      } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.co2) {
-        final isValid = _environmentCO2WidgetKey.currentState!.isValid;
-        if (!isValid) {
-          return;
-        }
-        final co2 = _environmentCO2WidgetKey.currentState!.co2;
-        measurement = EnvironmentMeasurement(
+            measurement: temperature.toJson(),
+          );
+        } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.humidity) {
+          final isValid = _environmentHumidityWidgetKey.currentState!.isValid;
+          if (!isValid) {
+            return;
+          }
+          final humidity = _environmentHumidityWidgetKey.currentState!.humidity;
+          measurement = EnvironmentMeasurement(
+              type: currentEnvironmentMeasurementType,
+              measurement: Map<String, dynamic>.from({'humidity': humidity}));
+        } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.lightDistance) {
+          final isValid = _environmentLightDistanceWidgetKey.currentState!.isValid;
+          if (!isValid) {
+            return;
+          }
+          final distance = _environmentLightDistanceWidgetKey.currentState!.distance;
+          measurement = EnvironmentMeasurement(
             type: currentEnvironmentMeasurementType,
-            measurement: Map<String, dynamic>.from({'co2': co2}));
-      } else {
-        throw Exception('Unknown environment measurement type: $currentEnvironmentMeasurementType');
-      }
-      final action = EnvironmentMeasurementAction(
-        id: const Uuid().v4().toString(),
-        description: _environmentActionDescriptionTextController.text,
-        environmentId: currentEnvironment.id,
-        type: _currentEnvironmentActionType,
-        measurement: measurement,
-        createdAt: _environmentActionDate,
-      );
-      await widget.actionsProvider
-          .addEnvironmentAction(action)
-          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
-      return;
-    }
-
-    if (_currentEnvironmentActionType == EnvironmentActionType.picture) {
-      final images = _environmentPictureFormState.currentState!.images;
-      if (images.isEmpty) {
-        _showImageSelectionMandatorySnackbar();
+            measurement: distance.toJson(),
+          );
+        } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.co2) {
+          final isValid = _environmentCO2WidgetKey.currentState!.isValid;
+          if (!isValid) {
+            return;
+          }
+          final co2 = _environmentCO2WidgetKey.currentState!.co2;
+          measurement = EnvironmentMeasurement(
+              type: currentEnvironmentMeasurementType,
+              measurement: Map<String, dynamic>.from({'co2': co2}));
+        } else {
+          throw Exception(
+              'Unknown environment measurement type: $currentEnvironmentMeasurementType');
+        }
+        final action = EnvironmentMeasurementAction(
+          id: const Uuid().v4().toString(),
+          description: _environmentActionDescriptionTextController.text,
+          environmentId: currentEnvironment.id,
+          type: _currentEnvironmentActionType,
+          measurement: measurement,
+          createdAt: _environmentActionDate,
+        );
+        await widget.actionsProvider
+            .addEnvironmentAction(action)
+            .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
         return;
       }
-      final action = EnvironmentPictureAction(
+
+      if (_currentEnvironmentActionType == EnvironmentActionType.picture) {
+        final images = _environmentPictureFormState.currentState!.images;
+        if (images.isEmpty) {
+          _showImageSelectionMandatorySnackbar();
+          return;
+        }
+        final action = EnvironmentPictureAction(
+          id: const Uuid().v4().toString(),
+          description: _environmentActionDescriptionTextController.text,
+          environmentId: currentEnvironment.id,
+          type: _currentEnvironmentActionType,
+          createdAt: _environmentActionDate,
+          images: images,
+        );
+        await widget.actionsProvider
+            .addEnvironmentAction(action)
+            .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
+        return;
+      }
+      final action = EnvironmentOtherAction(
         id: const Uuid().v4().toString(),
         description: _environmentActionDescriptionTextController.text,
         environmentId: currentEnvironment.id,
         type: _currentEnvironmentActionType,
         createdAt: _environmentActionDate,
-        images: images,
       );
       await widget.actionsProvider
           .addEnvironmentAction(action)
           .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
-      return;
+    } else {
+      final EnvironmentAction updatedAction;
+      if (widget.action is EnvironmentOtherAction) {
+        updatedAction = EnvironmentOtherAction(
+          id: widget.action!.id,
+          description: _environmentActionDescriptionTextController.text,
+          environmentId: currentEnvironment.id,
+          type: _currentEnvironmentActionType,
+          createdAt: _environmentActionDate,
+        );
+      } else if (widget.action is EnvironmentPictureAction) {
+        final images = _environmentPictureFormState.currentState!.images;
+        if (images.isEmpty) {
+          _showImageSelectionMandatorySnackbar();
+          return;
+        }
+        updatedAction = EnvironmentPictureAction(
+          id: widget.action!.id,
+          description: _environmentActionDescriptionTextController.text,
+          environmentId: currentEnvironment.id,
+          type: _currentEnvironmentActionType,
+          createdAt: _environmentActionDate,
+          images: _environmentPictureFormState.currentState!.images,
+        );
+      } else if (widget.action is EnvironmentMeasurementAction) {
+        EnvironmentMeasurement measurement;
+        final currentEnvironmentMeasurementType =
+            _environmentMeasurementFormKey.currentState!.measurementType;
+        if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.temperature) {
+          final isValid = _environmentTemperatureWidgetKey.currentState!.isValid;
+          if (!isValid) {
+            return;
+          }
+          final temperature = _environmentTemperatureWidgetKey.currentState!.temperature;
+          measurement = EnvironmentMeasurement(
+            type: currentEnvironmentMeasurementType,
+            measurement: temperature.toJson(),
+          );
+        } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.humidity) {
+          final isValid = _environmentHumidityWidgetKey.currentState!.isValid;
+          if (!isValid) {
+            return;
+          }
+          final humidity = _environmentHumidityWidgetKey.currentState!.humidity;
+          measurement = EnvironmentMeasurement(
+              type: currentEnvironmentMeasurementType,
+              measurement: Map<String, dynamic>.from({'humidity': humidity}));
+        } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.lightDistance) {
+          final isValid = _environmentLightDistanceWidgetKey.currentState!.isValid;
+          if (!isValid) {
+            return;
+          }
+          final distance = _environmentLightDistanceWidgetKey.currentState!.distance;
+          measurement = EnvironmentMeasurement(
+            type: currentEnvironmentMeasurementType,
+            measurement: distance.toJson(),
+          );
+        } else if (currentEnvironmentMeasurementType == EnvironmentMeasurementType.co2) {
+          final isValid = _environmentCO2WidgetKey.currentState!.isValid;
+          if (!isValid) {
+            return;
+          }
+          final co2 = _environmentCO2WidgetKey.currentState!.co2;
+          measurement = EnvironmentMeasurement(
+              type: currentEnvironmentMeasurementType,
+              measurement: Map<String, dynamic>.from({'co2': co2}));
+        } else {
+          throw Exception(
+              'Unknown environment measurement type: $currentEnvironmentMeasurementType');
+        }
+
+        updatedAction = EnvironmentMeasurementAction(
+          id: widget.action!.id,
+          description: _environmentActionDescriptionTextController.text,
+          environmentId: currentEnvironment.id,
+          type: _currentEnvironmentActionType,
+          measurement: measurement,
+          createdAt: _environmentActionDate,
+        );
+      } else {
+        throw Exception('Unknown environment action type: $_currentEnvironmentActionType');
+      }
+
+      await widget.actionsProvider
+          .updateEnvironmentAction(updatedAction)
+          .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
     }
-    final action = EnvironmentOtherAction(
-      id: const Uuid().v4().toString(),
-      description: _environmentActionDescriptionTextController.text,
-      environmentId: currentEnvironment.id,
-      type: _currentEnvironmentActionType,
-      createdAt: _environmentActionDate,
-    );
-    await widget.actionsProvider
-        .addEnvironmentAction(action)
-        .whenComplete(() => Navigator.of(context).popUntil((route) => route.isFirst));
   }
 
   /// Show a snackbar if no images are selected.
@@ -3193,6 +3528,13 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
         lastDate: DateTime(2101));
     if (picked != null) {
       dateCallback(picked);
+      if (widget.changeCallback != null) {
+        if (widget.action != null) {
+          widget.changeCallback!(true, []);
+        } else {
+          widget.changeCallback!(true, []);
+        }
+      }
     }
   }
 }
