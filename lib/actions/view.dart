@@ -833,9 +833,16 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
 
   late final Temperature _initialTemperature;
 
+  final FocusNode _temperatureValueFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
+    _temperatureValueFocusNode.addListener(() {
+      if (!_temperatureValueFocusNode.hasFocus) {
+        _checkTemperature();
+      }
+    });
     if (widget.action != null) {
       final temperature = Temperature.fromJson(widget.action!.measurement.measurement);
       _initialTemperature = temperature;
@@ -878,6 +885,7 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
           children: [
             Expanded(
               child: TextFormField(
+                focusNode: _temperatureValueFocusNode,
                 controller: _temperatureController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
