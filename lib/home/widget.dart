@@ -31,7 +31,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        leading: Text(action.type.icon, style: const TextStyle(fontSize: 14)),
+        leading: Text(_determineIcon(), style: const TextStyle(fontSize: 14)),
         title: Text(plant.name),
         subtitle: Text(action.formattedDate),
         onTap: () async {
@@ -40,6 +40,15 @@ class PlantActionLogHomeWidget extends StatelessWidget {
         },
       ),
     );
+  }
+
+  /// The icon of the displayed action
+  String _determineIcon() {
+    if (action.type != weedy.PlantActionType.measurement) {
+      return action.type.icon;
+    }
+    final fertilizerAction = action as weedy.PlantMeasurementAction;
+    return fertilizerAction.measurement.type.icon;
   }
 }
 
@@ -63,7 +72,7 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        leading: Text(action.type.icon, style: const TextStyle(fontSize: 14)),
+        leading: Text(_determineIcon(), style: const TextStyle(fontSize: 14)),
         title: Text(environment.name),
         subtitle: Text(action.formattedDate),
         onTap: () async {
@@ -77,6 +86,15 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
         },
       ),
     );
+  }
+
+  /// The icon of the displayed action
+  String _determineIcon() {
+    if (action.type != weedy.EnvironmentActionType.measurement) {
+      return action.type.icon;
+    }
+    final measurementAction = action as weedy.EnvironmentMeasurementAction;
+    return measurementAction.measurement.type.icon;
   }
 }
 

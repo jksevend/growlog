@@ -543,13 +543,20 @@ class EnvironmentCO2Form extends StatefulWidget {
 
 class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
   late TextEditingController _co2Controller;
+  late final double _initialCO2;
+  final FocusNode _co2ValueFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
+    _co2ValueFocusNode.addListener(() {
+      if (!_co2ValueFocusNode.hasFocus) {
+        _checkCO2();
+      }
+    });
     if (widget.action != null) {
-      final co2 = widget.action!.measurement.measurement['co2'] as double;
-      _co2Controller = TextEditingController(text: co2.toString());
+      _initialCO2 = widget.action!.measurement.measurement['co2'] as double;
+      _co2Controller = TextEditingController(text: _initialCO2.toString());
     } else {
       _co2Controller = TextEditingController();
     }
@@ -576,6 +583,7 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
     return Form(
       key: widget.formKey,
       child: TextFormField(
+        focusNode: _co2ValueFocusNode,
         controller: _co2Controller,
         keyboardType: TextInputType.number,
         decoration: const InputDecoration(
@@ -584,19 +592,37 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
           hintText: '50',
         ),
         validator: (value) => validateInput(value, isDouble: true),
-        onChanged: (value) {
-          if (double.tryParse(value) == null) {
-            return;
-          }
-
-          if (widget.action == null || widget.action!.measurement.measurement['co2'] != co2) {
-            widget.changeCallback(true, co2);
-          } else {
-            widget.changeCallback(false, co2);
-          }
-        },
+        onFieldSubmitted: widget.action == null
+            ? null
+            : (value) {
+                _checkCO2();
+              },
+        onTapOutside: widget.action == null
+            ? null
+            : (focusNode) {
+                _checkCO2();
+              },
+        onEditingComplete: widget.action == null
+            ? null
+            : () {
+                _checkCO2();
+              },
       ),
     );
+  }
+
+  void _checkCO2() {
+    if (double.tryParse(_co2Controller.text) == null) {
+      return;
+    }
+
+    if (widget.action != null) {
+      if (_initialCO2 != double.parse(_co2Controller.text)) {
+        widget.changeCallback(true, co2);
+      } else {
+        widget.changeCallback(false, co2);
+      }
+    }
   }
 }
 
@@ -622,13 +648,21 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
   late TextEditingController _distanceController;
   late MeasurementUnit _distanceUnit;
 
+  late final MeasurementAmount _initialDistance;
+  final FocusNode _distanceValueFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
+    _distanceValueFocusNode.addListener(() {
+      if (!_distanceValueFocusNode.hasFocus) {
+        _checkLightDistance();
+      }
+    });
     if (widget.action != null) {
-      final distance = MeasurementAmount.fromJson(widget.action!.measurement.measurement);
-      _distanceController = TextEditingController(text: distance.value.toString());
-      _distanceUnit = distance.measurementUnit;
+      _initialDistance = MeasurementAmount.fromJson(widget.action!.measurement.measurement);
+      _distanceController = TextEditingController(text: _initialDistance.value.toString());
+      _distanceUnit = _initialDistance.measurementUnit;
     } else {
       _distanceController = TextEditingController();
       _distanceUnit = MeasurementUnit.cm;
@@ -665,6 +699,7 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
           children: [
             Expanded(
               child: TextFormField(
+                focusNode: _distanceValueFocusNode,
                 controller: _distanceController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -673,17 +708,21 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
                   hintText: '50',
                 ),
                 validator: (value) => validateInput(value, isDouble: true),
-                onChanged: (value) {
-                  if (double.tryParse(value) == null) {
-                    return;
-                  }
-
-                  if (widget.action == null || widget.action!.measurement.measurement != distance) {
-                    widget.changeCallback(true, distance);
-                  } else {
-                    widget.changeCallback(false, distance);
-                  }
-                },
+                onFieldSubmitted: widget.action == null
+                    ? null
+                    : (value) {
+                        _checkLightDistance();
+                      },
+                onTapOutside: widget.action == null
+                    ? null
+                    : (focusNode) {
+                        _checkLightDistance();
+                      },
+                onEditingComplete: widget.action == null
+                    ? null
+                    : () {
+                        _checkLightDistance();
+                      },
               ),
             ),
             const SizedBox(width: 50),
@@ -712,6 +751,22 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
         ),
       ),
     );
+  }
+
+  /// Check the light distance.
+  void _checkLightDistance() {
+    if (double.tryParse(_distanceController.text) == null) {
+      return;
+    }
+
+    if (widget.action != null) {
+      if (_initialDistance.value != double.parse(_distanceController.text) ||
+          _initialDistance.measurementUnit != _distanceUnit) {
+        widget.changeCallback(true, distance);
+      } else {
+        widget.changeCallback(false, distance);
+      }
+    }
   }
 
   /// Update the distance unit.
@@ -750,12 +805,21 @@ class EnvironmentHumidityForm extends StatefulWidget {
 class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityForm> {
   late TextEditingController _humidityController;
 
+  late final double _initialHumidity;
+
+  final FocusNode _humidityValueFocusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
+    _humidityValueFocusNode.addListener(() {
+      if (!_humidityValueFocusNode.hasFocus) {
+        _checkHumidity();
+      }
+    });
     if (widget.action != null) {
-      final humidity = widget.action!.measurement.measurement['humidity'] as double;
-      _humidityController = TextEditingController(text: humidity.toString());
+      _initialHumidity = widget.action!.measurement.measurement['humidity'] as double;
+      _humidityController = TextEditingController(text: _initialHumidity.toString());
     } else {
       _humidityController = TextEditingController();
     }
@@ -784,6 +848,7 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
+          focusNode: _humidityValueFocusNode,
           controller: _humidityController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
@@ -792,21 +857,38 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
             hintText: '50',
           ),
           validator: (value) => validateInput(value, isDouble: true),
-          onChanged: (value) {
-            if (double.tryParse(value) == null) {
-              return;
-            }
-
-            if (widget.action == null ||
-                widget.action!.measurement.measurement['humidity'] != humidity) {
-              widget.changeCallback(true, humidity);
-            } else {
-              widget.changeCallback(false, humidity);
-            }
-          },
+          onFieldSubmitted: widget.action == null
+              ? null
+              : (value) {
+                  _checkHumidity();
+                },
+          onTapOutside: widget.action == null
+              ? null
+              : (focusNode) {
+                  _checkHumidity();
+                },
+          onEditingComplete: widget.action == null
+              ? null
+              : () {
+                  _checkHumidity();
+                },
         ),
       ),
     );
+  }
+
+  void _checkHumidity() {
+    if (double.tryParse(_humidityController.text) == null) {
+      return;
+    }
+
+    if (widget.action != null) {
+      if (_initialHumidity != double.parse(_humidityController.text)) {
+        widget.changeCallback(true, humidity);
+      } else {
+        widget.changeCallback(false, humidity);
+      }
+    }
   }
 }
 
@@ -844,10 +926,9 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
       }
     });
     if (widget.action != null) {
-      final temperature = Temperature.fromJson(widget.action!.measurement.measurement);
-      _initialTemperature = temperature;
-      _temperatureController = TextEditingController(text: temperature.value.toString());
-      _temperatureUnit = temperature.temperatureUnit;
+      _initialTemperature = Temperature.fromJson(widget.action!.measurement.measurement);
+      _temperatureController = TextEditingController(text: _initialTemperature.value.toString());
+      _temperatureUnit = _initialTemperature.temperatureUnit;
     } else {
       _temperatureController = TextEditingController();
       _temperatureUnit = TemperatureUnit.celsius;
@@ -2659,7 +2740,7 @@ class _PlantActionFormState extends State<PlantActionForm> {
           formKey: GlobalKey<FormState>(),
           action: widget.action as PlantHarvestingAction?,
         );
-      case PlantActionType.measuring:
+      case PlantActionType.measurement:
         return PlantMeasurementForm(
           key: _plantMeasuringFormKey,
           action: widget.action as PlantMeasurementAction?,
@@ -2829,7 +2910,7 @@ class _PlantActionFormState extends State<PlantActionForm> {
     }
 
     // In case of measuring, check the measurement type and create the action.
-    if (_currentPlantActionType == PlantActionType.measuring) {
+    if (_currentPlantActionType == PlantActionType.measurement) {
       final currentPlantMeasurementType = _plantMeasuringFormKey.currentState!.measurementType;
       if (currentPlantMeasurementType == PlantMeasurementType.height) {
         final isValid = _plantHeightMeasurementWidgetKey.currentState!.isValid;

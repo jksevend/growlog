@@ -246,7 +246,7 @@ enum PlantActionType {
   harvesting,
   replanting,
   training,
-  measuring,
+  measurement,
   picture,
   death,
   other,
@@ -269,7 +269,7 @@ extension PlantActionTypeExtension on PlantActionType {
         return tr('common.replanting');
       case PlantActionType.training:
         return tr('common.training');
-      case PlantActionType.measuring:
+      case PlantActionType.measurement:
         return tr('common.measuring');
       case PlantActionType.picture:
         return tr('common.picture');
@@ -295,7 +295,7 @@ extension PlantActionTypeExtension on PlantActionType {
         return '🔄';
       case PlantActionType.training:
         return '🏋️‍♂️';
-      case PlantActionType.measuring:
+      case PlantActionType.measurement:
         return '📐';
       case PlantActionType.picture:
         return '📸';
