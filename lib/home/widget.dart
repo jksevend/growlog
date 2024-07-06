@@ -5,7 +5,9 @@ import 'package:weedy/actions/model.dart' as weedy;
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/sheet.dart';
 import 'package:weedy/environments/model.dart';
+import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
+import 'package:weedy/plants/provider.dart';
 
 /// An item of a list of plant actions
 class PlantActionLogHomeWidget extends StatelessWidget {
@@ -13,6 +15,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
   final weedy.PlantAction action;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
+  final PlantsProvider plantsProvider;
 
   const PlantActionLogHomeWidget({
     super.key,
@@ -20,6 +23,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
     required this.action,
     required this.actionsProvider,
     required this.fertilizerProvider,
+    required this.plantsProvider,
   });
 
   @override
@@ -27,15 +31,24 @@ class PlantActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        leading: Text(action.type.icon, style: const TextStyle(fontSize: 14)),
+        leading: Text(_determineIcon(), style: const TextStyle(fontSize: 14)),
         title: Text(plant.name),
         subtitle: Text(action.formattedDate),
         onTap: () async {
           await showPlantActionDetailSheet(
-              context, action, plant, actionsProvider, fertilizerProvider);
+              context, action, plant, actionsProvider, fertilizerProvider, plantsProvider);
         },
       ),
     );
+  }
+
+  /// The icon of the displayed action
+  String _determineIcon() {
+    if (action.type != weedy.PlantActionType.measurement) {
+      return action.type.icon;
+    }
+    final fertilizerAction = action as weedy.PlantMeasurementAction;
+    return fertilizerAction.measurement.type.icon;
   }
 }
 
@@ -44,12 +57,14 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
   final Environment environment;
   final weedy.EnvironmentAction action;
   final ActionsProvider actionsProvider;
+  final EnvironmentsProvider environmentsProvider;
 
   const EnvironmentActionLogHomeWidget({
     super.key,
     required this.environment,
     required this.action,
     required this.actionsProvider,
+    required this.environmentsProvider,
   });
 
   @override
@@ -57,14 +72,29 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
     return Card(
       elevation: 10,
       child: ListTile(
-        leading: Text(action.type.icon, style: const TextStyle(fontSize: 14)),
+        leading: Text(_determineIcon(), style: const TextStyle(fontSize: 14)),
         title: Text(environment.name),
         subtitle: Text(action.formattedDate),
         onTap: () async {
-          await showEnvironmentActionDetailSheet(context, action, environment, actionsProvider);
+          await showEnvironmentActionDetailSheet(
+            context,
+            action,
+            environment,
+            actionsProvider,
+            environmentsProvider,
+          );
         },
       ),
     );
+  }
+
+  /// The icon of the displayed action
+  String _determineIcon() {
+    if (action.type != weedy.EnvironmentActionType.measurement) {
+      return action.type.icon;
+    }
+    final measurementAction = action as weedy.EnvironmentMeasurementAction;
+    return measurementAction.measurement.type.icon;
   }
 }
 
