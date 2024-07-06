@@ -3,6 +3,39 @@ import 'package:flutter/material.dart';
 import 'package:growlog/settings/model.dart';
 import 'package:growlog/settings/provider.dart';
 
+/// Helper for all supported locales in this game
+enum AppLocale { german, english, spanish }
+
+extension AppLocaleExtension on AppLocale {
+  String get localeFlag => _localeFlag(this);
+
+  String get translationKey => _translationKey(this);
+
+  /// Returns the path to a flag image of a given [appLocale]
+  String _localeFlag(final AppLocale appLocale) {
+    switch (appLocale) {
+      case AppLocale.german:
+        return 'assets/img/german.png';
+      case AppLocale.english:
+        return 'assets/img/us.png';
+      case AppLocale.spanish:
+        return 'assets/img/espanol.png';
+    }
+  }
+
+  /// Translation key for a [appLocale] located in assets/lang/
+  String _translationKey(final AppLocale appLocale) {
+    switch (appLocale) {
+      case AppLocale.german:
+        return 'common.german';
+      case AppLocale.english:
+        return 'common.english';
+      case AppLocale.spanish:
+        return 'common.spanish';
+    }
+  }
+}
+
 /// A view that displays the application's settings.
 class SettingsView extends StatelessWidget {
   final SettingsProvider settingsProvider;
@@ -31,7 +64,46 @@ class SettingsView extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: ListView(
                 children: [
-                  ListTile(
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.language),
+                    subtitle: Text(tr('common.change_language')),
+                    title: DropdownButton<AppLocale>(
+                      onChanged: (value) {
+                        if (value == AppLocale.german) {
+                          context.setLocale(const Locale('de', 'DE'));
+                        } else if (value == AppLocale.english) {
+                          context.setLocale(const Locale('en', 'US'));
+                        } else if (value == AppLocale.spanish) {
+                          context.setLocale(const Locale('es', 'ES'));
+                        }
+                      },
+                      value: _determineAppLocale(context),
+                      items: AppLocale.values
+                          .map(
+                            (locale) => DropdownMenuItem(
+                              value: locale,
+                              child: Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 15,
+                                    backgroundColor: Colors.transparent,
+                                    backgroundImage: AssetImage(locale.localeFlag),
+                                  ),
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  Text(tr(locale.translationKey)),
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
+                ),
+                Card(
+                  child: ListTile(
                       leading: const Icon(Icons.info_outline),
                       title: Text(tr('settings.about.title')),
                       subtitle: Text(tr('settings.about.description')),
@@ -46,10 +118,24 @@ class SettingsView extends StatelessWidget {
                               'MIT LICENSE 2024 GrowLog\ngithub.com/jksevend/growlog',
                         );
                       }),
-                ],
-              ),
+                ),
+              ],
+            ),
             );
-          }),
+        },
+      ),
     );
+  }
+
+  AppLocale _determineAppLocale(BuildContext context) {
+    if (context.locale == const Locale('de', 'DE')) {
+      return AppLocale.german;
+    } else if (context.locale == const Locale('en', 'US')) {
+      return AppLocale.english;
+    } else if (context.locale == const Locale('es', 'ES')) {
+      return AppLocale.spanish;
+    }
+
+    return AppLocale.english;
   }
 }

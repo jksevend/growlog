@@ -55,7 +55,7 @@ void main() async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
+      supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE'), Locale('es', 'ES')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en', 'US'),
       child: const GrowLogApp(),
