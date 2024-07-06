@@ -75,6 +75,7 @@
     "measurement": "Medida",
     "name": "Nombre",
     "name_mandatory": "Por favor ingrese un nombre",
+    "next": "Siguiente",
     "next_lifecycle": "Siguiente estado del ciclo de vida",
     "no_description": "Sin descripción",
     "no_image": "No se seleccionó imagen",

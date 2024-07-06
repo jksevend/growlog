@@ -4,16 +4,11 @@ import 'package:weedy/settings/model.dart';
 import 'package:weedy/settings/provider.dart';
 
 /// A view that displays the application's settings.
-class SettingsView extends StatefulWidget {
+class SettingsView extends StatelessWidget {
   final SettingsProvider settingsProvider;
 
   const SettingsView({super.key, required this.settingsProvider});
 
-  @override
-  State<SettingsView> createState() => _SettingsViewState();
-}
-
-class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +17,7 @@ class _SettingsViewState extends State<SettingsView> {
         centerTitle: true,
       ),
       body: StreamBuilder<Settings>(
-          stream: widget.settingsProvider.settings,
+          stream: settingsProvider.settings,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
