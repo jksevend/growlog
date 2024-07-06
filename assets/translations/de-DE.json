@@ -30,6 +30,7 @@
     "amount": "Menge",
     "banner_image": "Bannerbild",
     "cancel": "Abbrechen",
+    "choices": "Auswahl",
     "close": "Schließen",
     "coco": "Kokos",
     "confirm": "Bestätigen",
@@ -164,7 +165,9 @@
     "none": "Keine Pflanzen",
     "transitions": "Lebenszyklusübergang",
     "transition": "Übergang",
-    "transitions_end": "Ende des Lebenszyklus"
+    "transitions_end": "Ende des Lebenszyklus",
+    "relocations": "Umsiedeln",
+    "relocations_no_environments": "Keine Umgebungen zum Umsiedeln gefunden"
   },
   "settings": {
     "about": {

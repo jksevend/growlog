@@ -30,6 +30,7 @@
     "amount": "Cantidad",
     "banner_image": "Imagen del banner",
     "cancel": "Cancelar",
+    "choices": "Opciones",
     "close": "Cerrar",
     "coco": "Coco",
     "confirm": "Confirmar",
@@ -164,7 +165,9 @@
     "none": "No hay plantas",
     "transitions": "Transición del ciclo de vida",
     "transition": "Transición",
-    "transitions_end": "Fin del ciclo de vida"
+    "transitions_end": "Fin del ciclo de vida",
+    "relocations": "Reubicaciones",
+    "relocations_no_environments": "No hay entornos disponibles para reubicar"
   },
   "settings": {
     "about": {

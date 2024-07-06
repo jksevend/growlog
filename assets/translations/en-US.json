@@ -30,6 +30,7 @@
     "amount": "Amount",
     "banner_image": "Banner image",
     "cancel": "Cancel",
+    "choices": "Choices",
     "close": "Close",
     "coco": "Coco",
     "confirm": "Confirm",
@@ -164,7 +165,9 @@
     "none": "No plants",
     "transitions": "Lifecycle transition",
     "transition": "Transition",
-    "transitions_end": "End of lifecycle"
+    "transitions_end": "End of lifecycle",
+    "relocations": "Relocate",
+    "relocations_no_environments": "No environments to relocate to"
   },
   "settings": {
     "about": {

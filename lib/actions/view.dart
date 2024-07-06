@@ -304,7 +304,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                               padding: const EdgeInsets.all(8.0),
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.grey,
+                                  color: Colors.grey[700],
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Padding(
