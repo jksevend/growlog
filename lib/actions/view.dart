@@ -21,8 +21,8 @@ import 'package:weedy/environments/model.dart';
 import 'package:weedy/environments/provider.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
+import 'package:weedy/plants/relocation/model.dart';
 import 'package:weedy/plants/transition/model.dart';
-import 'package:weedy/plants/transition/provider.dart';
 
 /// An over view of all environment actions.
 class EnvironmentActionOverview extends StatelessWidget {
@@ -160,7 +160,7 @@ class PlantActionOverview extends StatefulWidget {
   final PlantsProvider plantsProvider;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
-  final PlantLifecycleTransitionProvider plantLifecycleTransitionProvider;
+  final EnvironmentsProvider environmentsProvider;
 
   const PlantActionOverview({
     super.key,
@@ -168,7 +168,7 @@ class PlantActionOverview extends StatefulWidget {
     required this.plantsProvider,
     required this.actionsProvider,
     required this.fertilizerProvider,
-    required this.plantLifecycleTransitionProvider,
+    required this.environmentsProvider,
   });
 
   @override
@@ -196,7 +196,9 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
       body: StreamBuilder<List<dynamic>>(
         stream: CombineLatestStream.list([
           widget.actionsProvider.plantActions,
-          widget.plantLifecycleTransitionProvider.transitions,
+          widget.plantsProvider.transitions,
+          widget.plantsProvider.relocations,
+          widget.environmentsProvider.environments
         ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -208,27 +210,33 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
           }
 
           // Prepare data
+          final environments = snapshot.data![3] as Map<String, Environment>;
           final plantActions = snapshot.data![0] as List<PlantAction>;
+          final plantRelocations = snapshot.data![2] as List<PlantRelocation>;
           final specificPlantActions =
               plantActions.where((action) => action.plantId == widget.plant.id).toList();
           final specificPlantLifecycleTransitions =
               (snapshot.data![1] as List<PlantLifecycleTransition>)
                   .where((transition) => transition.plantId == widget.plant.id);
-          final combinedActions = [...specificPlantActions, ...specificPlantLifecycleTransitions];
+          final specificPlantRelocations =
+              plantRelocations.where((relocation) => relocation.plantId == widget.plant.id);
+          final combinedActions = [
+            ...specificPlantActions,
+            ...specificPlantLifecycleTransitions,
+            ...specificPlantRelocations
+          ];
 
           // Latest actions appear first
           combinedActions.sort((a, b) {
-            var aDate = a is PlantAction ? a.createdAt : (a as PlantLifecycleTransition).timestamp;
-            var bDate = b is PlantAction ? b.createdAt : (b as PlantLifecycleTransition).timestamp;
+            var aDate = _determineDate(a);
+            var bDate = _determineDate(b);
             return bDate.compareTo(aDate);
           });
 
           // Group actions by date
           final groupedByDate =
               combinedActions.fold<Map<DateTime, List<dynamic>>>({}, (map, action) {
-            final date = action is PlantAction
-                ? action.createdAt
-                : (action as PlantLifecycleTransition).timestamp;
+            final date = _determineDate(action);
             final dateKey = DateTime(date.year, date.month, date.day);
             map[dateKey] = map[dateKey] ?? [];
             map[dateKey]!.add(action);
@@ -238,10 +246,8 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
           // Per latest action the actions are sorted by date descending
           groupedByDate.forEach((date, actions) {
             actions.sort((a, b) {
-              var aTime =
-                  a is PlantAction ? a.createdAt : (a as PlantLifecycleTransition).timestamp;
-              var bTime =
-                  b is PlantAction ? b.createdAt : (b as PlantLifecycleTransition).timestamp;
+              var aTime = _determineDate(a);
+              var bTime = _determineDate(b);
               return bTime.compareTo(aTime);
             });
           });
@@ -287,6 +293,73 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                               action: action,
                               isFirst: index == 0,
                               isLast: index == actions.length - 1,
+                            );
+                          } else if (action is PlantRelocation) {
+                            final fromName = environments[action.environmentIdFrom]!.name;
+                            final toName = environments[action.environmentIdTo]!.name;
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[700],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      const Icon(Icons.location_on),
+                                      Flexible(
+                                        flex: 1,
+                                        child: Text(
+                                          tr('common.relocation_message',
+                                              namedArgs: {'from': fromName, 'to': toName}),
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.info_outline),
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: Text(tr('common.relocation')),
+                                                content: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  mainAxisSize: MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      tr(
+                                                        'common.relocation_dialog_message',
+                                                        namedArgs: {
+                                                          'from': fromName,
+                                                          'to': toName,
+                                                          'at': DateFormat.yMMMd()
+                                                              .add_jm()
+                                                              .format(action.timestamp)
+                                                        },
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    child: Text(tr('common.ok')),
+                                                    onPressed: () => Navigator.of(context).pop(),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             );
                           } else {
                             final transition = action as PlantLifecycleTransition;
@@ -385,6 +458,16 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
         },
       ),
     );
+  }
+
+  DateTime _determineDate(Object a) {
+    if (a is PlantAction) {
+      return a.createdAt;
+    } else if (a is PlantLifecycleTransition) {
+      return a.timestamp;
+    } else {
+      return (a as PlantRelocation).timestamp;
+    }
   }
 
   String _lifecycleMessage(String name, LifeCycleState lifeCycleState) {
@@ -579,8 +662,6 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
       ),
     );
   }
-
-
 }
 
 /// A form to display the distance of the light in the environment.
@@ -602,7 +683,6 @@ class EnvironmentLightDistanceForm extends StatefulWidget {
 class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLightDistanceForm> {
   late TextEditingController _distanceController;
   late MeasurementUnit _distanceUnit;
-
 
   @override
   void initState() {
@@ -680,8 +760,6 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
     );
   }
 
-
-
   /// Update the distance unit.
   void _updateMeasurementUnit(MeasurementUnit? value) {
     setState(() {
@@ -707,8 +785,6 @@ class EnvironmentHumidityForm extends StatefulWidget {
 
 class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityForm> {
   late TextEditingController _humidityController;
-
-
 
   @override
   void initState() {
@@ -1951,6 +2027,7 @@ class EnvironmentMeasurementForm extends StatefulWidget {
 
 class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm> {
   late EnvironmentMeasurementType _measurementType;
+
   @override
   void initState() {
     super.initState();
@@ -2068,10 +2145,10 @@ class _CreatePlantActionViewState extends State<CreatePlantActionView> {
   Widget build(BuildContext context) {
     return PlantActionForm(
       title: tr('actions.plants.create'),
-        action: null,
-        actionsProvider: widget.actionsProvider,
-        plantsProvider: widget.plantsProvider,
-        fertilizerProvider: widget.fertilizerProvider,
+      action: null,
+      actionsProvider: widget.actionsProvider,
+      plantsProvider: widget.plantsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
     );
   }
 }
@@ -2415,10 +2492,10 @@ class _PlantActionFormState extends State<PlantActionForm> {
         final pictureAction = widget.action as PlantPictureAction?;
         return PictureForm(
           key: _plantPictureFormState,
-            value: pictureAction,
-            allowMultiple: true,
-            images: pictureAction == null
-                ? []
+          value: pictureAction,
+          allowMultiple: true,
+          images: pictureAction == null
+              ? []
               : pictureAction.images.map((image) => File(image)).toList(),
           changeCallback: null,
         );
@@ -2767,7 +2844,6 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
   late final TextEditingController _environmentActionDescriptionTextController =
       TextEditingController();
   DateTime _environmentActionDate = DateTime.now();
-
 
   @override
   void initState() {

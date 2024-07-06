@@ -30,6 +30,7 @@
     "amount": "Amount",
     "banner_image": "Banner image",
     "cancel": "Cancel",
+    "choices": "Choices",
     "close": "Close",
     "coco": "Coco",
     "confirm": "Confirm",
@@ -85,6 +86,9 @@
     "plant": "Plant",
     "pruning": "Pruning",
     "replanting": "Replanting",
+    "relocation": "Relocation",
+    "relocation_message": "Relocated from {from} to {to}",
+    "relocation_dialog_message": "Relocated at {at} from {from} to {to}",
     "save": "Save",
     "seedling": "Seedling",
     "seedling_message": "{name} is a seedling",
@@ -161,7 +165,9 @@
     "none": "No plants",
     "transitions": "Lifecycle transition",
     "transition": "Transition",
-    "transitions_end": "End of lifecycle"
+    "transitions_end": "End of lifecycle",
+    "relocations": "Relocate",
+    "relocations_no_environments": "No environments to relocate to"
   },
   "settings": {
     "about": {

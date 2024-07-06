@@ -7,8 +7,8 @@ import 'package:weedy/environments/sheet.dart';
 import 'package:weedy/plants/dialog.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
+import 'package:weedy/plants/relocation/model.dart';
 import 'package:weedy/plants/transition/model.dart';
-import 'package:weedy/plants/transition/provider.dart';
 import 'package:weedy/plants/view.dart';
 
 /// Shows a bottom sheet with detailed information about a [plant].
@@ -21,43 +21,43 @@ Future<void> showPlantDetailSheet(
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
   EnvironmentsProvider environmentsProvider,
-  PlantLifecycleTransitionProvider transitionProvider,
   GlobalKey<State<BottomNavigationBar>> bottomNavigationBarKey,
 ) async {
   await showModalBottomSheet(
     context: context,
     builder: (context) {
-      return StatefulBuilder(builder: (context, setState) {
-        return Column(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: Row(
-                children: [
-                  Text(plant.name),
-                  const SizedBox(width: 8.0),
-                  Text(plant.lifeCycleState.icon),
-                ],
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    plant.medium.name,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.info),
+                title: Row(
+                  children: [
+                    Text(plant.name),
+                    const SizedBox(width: 8.0),
+                    Text(plant.lifeCycleState.icon),
+                  ],
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      plant.medium.name,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
-                  ),
-                  Text(plant.description),
-                ],
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                      onPressed: () async => _onDeletePlant(
-                          context, plant, plantsProvider, actionsProvider, transitionProvider),
+                    Text(plant.description),
+                  ],
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: () async =>
+                          _onDeletePlant(context, plant, plantsProvider, actionsProvider),
                       icon: const Icon(
                         Icons.delete_forever,
                         color: Colors.red,
@@ -69,7 +69,6 @@ Future<void> showPlantDetailSheet(
                         plant,
                         plantsProvider,
                         environmentsProvider,
-                        transitionProvider,
                         (updatedPlant) {
                           setState(
                             () {
@@ -87,31 +86,8 @@ Future<void> showPlantDetailSheet(
                     ),
                   ],
                 ),
-            ),
-            const Divider(),
-            // Information about the plants' environment
-            plantEnvironment == null
-                ? Text(tr('environments.none'))
-                : ListTile(
-                    leading: const Icon(Icons.lightbulb, color: Colors.yellow),
-                    title: Text(tr('common.environment')),
-                    subtitle: Text(plantEnvironment.name),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.arrow_right_alt),
-                      onPressed: () async => _navigateToEnvironmentDetailSheet(
-                        context,
-                        bottomNavigationBarKey,
-                        plant,
-                        plantEnvironment,
-                        plants,
-                        plantsProvider,
-                        environmentsProvider,
-                        actionsProvider,
-                      ),
-                    ),
-                  ),
-            const Divider(),
-              // Lifecycle transitions
+              ),
+              const Divider(),
               ListTile(
                 leading: const Icon(Icons.change_circle_outlined),
                 title: Text(tr('plants.transitions')),
@@ -150,7 +126,6 @@ Future<void> showPlantDetailSheet(
                           onPressed: () async => _onLifecycleTransition(
                             plant,
                             lifecycleTransition,
-                            transitionProvider,
                             plantsProvider,
                             (updatedParams) {
                               final updatedPlant = updatedParams[0] as Plant;
@@ -170,6 +145,98 @@ Future<void> showPlantDetailSheet(
                 ),
               ),
               const Divider(),
+              // Information about the plants' environment
+              plantEnvironment == null
+                  ? Text(tr('environments.none'))
+                  : ListTile(
+                      leading: const Icon(Icons.lightbulb, color: Colors.yellow),
+                      title: Text(tr('common.environment')),
+                      subtitle: Text(plantEnvironment!.name),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.arrow_right_alt),
+                        onPressed: () async => _navigateToEnvironmentDetailSheet(
+                          context,
+                          bottomNavigationBarKey,
+                          plant,
+                          plantEnvironment!,
+                          plants,
+                          plantsProvider,
+                          environmentsProvider,
+                          actionsProvider,
+                        ),
+                      ),
+                    ),
+              const Divider(),
+              StreamBuilder<Map<String, Environment>>(
+                  stream: environmentsProvider.environments,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    final environments = snapshot.data!;
+                    final otherEnvironments = environments.values
+                        .where((environment) => environment.id != plantEnvironment?.id)
+                        .toList();
+                    return ListTile(
+                      leading: const Icon(Icons.moving_rounded),
+                      title: Text(tr('plants.relocations')),
+                      subtitle: otherEnvironments.isEmpty
+                          ? Text(tr('plants.relocations_no_environments'))
+                          : null,
+                      trailing: otherEnvironments.isEmpty
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.arrow_right_alt),
+                              onPressed: () async {
+                                final Environment? selected = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text(tr('common.choices')),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: otherEnvironments
+                                              .map((environment) => ListTile(
+                                                    title: Text(environment.name),
+                                                    onTap: () =>
+                                                        Navigator.of(context).pop(environment),
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      );
+                                    });
+                                if (selected != null) {
+                                  // Create a relocation event
+                                  final relocation = PlantRelocation(
+                                    plantId: plant.id,
+                                    environmentIdFrom: plantEnvironment!.id,
+                                    environmentIdTo: selected.id,
+                                    timestamp: DateTime.now(),
+                                  );
+                                  await plantsProvider.addRelocation(relocation);
+
+                                  // Update the plant
+                                  plant.environmentId = selected.id;
+                                  final updatedPlant = await plantsProvider.updatePlant(plant);
+                                  setState(() {
+                                    plant = updatedPlant;
+                                  });
+
+                                  final updatedEnvironment = environments[selected.id]!;
+                                  setState(() {
+                                    plantEnvironment = updatedEnvironment;
+                                  });
+                                }
+                              },
+                            ),
+                    );
+                  }),
+              const Divider(),
             ],
           );
         },
@@ -182,7 +249,6 @@ Future<void> showPlantDetailSheet(
 Future<void> _onLifecycleTransition(
   Plant plant,
   PlantLifecycleTransition lifecycleTransition,
-  PlantLifecycleTransitionProvider transitionProvider,
   PlantsProvider plantsProvider,
   Function(List<dynamic>) stateSetter,
 ) async {
@@ -202,7 +268,7 @@ Future<void> _onLifecycleTransition(
     plantId: plant.id,
     timestamp: DateTime.now(),
   );
-  await transitionProvider.addTransition(transition);
+  await plantsProvider.addTransition(transition);
 
   // Update the plant in the provider.
   plant.lifeCycleState = nextLifecycleState;
@@ -220,10 +286,9 @@ Future<void> _onDeletePlant(
   Plant plant,
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
-  PlantLifecycleTransitionProvider transitionProvider,
 ) async {
-  final confirmed = await confirmDeletionOfPlantDialog(
-      context, plant, plantsProvider, actionsProvider, transitionProvider);
+  final confirmed =
+      await confirmDeletionOfPlantDialog(context, plant, plantsProvider, actionsProvider);
   if (confirmed == true) {
     if (!context.mounted) {
       return;
@@ -243,15 +308,14 @@ Future<void> _onUpdatePlant(
   Plant plant,
   PlantsProvider plantsProvider,
   EnvironmentsProvider environmentsProvider,
-  PlantLifecycleTransitionProvider transitionProvider,
   Function(Plant?) stateSetter,
 ) async {
   final updatedPlant = await Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => EditPlantView(
           plant: plant,
           plantsProvider: plantsProvider,
-          environmentsProvider: environmentsProvider,
-          transitionsProvider: transitionProvider)));
+            environmentsProvider: environmentsProvider,
+          )));
   stateSetter(updatedPlant);
 }
 

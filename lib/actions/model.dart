@@ -716,7 +716,7 @@ class Actions {
           return PlantReplantingAction.fromJson(map);
         case 'training':
           return PlantTrainingAction.fromJson(map);
-        case 'measuring':
+        case 'measurement':
           return PlantMeasurementAction.fromJson(map);
         case 'picture':
           return PlantPictureAction.fromJson(map);

@@ -15,7 +15,6 @@ import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 import 'package:weedy/plants/sheet.dart';
 import 'package:weedy/plants/transition/model.dart';
-import 'package:weedy/plants/transition/provider.dart';
 
 /// A widget that displays an overview of all plants.
 class PlantOverview extends StatelessWidget {
@@ -23,7 +22,6 @@ class PlantOverview extends StatelessWidget {
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
-  final PlantLifecycleTransitionProvider transitionsProvider;
   final GlobalKey<State<BottomNavigationBar>> bottomNavigationKey;
 
   const PlantOverview({
@@ -33,7 +31,6 @@ class PlantOverview extends StatelessWidget {
     required this.actionsProvider,
     required this.fertilizerProvider,
     required this.bottomNavigationKey,
-    required this.transitionsProvider,
   });
 
   @override
@@ -44,7 +41,7 @@ class PlantOverview extends StatelessWidget {
         stream: CombineLatestStream.list([
           plantsProvider.plants,
           environmentsProvider.environments,
-          transitionsProvider.transitions,
+          plantsProvider.transitions,
         ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -134,7 +131,6 @@ class PlantOverview extends StatelessWidget {
                                   plantsProvider,
                                   actionsProvider,
                                   environmentsProvider,
-                                  transitionsProvider,
                                   bottomNavigationKey);
                             },
                             trailing: Row(
@@ -163,7 +159,7 @@ class PlantOverview extends StatelessWidget {
                                               plantsProvider: plantsProvider,
                                               actionsProvider: actionsProvider,
                                               fertilizerProvider: fertilizerProvider,
-                                              plantLifecycleTransitionProvider: transitionsProvider,
+                                              environmentsProvider: environmentsProvider,
                                             )));
                                   },
                                 ),
@@ -191,7 +187,6 @@ class PlantForm extends StatefulWidget {
   final String title;
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
-  final PlantLifecycleTransitionProvider transitionsProvider;
   final Function(bool)? changeCallback;
 
   const PlantForm({
@@ -201,7 +196,6 @@ class PlantForm extends StatefulWidget {
     required this.plant,
     required this.plantsProvider,
     required this.environmentsProvider,
-    required this.transitionsProvider,
     required this.changeCallback,
   });
 
@@ -298,9 +292,9 @@ class _PlantFormState extends State<PlantForm> {
                         maxLines: null,
                         minLines: 5,
                         decoration: InputDecoration(
-                            labelText: tr('common.description'),
-                            hintText: tr('plants.hint_description'),
-                          ),
+                          labelText: tr('common.description'),
+                          hintText: tr('plants.hint_description'),
+                        ),
                         onChanged: (value) {
                           if (widget.changeCallback != null) {
                             if (widget.plant != null) {
@@ -579,7 +573,7 @@ class _PlantFormState extends State<PlantForm> {
             to: nextLifeCycleState,
             timestamp: DateTime.now(),
           );
-          await widget.transitionsProvider.addTransition(transition);
+          await widget.plantsProvider.addTransition(transition);
           await widget.plantsProvider
               .addPlant(plant)
               .whenComplete(() => Navigator.of(context).pop());
@@ -635,13 +629,11 @@ class _PlantFormState extends State<PlantForm> {
 class CreatePlantView extends StatefulWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
-  final PlantLifecycleTransitionProvider transitionsProvider;
 
   const CreatePlantView({
     super.key,
     required this.plantsProvider,
     required this.environmentsProvider,
-    required this.transitionsProvider,
   });
 
   @override
@@ -650,6 +642,7 @@ class CreatePlantView extends StatefulWidget {
 
 class _CreatePlantViewState extends State<CreatePlantView> {
   final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return PlantForm(
@@ -658,7 +651,6 @@ class _CreatePlantViewState extends State<CreatePlantView> {
       plant: null,
       plantsProvider: widget.plantsProvider,
       environmentsProvider: widget.environmentsProvider,
-      transitionsProvider: widget.transitionsProvider,
       changeCallback: null,
     );
   }
@@ -669,14 +661,12 @@ class EditPlantView extends StatefulWidget {
   final Plant plant;
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
-  final PlantLifecycleTransitionProvider transitionsProvider;
 
   const EditPlantView({
     super.key,
     required this.plant,
     required this.plantsProvider,
     required this.environmentsProvider,
-    required this.transitionsProvider,
   });
 
   @override
@@ -709,7 +699,6 @@ class _EditPlantViewState extends State<EditPlantView> {
         plant: widget.plant,
         plantsProvider: widget.plantsProvider,
         environmentsProvider: widget.environmentsProvider,
-        transitionsProvider: widget.transitionsProvider,
         changeCallback: (bool hasChanged) {
           setState(() {
             _hasChanged = hasChanged;

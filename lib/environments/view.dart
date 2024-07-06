@@ -528,12 +528,12 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     }),
                                 const SizedBox(height: 16.0),
                                 TextFormField(
-                                    controller: _heightController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      labelText: tr('common.height'),
-                                      hintText: tr('common.height_hint'),
-                                    ),
+                                  controller: _heightController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: tr('common.height'),
+                                    hintText: tr('common.height_hint'),
+                                  ),
                                   validator: (value) => validateInput(value, isDouble: true),
                                   onChanged: (value) {
                                     if (widget.changeCallback != null) {
@@ -740,7 +740,6 @@ class CreateEnvironmentView extends StatefulWidget {
 
 class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
   final _formKey = GlobalKey<FormState>();
-
 
   @override
   Widget build(BuildContext context) {

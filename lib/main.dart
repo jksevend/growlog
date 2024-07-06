@@ -10,7 +10,6 @@ import 'package:weedy/environments/provider.dart';
 import 'package:weedy/environments/view.dart';
 import 'package:weedy/home/view.dart';
 import 'package:weedy/plants/provider.dart';
-import 'package:weedy/plants/transition/provider.dart';
 import 'package:weedy/plants/view.dart';
 import 'package:weedy/settings/provider.dart';
 import 'package:weedy/settings/view.dart';
@@ -76,12 +75,11 @@ class WeedyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EnvironmentsProvider()),
         ChangeNotifierProvider(create: (_) => ActionsProvider()),
         ChangeNotifierProvider(create: (_) => FertilizerProvider()),
-        ChangeNotifierProvider(create: (_) => PlantLifecycleTransitionProvider()),
       ],
-      child: Consumer6<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider,
-          FertilizerProvider, PlantLifecycleTransitionProvider>(
+      child: Consumer5<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider,
+          FertilizerProvider>(
         builder: (context, settingsProvider, plantsProvider, environmentsProvider, actionsProvider,
-            fertilizerProvider, lifecycleTransitionProvider, _) {
+            fertilizerProvider, _) {
           return MaterialApp(
             title: 'Weedy',
             localizationsDelegates: context.localizationDelegates,
@@ -96,7 +94,6 @@ class WeedyApp extends StatelessWidget {
               environmentsProvider: environmentsProvider,
               actionsProvider: actionsProvider,
               fertilizerProvider: fertilizerProvider,
-              lifecycleTransitionProvider: lifecycleTransitionProvider,
             ),
           );
         },
@@ -112,7 +109,6 @@ class MainView extends StatefulWidget {
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
-  final PlantLifecycleTransitionProvider lifecycleTransitionProvider;
 
   const MainView({
     super.key,
@@ -121,7 +117,6 @@ class MainView extends StatefulWidget {
     required this.environmentsProvider,
     required this.actionsProvider,
     required this.fertilizerProvider,
-    required this.lifecycleTransitionProvider,
   });
 
   @override
@@ -143,7 +138,6 @@ class _MainViewState extends State<MainView> {
       environmentsProvider: widget.environmentsProvider,
       actionsProvider: widget.actionsProvider,
       fertilizerProvider: widget.fertilizerProvider,
-      transitionsProvider: widget.lifecycleTransitionProvider,
       bottomNavigationKey: _bottomNavigationKey,
     ),
     EnvironmentOverview(
@@ -249,7 +243,6 @@ class _MainViewState extends State<MainView> {
               builder: (context) => CreatePlantView(
                     plantsProvider: widget.plantsProvider,
                     environmentsProvider: widget.environmentsProvider,
-                    transitionsProvider: widget.lifecycleTransitionProvider,
                   )));
         },
         tooltip: tr('main.add_plant'),

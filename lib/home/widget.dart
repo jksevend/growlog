@@ -102,7 +102,7 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
 ///
 /// In this view actions done today are highlighted.
 class WeekAndMonthView extends StatefulWidget {
-  final List<Widget> actionIndicators;
+  final Map<DateTime, List<Widget>> actionIndicators;
 
   const WeekAndMonthView({super.key, required this.actionIndicators});
 
@@ -176,10 +176,6 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     });
   }
 
-  bool _isToday(DateTime date) {
-    return date.year == _now.year && date.month == _now.month && date.day == _now.day;
-  }
-
   Widget _buildHeader() {
     return IconButton(
       icon: Icon(_isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down),
@@ -191,7 +187,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     );
   }
 
-  Widget _buildWeekView(List<Widget> actionIndicators) {
+  Widget _buildWeekView(Map<DateTime, List<Widget>> actionIndicators) {
     return Column(
       children: [
         _buildWeekdayHeader(),
@@ -200,14 +196,15 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           children: _currentWeek.map((date) {
-            return _buildDateCell(date, _isToday(date), actionIndicators);
+            return _buildDateCell(
+                date, actionIndicators[DateTime(date.year, date.month, date.day)]);
           }).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildMonthView(List<Widget> actionIndicators) {
+  Widget _buildMonthView(Map<DateTime, List<Widget>> actionIndicators) {
     return LayoutBuilder(builder: (context, constraints) {
       return Column(
         children: [
@@ -220,8 +217,7 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
                 bool isCurrentMonth = date.month == _now.month;
                 return _buildDateCell(
                   date,
-                  _isToday(date),
-                  actionIndicators,
+                  actionIndicators[DateTime(date.year, date.month, date.day)],
                   isCurrentMonth: isCurrentMonth,
                 );
               }).toList(),
@@ -247,38 +243,31 @@ class _WeekAndMonthViewState extends State<WeekAndMonthView> {
     );
   }
 
-  Widget _buildDateCell(DateTime date, bool isToday, List<Widget> actionIndicators,
+  Widget _buildDateCell(DateTime date, List<Widget>? actionIndicators,
       {bool isCurrentMonth = true}) {
-    return isToday
-        ? Center(
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.blue, width: 1.5),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(_formatDate(date)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: actionIndicators,
-                  ),
-                ],
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              _formatDate(date),
+              style: TextStyle(
+                color: isCurrentMonth ? Colors.grey : Colors.grey[700],
+                fontWeight: isCurrentMonth ? FontWeight.bold : FontWeight.normal,
               ),
             ),
-          )
-        : Center(
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Text(
-                _formatDate(date),
-                style: TextStyle(
-                  color: isCurrentMonth ? Colors.grey : Colors.grey[700],
-                  fontWeight: isCurrentMonth ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: actionIndicators ??
+                  [
+                    Container(),
+                  ],
             ),
-          );
+          ],
+        ),
+      ),
+    );
   }
 }

@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
-import 'package:weedy/plants/transition/provider.dart';
 
 /// Shows a dialog that asks the user to confirm the deletion of a plant.
 Future<bool> confirmDeletionOfPlantDialog(
@@ -13,7 +10,6 @@ Future<bool> confirmDeletionOfPlantDialog(
   Plant plant,
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
-  PlantLifecycleTransitionProvider transitionProvider,
 ) async {
   final confirmed = await showDialog<bool>(
     context: context,
@@ -27,8 +23,7 @@ Future<bool> confirmDeletionOfPlantDialog(
             child: Text(tr('common.cancel')),
           ),
           TextButton(
-            onPressed: () async => _onPlantDeleted(
-                context, plantsProvider, actionsProvider, plant, transitionProvider),
+            onPressed: () async => _onPlantDeleted(context, plantsProvider, actionsProvider, plant),
             child: Text(tr('common.delete')),
           ),
         ],
@@ -49,15 +44,11 @@ Future<void> _onPlantDeleted(
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
   Plant plant,
-  PlantLifecycleTransitionProvider transitionProvider,
 ) async {
   await plantsProvider.removePlant(plant);
+  await plantsProvider.removeRelocationsForPlant(plant.id);
   await actionsProvider.removeActionsForPlant(plant.id);
-  await transitionProvider.removeTransitionsForPlant(plant.id);
-  final bannerImage = File(plant.bannerImagePath);
-  if (await bannerImage.exists()) {
-    await bannerImage.delete();
-  }
+  await plantsProvider.removeTransitionsForPlant(plant.id);
 
   if (!context.mounted) {
     return;

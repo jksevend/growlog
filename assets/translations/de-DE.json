@@ -30,6 +30,7 @@
     "amount": "Menge",
     "banner_image": "Bannerbild",
     "cancel": "Abbrechen",
+    "choices": "Auswahl",
     "close": "Schließen",
     "coco": "Kokos",
     "confirm": "Bestätigen",
@@ -85,6 +86,9 @@
     "plant": "Pflanze",
     "pruning": "Beschneiden",
     "replanting": "Umpflanzen",
+    "relocation": "Umsiedlung",
+    "relocation_message": "Von {from} nach {to} umgesiedelt",
+    "relocation_dialog_message": "Am {at} von {from} nach {to} umgesiedelt",
     "save": "Speichern",
     "seedling": "Keimling",
     "seedling_message": "{name} ist ein Keimling",
@@ -161,7 +165,9 @@
     "none": "Keine Pflanzen",
     "transitions": "Lebenszyklusübergang",
     "transition": "Übergang",
-    "transitions_end": "Ende des Lebenszyklus"
+    "transitions_end": "Ende des Lebenszyklus",
+    "relocations": "Umsiedeln",
+    "relocations_no_environments": "Keine Umgebungen zum Umsiedeln gefunden"
   },
   "settings": {
     "about": {
