@@ -192,7 +192,7 @@ class PlantForm extends StatefulWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
   final PlantLifecycleTransitionProvider transitionsProvider;
-  final Function(bool, List<File>)? changeCallback;
+  final Function(bool)? changeCallback;
 
   const PlantForm({
     super.key,
@@ -285,9 +285,9 @@ class _PlantFormState extends State<PlantForm> {
                             if (widget.changeCallback != null) {
                               if (widget.plant != null) {
                                 if (_initialPlant.name != value) {
-                                  widget.changeCallback!(true, []);
+                                  widget.changeCallback!(true);
                                 } else {
-                                  widget.changeCallback!(false, []);
+                                  widget.changeCallback!(false);
                                 }
                               }
                             }
@@ -305,9 +305,9 @@ class _PlantFormState extends State<PlantForm> {
                           if (widget.changeCallback != null) {
                             if (widget.plant != null) {
                               if (_descriptionController.text != _initialPlant.description) {
-                                widget.changeCallback!(true, []);
+                                widget.changeCallback!(true);
                               } else {
-                                widget.changeCallback!(false, []);
+                                widget.changeCallback!(false);
                               }
                             }
                           }
@@ -435,27 +435,27 @@ class _PlantFormState extends State<PlantForm> {
                                 if (images.isNotEmpty) {
                                   // Creation case - image was added but now user decided to leave the page
                                   if (widget.plant == null && images.isNotEmpty) {
-                                    widget.changeCallback!(true, images);
+                                    widget.changeCallback!(true);
                                     return;
                                   }
 
                                   // First case - environment was created without image, now editing with image.
                                   if (images.first.path != _initialPlant.bannerImagePath) {
-                                    widget.changeCallback!(true, images);
+                                    widget.changeCallback!(true);
                                   } else {
-                                    widget.changeCallback!(false, []);
+                                    widget.changeCallback!(false);
                                   }
                                 } else {
                                   if (widget.plant == null) {
-                                    widget.changeCallback!(false, []);
+                                    widget.changeCallback!(false);
                                     return;
                                   }
 
                                   // Second case - environment was created with image, now editing without image.
                                   if (_initialPlant.bannerImagePath.isNotEmpty) {
-                                    widget.changeCallback!(true, images);
+                                    widget.changeCallback!(true);
                                   } else {
-                                    widget.changeCallback!(false, []);
+                                    widget.changeCallback!(false);
                                   }
                                 }
                               }
@@ -486,9 +486,9 @@ class _PlantFormState extends State<PlantForm> {
       if (widget.changeCallback != null) {
         if (widget.plant != null) {
           if (_initialPlant.environmentId != environment!.id) {
-            widget.changeCallback!(true, []);
+            widget.changeCallback!(true);
           } else {
-            widget.changeCallback!(false, []);
+            widget.changeCallback!(false);
           }
         }
       }
@@ -502,9 +502,9 @@ class _PlantFormState extends State<PlantForm> {
       if (widget.changeCallback != null) {
         if (widget.plant != null) {
           if (_initialPlant.medium != medium) {
-            widget.changeCallback!(true, []);
+            widget.changeCallback!(true);
           } else {
-            widget.changeCallback!(false, []);
+            widget.changeCallback!(false);
           }
         }
       }
@@ -536,6 +536,9 @@ class _PlantFormState extends State<PlantForm> {
       } else {
         Plant plant;
         if (widget.plant != null) {
+          final formPicture = _pictureFormKey.currentState!.images.isEmpty
+              ? ''
+              : _pictureFormKey.currentState!.images.first;
           plant = Plant(
             id: widget.plant!.id,
             name: _nameController.text,
@@ -543,9 +546,7 @@ class _PlantFormState extends State<PlantForm> {
             environmentId: _currentEnvironment!.id,
             medium: _selectedMedium,
             lifeCycleState: _lifeCycleState,
-            bannerImagePath: _pictureFormKey.currentState!.images.isEmpty
-                ? ''
-                : _pictureFormKey.currentState!.images.first,
+            bannerImagePath: formPicture,
             createdAt: widget.plant!.createdAt,
           );
           await widget.plantsProvider
@@ -649,44 +650,16 @@ class CreatePlantView extends StatefulWidget {
 
 class _CreatePlantViewState extends State<CreatePlantView> {
   final _formKey = GlobalKey<FormState>();
-
-  bool _hasChanged = false;
-  List<File> _images = [];
-
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: !_hasChanged,
-      onPopInvoked: (didPop) async {
-        if (didPop) {
-          return;
-        }
-        if (_hasChanged) {
-          final confirmed = await discardChangesDialog(context);
-          if (confirmed && context.mounted) {
-            // Delete all images that were added.
-            for (var image in _images) {
-              if (image.path.contains('app_flutter')) {
-                image.delete();
-              }
-            }
-            Navigator.of(context).pop();
-          }
-        }
-      },
-      child: PlantForm(
-          formKey: _formKey,
-          title: tr('plants.create'),
-          plant: null,
-          plantsProvider: widget.plantsProvider,
-          environmentsProvider: widget.environmentsProvider,
-          transitionsProvider: widget.transitionsProvider,
-          changeCallback: (bool hasChanged, List<File> objects) {
-            setState(() {
-              _hasChanged = hasChanged;
-              _images = objects;
-            });
-          }),
+    return PlantForm(
+      formKey: _formKey,
+      title: tr('plants.create'),
+      plant: null,
+      plantsProvider: widget.plantsProvider,
+      environmentsProvider: widget.environmentsProvider,
+      transitionsProvider: widget.transitionsProvider,
+      changeCallback: null,
     );
   }
 }
@@ -714,7 +687,6 @@ class _EditPlantViewState extends State<EditPlantView> {
   final _formKey = GlobalKey<FormState>();
 
   bool _hasChanged = false;
-  List<File> _images = [];
 
   @override
   Widget build(BuildContext context) {
@@ -727,12 +699,6 @@ class _EditPlantViewState extends State<EditPlantView> {
         if (_hasChanged) {
           final confirmed = await discardChangesDialog(context);
           if (confirmed && context.mounted) {
-            // Delete all images that were added.
-            for (var image in _images) {
-              if (image.path.contains('app_flutter')) {
-                image.delete();
-              }
-            }
             Navigator.of(context).pop();
           }
         }
@@ -744,10 +710,9 @@ class _EditPlantViewState extends State<EditPlantView> {
         plantsProvider: widget.plantsProvider,
         environmentsProvider: widget.environmentsProvider,
         transitionsProvider: widget.transitionsProvider,
-        changeCallback: (bool hasChanged, List<File> objects) {
+        changeCallback: (bool hasChanged) {
           setState(() {
             _hasChanged = hasChanged;
-            _images = objects;
           });
         },
       ),

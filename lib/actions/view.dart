@@ -1,11 +1,8 @@
 import 'dart:io';
 
-import 'package:collection/collection.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart' as path;
-import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/streams.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/dialog.dart';
@@ -15,7 +12,6 @@ import 'package:weedy/actions/fertilizer/sheet.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/widget.dart';
-import 'package:weedy/common/dialog.dart';
 import 'package:weedy/common/measurement.dart';
 import 'package:weedy/common/temperature.dart';
 import 'package:weedy/common/validators.dart';
@@ -528,13 +524,11 @@ class _ChooseActionViewState extends State<ChooseActionView> {
 class EnvironmentCO2Form extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final EnvironmentMeasurementAction? action;
-  final Function(bool, double) changeCallback;
 
   const EnvironmentCO2Form({
     super.key,
     required this.formKey,
     required this.action,
-    required this.changeCallback,
   });
 
   @override
@@ -543,23 +537,12 @@ class EnvironmentCO2Form extends StatefulWidget {
 
 class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
   late TextEditingController _co2Controller;
-  late final double _initialCO2;
-  final FocusNode _co2ValueFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _co2ValueFocusNode.addListener(() {
-      if (!_co2ValueFocusNode.hasFocus) {
-        _checkCO2();
-      }
-    });
-    if (widget.action != null) {
-      _initialCO2 = widget.action!.measurement.measurement['co2'] as double;
-      _co2Controller = TextEditingController(text: _initialCO2.toString());
-    } else {
-      _co2Controller = TextEditingController();
-    }
+
+    _co2Controller = TextEditingController();
   }
 
   @override
@@ -583,7 +566,6 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
     return Form(
       key: widget.formKey,
       child: TextFormField(
-        focusNode: _co2ValueFocusNode,
         controller: _co2Controller,
         keyboardType: TextInputType.number,
         decoration: const InputDecoration(
@@ -592,51 +574,22 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
           hintText: '50',
         ),
         validator: (value) => validateInput(value, isDouble: true),
-        onFieldSubmitted: widget.action == null
-            ? null
-            : (value) {
-                _checkCO2();
-              },
-        onTapOutside: widget.action == null
-            ? null
-            : (focusNode) {
-                _checkCO2();
-              },
-        onEditingComplete: widget.action == null
-            ? null
-            : () {
-                _checkCO2();
-              },
       ),
     );
   }
 
-  void _checkCO2() {
-    if (double.tryParse(_co2Controller.text) == null) {
-      return;
-    }
 
-    if (widget.action != null) {
-      if (_initialCO2 != double.parse(_co2Controller.text)) {
-        widget.changeCallback(true, co2);
-      } else {
-        widget.changeCallback(false, co2);
-      }
-    }
-  }
 }
 
 /// A form to display the distance of the light in the environment.
 class EnvironmentLightDistanceForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final EnvironmentMeasurementAction? action;
-  final Function(bool, MeasurementAmount) changeCallback;
 
   const EnvironmentLightDistanceForm({
     super.key,
     required this.formKey,
     required this.action,
-    required this.changeCallback,
   });
 
   @override
@@ -648,25 +601,13 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
   late TextEditingController _distanceController;
   late MeasurementUnit _distanceUnit;
 
-  late final MeasurementAmount _initialDistance;
-  final FocusNode _distanceValueFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _distanceValueFocusNode.addListener(() {
-      if (!_distanceValueFocusNode.hasFocus) {
-        _checkLightDistance();
-      }
-    });
-    if (widget.action != null) {
-      _initialDistance = MeasurementAmount.fromJson(widget.action!.measurement.measurement);
-      _distanceController = TextEditingController(text: _initialDistance.value.toString());
-      _distanceUnit = _initialDistance.measurementUnit;
-    } else {
-      _distanceController = TextEditingController();
-      _distanceUnit = MeasurementUnit.cm;
-    }
+
+    _distanceController = TextEditingController();
+    _distanceUnit = MeasurementUnit.cm;
   }
 
   @override
@@ -699,7 +640,6 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
           children: [
             Expanded(
               child: TextFormField(
-                focusNode: _distanceValueFocusNode,
                 controller: _distanceController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -708,21 +648,6 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
                   hintText: '50',
                 ),
                 validator: (value) => validateInput(value, isDouble: true),
-                onFieldSubmitted: widget.action == null
-                    ? null
-                    : (value) {
-                        _checkLightDistance();
-                      },
-                onTapOutside: widget.action == null
-                    ? null
-                    : (focusNode) {
-                        _checkLightDistance();
-                      },
-                onEditingComplete: widget.action == null
-                    ? null
-                    : () {
-                        _checkLightDistance();
-                      },
               ),
             ),
             const SizedBox(width: 50),
@@ -753,34 +678,12 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
     );
   }
 
-  /// Check the light distance.
-  void _checkLightDistance() {
-    if (double.tryParse(_distanceController.text) == null) {
-      return;
-    }
 
-    if (widget.action != null) {
-      if (_initialDistance.value != double.parse(_distanceController.text) ||
-          _initialDistance.measurementUnit != _distanceUnit) {
-        widget.changeCallback(true, distance);
-      } else {
-        widget.changeCallback(false, distance);
-      }
-    }
-  }
 
   /// Update the distance unit.
   void _updateMeasurementUnit(MeasurementUnit? value) {
     setState(() {
       _distanceUnit = value!;
-      if (widget.action != null) {
-        final distance = MeasurementAmount.fromJson(widget.action!.measurement.measurement);
-        if (distance.measurementUnit != _distanceUnit) {
-          widget.changeCallback(true, distance);
-        } else {
-          widget.changeCallback(false, distance);
-        }
-      }
     });
   }
 }
@@ -789,13 +692,11 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
 class EnvironmentHumidityForm extends StatefulWidget {
   final EnvironmentMeasurementAction? action;
   final GlobalKey<FormState> formKey;
-  final Function(bool, double) changeCallback;
 
   const EnvironmentHumidityForm({
     super.key,
     required this.formKey,
     required this.action,
-    required this.changeCallback,
   });
 
   @override
@@ -805,24 +706,13 @@ class EnvironmentHumidityForm extends StatefulWidget {
 class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityForm> {
   late TextEditingController _humidityController;
 
-  late final double _initialHumidity;
 
-  final FocusNode _humidityValueFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
-    _humidityValueFocusNode.addListener(() {
-      if (!_humidityValueFocusNode.hasFocus) {
-        _checkHumidity();
-      }
-    });
-    if (widget.action != null) {
-      _initialHumidity = widget.action!.measurement.measurement['humidity'] as double;
-      _humidityController = TextEditingController(text: _initialHumidity.toString());
-    } else {
-      _humidityController = TextEditingController();
-    }
+
+    _humidityController = TextEditingController();
   }
 
   @override
@@ -848,7 +738,6 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
-          focusNode: _humidityValueFocusNode,
           controller: _humidityController,
           keyboardType: TextInputType.number,
           decoration: InputDecoration(
@@ -857,38 +746,9 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
             hintText: '50',
           ),
           validator: (value) => validateInput(value, isDouble: true),
-          onFieldSubmitted: widget.action == null
-              ? null
-              : (value) {
-                  _checkHumidity();
-                },
-          onTapOutside: widget.action == null
-              ? null
-              : (focusNode) {
-                  _checkHumidity();
-                },
-          onEditingComplete: widget.action == null
-              ? null
-              : () {
-                  _checkHumidity();
-                },
         ),
       ),
     );
-  }
-
-  void _checkHumidity() {
-    if (double.tryParse(_humidityController.text) == null) {
-      return;
-    }
-
-    if (widget.action != null) {
-      if (_initialHumidity != double.parse(_humidityController.text)) {
-        widget.changeCallback(true, humidity);
-      } else {
-        widget.changeCallback(false, humidity);
-      }
-    }
   }
 }
 
@@ -896,13 +756,11 @@ class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityF
 class EnvironmentTemperatureForm extends StatefulWidget {
   final EnvironmentMeasurementAction? action;
   final GlobalKey<FormState> formKey;
-  final Function(bool, Temperature) changeCallback;
 
   const EnvironmentTemperatureForm({
     super.key,
     required this.formKey,
     required this.action,
-    required this.changeCallback,
   });
 
   @override
@@ -913,26 +771,12 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
   late TextEditingController _temperatureController;
   late TemperatureUnit _temperatureUnit;
 
-  late final Temperature _initialTemperature;
-
-  final FocusNode _temperatureValueFocusNode = FocusNode();
-
   @override
   void initState() {
     super.initState();
-    _temperatureValueFocusNode.addListener(() {
-      if (!_temperatureValueFocusNode.hasFocus) {
-        _checkTemperature();
-      }
-    });
-    if (widget.action != null) {
-      _initialTemperature = Temperature.fromJson(widget.action!.measurement.measurement);
-      _temperatureController = TextEditingController(text: _initialTemperature.value.toString());
-      _temperatureUnit = _initialTemperature.temperatureUnit;
-    } else {
-      _temperatureController = TextEditingController();
-      _temperatureUnit = TemperatureUnit.celsius;
-    }
+
+    _temperatureController = TextEditingController();
+    _temperatureUnit = TemperatureUnit.celsius;
   }
 
   @override
@@ -966,7 +810,6 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
           children: [
             Expanded(
               child: TextFormField(
-                focusNode: _temperatureValueFocusNode,
                 controller: _temperatureController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
@@ -975,21 +818,6 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
                   hintText: '25',
                 ),
                 validator: (value) => validateInput(value, isDouble: true),
-                onFieldSubmitted: widget.action == null
-                    ? null
-                    : (value) {
-                        _checkTemperature();
-                      },
-                onTapOutside: widget.action == null
-                    ? null
-                    : (focusNode) {
-                        _checkTemperature();
-                      },
-                onEditingComplete: widget.action == null
-                    ? null
-                    : () {
-                        _checkTemperature();
-                      },
               ),
             ),
             const SizedBox(width: 50),
@@ -1020,31 +848,10 @@ class EnvironmentTemperatureMeasurementFormState extends State<EnvironmentTemper
     );
   }
 
-  void _checkTemperature() {
-    if (double.tryParse(_temperatureController.text) == null) {
-      return;
-    }
-
-    if (widget.action != null) {
-      if (_initialTemperature.value != double.parse(_temperatureController.text)) {
-        widget.changeCallback(true, temperature);
-      } else {
-        widget.changeCallback(false, temperature);
-      }
-    }
-  }
-
   /// Update the temperature unit.
   void _updateTemperatureUnit(TemperatureUnit? value) {
     setState(() {
       _temperatureUnit = value!;
-      if (widget.action != null) {
-        if (_initialTemperature.temperatureUnit != _temperatureUnit) {
-          widget.changeCallback(true, temperature);
-        } else {
-          widget.changeCallback(false, temperature);
-        }
-      }
     });
   }
 }
@@ -1965,7 +1772,7 @@ class PictureForm<T> extends StatefulWidget {
   final T? value;
   final bool allowMultiple;
   final List<File> images;
-  final Function(bool, List<File>) changeCallback;
+  final Function(bool, List<File>)? changeCallback;
 
   const PictureForm({
     super.key,
@@ -2023,7 +1830,7 @@ class PictureFormState extends State<PictureForm> {
                         return Column(
                           children: [
                             IconButton(
-                              onPressed: () => _removeImage(index, image),
+                              onPressed: () => _removeImage(index),
                               icon: const Icon(Icons.clear, color: Colors.red),
                             ),
                             Image.file(
@@ -2044,23 +1851,15 @@ class PictureFormState extends State<PictureForm> {
   }
 
   /// Remove an image.
-  void _removeImage(int index, File image) {
+  void _removeImage(int index) {
     setState(() {
-      if (widget.value == null) {
-        for (final tempImage in _images) {
-          // We only save app images
-          if (tempImage.path.contains('app_flutter')) {
-            if (image.path == tempImage.path) {
-              tempImage.delete();
-            }
-          }
-        }
-      }
       _images.removeAt(index);
-      if (widget.allowMultiple) {
-        widget.changeCallback(true, _images);
-      } else {
-        widget.changeCallback(false, _images);
+      if (widget.changeCallback != null) {
+        if (widget.allowMultiple) {
+          widget.changeCallback!(true, _images);
+        } else {
+          widget.changeCallback!(false, _images);
+        }
       }
     });
   }
@@ -2075,15 +1874,6 @@ class PictureFormState extends State<PictureForm> {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt),
-                  title: Text(tr('common.take_image_camera')),
-                  onTap: () async {
-                    final file = await _getImage(ImageSource.camera);
-                    if (!context.mounted) return;
-                    Navigator.of(context).pop(file);
-                  },
-                ),
                 ListTile(
                   leading: const Icon(Icons.photo),
                   title: Text(tr('common.select_image_gallery')),
@@ -2102,7 +1892,9 @@ class PictureFormState extends State<PictureForm> {
 
         setState(() {
           _images.add(image);
-          widget.changeCallback(true, _images);
+          if (widget.changeCallback != null) {
+            widget.changeCallback!(true, _images);
+          }
         });
       },
       icon: const Icon(Icons.add_a_photo),
@@ -2113,29 +1905,6 @@ class PictureFormState extends State<PictureForm> {
   Future<File> _getImage(final ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile == null) throw Exception('No image picked');
-    if (source == ImageSource.camera) {
-      // images taken from the camera are stored in the app directory for now
-      // TODO: Store images in platform specific gallery directory
-      final appDir = await getApplicationDocumentsDirectory();
-      final fileName = path.basename(pickedFile.path);
-      final fullPath = '${appDir.path}/images/$fileName';
-
-      // Create the images directory if it does not exist
-      final imagesDirectory = Directory('${appDir.path}/images');
-      if (!imagesDirectory.existsSync()) {
-        imagesDirectory.createSync();
-      }
-
-      // Save the image to the app directory
-      await pickedFile.saveTo(fullPath);
-
-      // Delete the image from the temporary directory
-      final cachedFile = File(pickedFile.path);
-      await cachedFile.delete();
-
-      final file = File(fullPath);
-      return file;
-    }
     return File(pickedFile.path);
   }
 }
@@ -2147,7 +1916,6 @@ class EnvironmentMeasurementForm extends StatefulWidget {
   final GlobalKey<EnvironmentHumidityMeasurementFormState> environmentHumidityFormKey;
   final GlobalKey<EnvironmentLightDistanceMeasurementFormState> environmentLightDistanceFormKey;
   final GlobalKey<EnvironmentTemperatureMeasurementFormState> environmentTemperatureFormKey;
-  final Function(bool, dynamic) changeCallback;
 
   const EnvironmentMeasurementForm({
     super.key,
@@ -2156,7 +1924,6 @@ class EnvironmentMeasurementForm extends StatefulWidget {
     required this.environmentHumidityFormKey,
     required this.environmentLightDistanceFormKey,
     required this.environmentTemperatureFormKey,
-    required this.changeCallback,
   });
 
   @override
@@ -2237,28 +2004,24 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
           key: widget.environmentTemperatureFormKey,
           action: widget.action,
           formKey: GlobalKey<FormState>(),
-          changeCallback: widget.changeCallback,
         );
       case EnvironmentMeasurementType.humidity:
         return EnvironmentHumidityForm(
           key: widget.environmentHumidityFormKey,
           action: widget.action,
           formKey: GlobalKey<FormState>(),
-          changeCallback: widget.changeCallback,
         );
       case EnvironmentMeasurementType.co2:
         return EnvironmentCO2Form(
           key: widget.environmentCO2FormKey,
           action: widget.action,
           formKey: GlobalKey<FormState>(),
-          changeCallback: widget.changeCallback,
         );
       case EnvironmentMeasurementType.lightDistance:
         return EnvironmentLightDistanceForm(
           key: widget.environmentLightDistanceFormKey,
           action: widget.action,
           formKey: GlobalKey<FormState>(),
-          changeCallback: widget.changeCallback,
         );
     }
   }
@@ -2294,36 +2057,6 @@ class _CreatePlantActionViewState extends State<CreatePlantActionView> {
   }
 }
 
-class EditPlantActionView extends StatefulWidget {
-  final PlantAction action;
-  final PlantsProvider plantsProvider;
-  final ActionsProvider actionsProvider;
-  final FertilizerProvider fertilizerProvider;
-
-  const EditPlantActionView({
-    super.key,
-    required this.action,
-    required this.plantsProvider,
-    required this.actionsProvider,
-    required this.fertilizerProvider,
-  });
-
-  @override
-  State<EditPlantActionView> createState() => _EditPlantActionViewState();
-}
-
-class _EditPlantActionViewState extends State<EditPlantActionView> {
-  @override
-  Widget build(BuildContext context) {
-    return PlantActionForm(
-      title: tr('actions.plants.edit'),
-      action: widget.action,
-      actionsProvider: widget.actionsProvider,
-      plantsProvider: widget.plantsProvider,
-      fertilizerProvider: widget.fertilizerProvider,
-    );
-  }
-}
 /// A view to create an environment action.
 class CreateEnvironmentActionView extends StatefulWidget {
   final ActionsProvider actionsProvider;
@@ -2340,103 +2073,13 @@ class CreateEnvironmentActionView extends StatefulWidget {
 }
 
 class _CreateEnvironmentActionViewState extends State<CreateEnvironmentActionView> {
-  bool _hasChanged = false;
-  List<File> _images = [];
-
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: !_hasChanged,
-      onPopInvoked: (didPop) async {
-        if (didPop) {
-          return;
-        }
-        if (_hasChanged) {
-          final confirmed = await discardChangesDialog(context);
-          if (confirmed && context.mounted) {
-            // Delete all images that were added.
-            for (var image in _images) {
-              if (image.path.contains('app_flutter')) {
-                image.delete();
-              }
-            }
-            int count = 0;
-            Navigator.of(context).popUntil((route) {
-              return count++ == 2;
-            });
-          }
-        }
-      },
-      child: EnvironmentActionForm(
-        title: tr('actions.environments.create'),
-        action: null,
-        actionsProvider: widget.actionsProvider,
-        environmentsProvider: widget.environmentsProvider,
-        changeCallback: (changed, images) {
-          setState(() {
-            _hasChanged = changed;
-            _images = images;
-          });
-        },
-      ),
-    );
-  }
-}
-
-/// A view to edit an environment action.
-class EditEnvironmentActionView extends StatefulWidget {
-  final EnvironmentAction action;
-  final ActionsProvider actionsProvider;
-  final EnvironmentsProvider environmentsProvider;
-
-  const EditEnvironmentActionView({
-    super.key,
-    required this.action,
-    required this.actionsProvider,
-    required this.environmentsProvider,
-  });
-
-  @override
-  State<EditEnvironmentActionView> createState() => _EditEnvironmentActionViewState();
-}
-
-class _EditEnvironmentActionViewState extends State<EditEnvironmentActionView> {
-  bool _hasChanged = false;
-  List<File> _images = [];
-
-  @override
-  Widget build(BuildContext context) {
-    return PopScope(
-      canPop: !_hasChanged,
-      onPopInvoked: (didPop) async {
-        if (didPop) {
-          return;
-        }
-        if (_hasChanged) {
-          final confirmed = await discardChangesDialog(context);
-          if (confirmed && context.mounted) {
-            // Delete all images that were added.
-            for (var image in _images) {
-              if (image.path.contains('app_flutter')) {
-                image.delete();
-              }
-            }
-            Navigator.of(context).pop();
-          }
-        }
-      },
-      child: EnvironmentActionForm(
-        title: tr('actions.environments.edit'),
-        action: widget.action,
-        actionsProvider: widget.actionsProvider,
-        environmentsProvider: widget.environmentsProvider,
-        changeCallback: (changed, images) async {
-          setState(() {
-            _hasChanged = changed;
-            _images = images;
-          });
-        },
-      ),
+    return EnvironmentActionForm(
+      title: tr('actions.environments.create'),
+      action: null,
+      actionsProvider: widget.actionsProvider,
+      environmentsProvider: widget.environmentsProvider,
     );
   }
 }
@@ -2757,8 +2400,9 @@ class _PlantActionFormState extends State<PlantActionForm> {
             allowMultiple: true,
             images: pictureAction == null
                 ? []
-                : pictureAction.images.map((image) => File(image)).toList(),
-            changeCallback: (hasImages, images) {});
+              : pictureAction.images.map((image) => File(image)).toList(),
+          changeCallback: null,
+        );
       case PlantActionType.death:
       case PlantActionType.other:
         return Container();
@@ -3073,7 +2717,6 @@ class EnvironmentActionForm extends StatefulWidget {
   final EnvironmentAction? action;
   final ActionsProvider actionsProvider;
   final EnvironmentsProvider environmentsProvider;
-  final Function(bool, List<File>)? changeCallback;
 
   const EnvironmentActionForm({
     super.key,
@@ -3081,7 +2724,6 @@ class EnvironmentActionForm extends StatefulWidget {
     required this.action,
     required this.actionsProvider,
     required this.environmentsProvider,
-    required this.changeCallback,
   });
 
   @override
@@ -3107,25 +2749,10 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
       TextEditingController();
   DateTime _environmentActionDate = DateTime.now();
 
-  late final EnvironmentAction _initialAction;
 
   @override
   void initState() {
     super.initState();
-    if (widget.action != null) {
-      _initialAction = widget.action!;
-      final action = widget.action!;
-      _currentEnvironmentActionType = action.type;
-      _environmentActionDate = action.createdAt;
-      _environmentActionDescriptionTextController.text = action.description;
-
-      // Postframe callback to update the current environment.
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        final environments = await widget.environmentsProvider.environments.first;
-        final environment = environments[action.environmentId];
-        _currentEnvironment = environment;
-      });
-    }
   }
 
   @override
@@ -3218,17 +2845,6 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
                       labelText: tr('common.description'),
                       hintText: tr('actions.environments.description_hint'),
                     ),
-                    onChanged: (value) {
-                      if (widget.changeCallback != null) {
-                        if (widget.action != null) {
-                          if (_initialAction.description != value) {
-                            widget.changeCallback!(true, []);
-                          } else {
-                            widget.changeCallback!(false, []);
-                          }
-                        }
-                      }
-                    },
                   ),
                 ],
               ),
@@ -3299,17 +2915,6 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
           environmentHumidityFormKey: _environmentHumidityWidgetKey,
           environmentLightDistanceFormKey: _environmentLightDistanceWidgetKey,
           environmentCO2FormKey: _environmentCO2WidgetKey,
-          changeCallback: (changed, measurement) {
-            if (widget.changeCallback != null) {
-              if (widget.action != null) {
-                if (changed) {
-                  widget.changeCallback!(true, []);
-                } else {
-                  widget.changeCallback!(false, []);
-                }
-              }
-            }
-          },
         );
       case EnvironmentActionType.picture:
         final pictureAction = widget.action as EnvironmentPictureAction?;
@@ -3320,47 +2925,7 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
           images: pictureAction == null
               ? []
               : pictureAction.images.map((image) => File(image)).toList(),
-          changeCallback: (hasImages, images) {
-            if (widget.changeCallback != null) {
-              if (images.isNotEmpty) {
-                // Creation case - pictures were
-                // taken but now user decided to leave the creation screen.
-                if (pictureAction == null && images.isNotEmpty) {
-                  widget.changeCallback!(true, images);
-                  return;
-                }
-
-                // Find the differences between the current images and the new images.
-                final newImages =
-                    images.where((image) => !pictureAction!.images.contains(image.path));
-                if (newImages.isNotEmpty) {
-                  widget.changeCallback!(true, newImages.toList());
-                  return;
-                }
-
-                // First case, action created without pictures, now pictures added
-                // and user wants to save the action.
-                Function eq = const ListEquality().equals;
-                if (eq(pictureAction!.images, images)) {
-                  widget.changeCallback!(true, images);
-                } else {
-                  widget.changeCallback!(false, images);
-                }
-              } else {
-                if (pictureAction == null) {
-                  widget.changeCallback!(false, images);
-                  return;
-                }
-                // Second case, action created with pictures, now pictures removed
-                // and user wants to save the action.
-                if (pictureAction.images.isNotEmpty) {
-                  widget.changeCallback!(true, images);
-                } else {
-                  widget.changeCallback!(false, images);
-                }
-              }
-            }
-          },
+          changeCallback: null,
         );
       case EnvironmentActionType.other:
         return Container();
@@ -3617,13 +3182,6 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
         lastDate: DateTime(2101));
     if (picked != null) {
       dateCallback(picked);
-      if (widget.changeCallback != null) {
-        if (widget.action != null) {
-          widget.changeCallback!(true, []);
-        } else {
-          widget.changeCallback!(true, []);
-        }
-      }
     }
   }
 }

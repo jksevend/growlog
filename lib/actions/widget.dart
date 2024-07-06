@@ -8,7 +8,6 @@ import 'package:weedy/actions/fertilizer/provider.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/sheet.dart';
-import 'package:weedy/actions/view.dart';
 import 'package:weedy/common/measurement.dart';
 import 'package:weedy/common/temperature.dart';
 import 'package:weedy/environments/model.dart';
@@ -323,14 +322,12 @@ class EnvironmentMeasurementActionSheetWidget extends StatefulWidget {
   final Environment environment;
   final EnvironmentMeasurementAction action;
   final ActionsProvider actionsProvider;
-  final EnvironmentsProvider environmentsProvider;
 
   const EnvironmentMeasurementActionSheetWidget({
     super.key,
     required this.environment,
     required this.action,
     required this.actionsProvider,
-    required this.environmentsProvider,
   });
 
   @override
@@ -346,7 +343,6 @@ class _EnvironmentMeasurementActionSheetWidgetState
       environment: widget.environment,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
-      environmentsProvider: widget.environmentsProvider,
       child: _measurementWidget(),
     );
   }
@@ -398,14 +394,12 @@ class EnvironmentOtherActionSheetWidget extends StatefulWidget {
   final Environment environment;
   final EnvironmentOtherAction action;
   final ActionsProvider actionsProvider;
-  final EnvironmentsProvider environmentsProvider;
 
   const EnvironmentOtherActionSheetWidget({
     super.key,
     required this.environment,
     required this.action,
     required this.actionsProvider,
-    required this.environmentsProvider,
   });
 
   @override
@@ -420,7 +414,6 @@ class _EnvironmentOtherActionSheetWidgetState extends State<EnvironmentOtherActi
       environment: widget.environment,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
-      environmentsProvider: widget.environmentsProvider,
       child: Container(),
     );
   }
@@ -431,14 +424,12 @@ class EnvironmentPictureActionSheetWidget extends StatefulWidget {
   final Environment environment;
   final EnvironmentPictureAction action;
   final ActionsProvider actionsProvider;
-  final EnvironmentsProvider environmentsProvider;
 
   const EnvironmentPictureActionSheetWidget({
     super.key,
     required this.environment,
     required this.action,
     required this.actionsProvider,
-    required this.environmentsProvider,
   });
 
   @override
@@ -453,7 +444,6 @@ class _EnvironmentPictureActionSheetWidgetState extends State<EnvironmentPicture
       environment: widget.environment,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
-      environmentsProvider: widget.environmentsProvider,
       child: SizedBox(
         height: 300,
         child: GridView.builder(
@@ -505,7 +495,6 @@ class _BaseEnvironmentActionSheetWidget extends StatefulWidget {
   final Environment environment;
   final EnvironmentAction action;
   final ActionsProvider actionsProvider;
-  final EnvironmentsProvider environmentsProvider;
   final Widget child;
 
   const _BaseEnvironmentActionSheetWidget({
@@ -513,7 +502,6 @@ class _BaseEnvironmentActionSheetWidget extends StatefulWidget {
     required this.environment,
     required this.action,
     required this.actionsProvider,
-    required this.environmentsProvider,
   });
 
   @override
@@ -549,20 +537,6 @@ class _BaseEnvironmentActionSheetWidgetState extends State<_BaseEnvironmentActio
                   widget.actionsProvider,
                 ),
                 icon: const Icon(Icons.delete_forever, color: Colors.red),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => EditEnvironmentActionView(
-                            action: widget.action,
-                            actionsProvider: widget.actionsProvider,
-                            environmentsProvider: widget.environmentsProvider,
-                          )));
-                },
-                icon: Icon(
-                  Icons.edit,
-                  color: Colors.yellow,
-                ),
               ),
             ],
           ),
@@ -604,16 +578,12 @@ class _BasePlantActionSheetWidget extends StatefulWidget {
   final Plant plant;
   final PlantAction action;
   final ActionsProvider actionsProvider;
-  final PlantsProvider plantsProvider;
-  final FertilizerProvider fertilizerProvider;
   final Widget child;
 
   const _BasePlantActionSheetWidget({
     required this.plant,
     required this.action,
     required this.actionsProvider,
-    required this.plantsProvider,
-    required this.fertilizerProvider,
     required this.child,
   });
 
@@ -649,21 +619,6 @@ class _BasePlantActionSheetWidgetState extends State<_BasePlantActionSheetWidget
                   widget.actionsProvider,
                 ),
                 icon: const Icon(Icons.delete_forever, color: Colors.red),
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => EditPlantActionView(
-                            action: widget.action,
-                            actionsProvider: widget.actionsProvider,
-                            plantsProvider: widget.plantsProvider,
-                            fertilizerProvider: widget.fertilizerProvider,
-                          )));
-                },
-                icon: Icon(
-                  Icons.edit,
-                  color: Colors.yellow,
-                ),
               ),
             ],
           ),
@@ -727,8 +682,6 @@ class _PlantWateringActionSheetWidgetState extends State<PlantWateringActionShee
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
-        plantsProvider: widget.plantsProvider,
-        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.water_amount')),
           subtitle: Text('${widget.action.amount.amount} ${widget.action.amount.unit.name}'),
@@ -765,8 +718,6 @@ class _PlantFertilizingActionSheetWidgetState extends State<PlantFertilizingActi
       plant: widget.plant,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
-      plantsProvider: widget.plantsProvider,
-      fertilizerProvider: widget.fertilizerProvider,
       child: StreamBuilder<Map<String, Fertilizer>>(
         stream: widget.fertilizerProvider.fertilizers,
         builder: (context, snapshot) {
@@ -853,8 +804,6 @@ class _PlantPruningActionSheetWidgetState extends State<PlantPruningActionSheetW
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
-        plantsProvider: widget.plantsProvider,
-        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.pruning')),
           subtitle: Text(widget.action.pruningType.name),
@@ -890,8 +839,6 @@ class _PlantTrainingActionSheetWidgetState extends State<PlantTrainingActionShee
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
-        plantsProvider: widget.plantsProvider,
-        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.training')),
           subtitle: Text(widget.action.trainingType.name),
@@ -927,8 +874,6 @@ class _PlantReplantingActionSheetWidgetState extends State<PlantReplantingAction
       plant: widget.plant,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
-      plantsProvider: widget.plantsProvider,
-      fertilizerProvider: widget.fertilizerProvider,
       child: Container(),
     );
   }
@@ -962,8 +907,6 @@ class _PlantHarvestingActionSheetWidgetState extends State<PlantHarvestingAction
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
-        plantsProvider: widget.plantsProvider,
-        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.harvesting')),
           subtitle: Text('${widget.action.amount.amount} ${widget.action.amount.unit.name}'),
@@ -999,8 +942,6 @@ class _PlantDeathActionSheetWidgetState extends State<PlantDeathActionSheetWidge
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
-        plantsProvider: widget.plantsProvider,
-        fertilizerProvider: widget.fertilizerProvider,
         child: ListTile(
           title: Text(tr('common.death')),
         ));
@@ -1035,8 +976,6 @@ class _PlantPictureActionSheetWidgetState extends State<PlantPictureActionSheetW
         plant: widget.plant,
         action: widget.action,
         actionsProvider: widget.actionsProvider,
-        plantsProvider: widget.plantsProvider,
-        fertilizerProvider: widget.fertilizerProvider,
         child: SizedBox(
           height: 300,
           child: GridView.builder(
@@ -1110,8 +1049,6 @@ class _PlantOtherActionSheetWidgetState extends State<PlantOtherActionSheetWidge
       plant: widget.plant,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
-      plantsProvider: widget.plantsProvider,
-      fertilizerProvider: widget.fertilizerProvider,
       child: Container(),
     );
   }
@@ -1146,8 +1083,6 @@ class _PlantMeasurementActionSheetWidgetState extends State<PlantMeasurementActi
       plant: widget.plant,
       action: widget.action,
       actionsProvider: widget.actionsProvider,
-      plantsProvider: widget.plantsProvider,
-      fertilizerProvider: widget.fertilizerProvider,
       child: _measurementWidget(),
     );
   }

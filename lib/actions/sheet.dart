@@ -141,7 +141,6 @@ Future<void> showEnvironmentActionDetailSheet(
           action: environmentAction,
           environment: environment,
           actionsProvider: actionsProvider,
-          environmentsProvider: environmentsProvider,
         );
       }
 
@@ -150,7 +149,6 @@ Future<void> showEnvironmentActionDetailSheet(
           action: environmentAction,
           environment: environment,
           actionsProvider: actionsProvider,
-          environmentsProvider: environmentsProvider,
         );
       }
 
@@ -159,7 +157,6 @@ Future<void> showEnvironmentActionDetailSheet(
           action: environmentAction,
           environment: environment,
           actionsProvider: actionsProvider,
-          environmentsProvider: environmentsProvider,
         );
       }
 

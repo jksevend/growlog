@@ -164,7 +164,7 @@ class EnvironmentForm extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final String title;
   final EnvironmentsProvider environmentsProvider;
-  final Function(bool, List<dynamic>)? changeCallback;
+  final Function(bool)? changeCallback;
 
   const EnvironmentForm({
     super.key,
@@ -287,9 +287,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                             if (widget.changeCallback != null) {
                               if (widget.environment != null) {
                                 if (_nameController.text != _initialEnvironment.name) {
-                                  widget.changeCallback!(true, []);
+                                  widget.changeCallback!(true);
                                 } else {
-                                  widget.changeCallback!(false, []);
+                                  widget.changeCallback!(false);
                                 }
                               }
                             }
@@ -309,9 +309,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                               if (widget.environment != null) {
                                 if (_descriptionController.text !=
                                     _initialEnvironment.description) {
-                                  widget.changeCallback!(true, []);
+                                  widget.changeCallback!(true);
                                 } else {
-                                  widget.changeCallback!(false, []);
+                                  widget.changeCallback!(false);
                                 }
                               }
                             }
@@ -393,33 +393,27 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                 // Creation case - environment banner image was
                                 // taken but now user decided to leave the creation screen.
                                 if (widget.environment == null && images.isNotEmpty) {
-                                  widget.changeCallback!(true, [
-                                    images,
-                                  ]);
+                                  widget.changeCallback!(true);
                                   return;
                                 }
 
                                 // First case - environment was created without image, now editing with image.
                                 if (images.first.path != _initialEnvironment.bannerImagePath) {
-                                  widget.changeCallback!(true, [
-                                    images,
-                                  ]);
+                                  widget.changeCallback!(true);
                                 } else {
-                                  widget.changeCallback!(false, []);
+                                  widget.changeCallback!(false);
                                 }
                               } else {
                                 if (widget.environment == null) {
-                                  widget.changeCallback!(false, []);
+                                  widget.changeCallback!(false);
                                   return;
                                 }
 
                                 // Second case - environment was created with image, now editing without image.
                                 if (_initialEnvironment.bannerImagePath.isNotEmpty) {
-                                  widget.changeCallback!(true, [
-                                    images,
-                                  ]);
+                                  widget.changeCallback!(true);
                                 } else {
-                                  widget.changeCallback!(false, []);
+                                  widget.changeCallback!(false);
                                 }
                               }
                             }
@@ -471,9 +465,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                       if (_wattController.text !=
                                           _initialEnvironment.lightDetails.lights.first.watt
                                               .toString()) {
-                                        widget.changeCallback!(true, []);
+                                        widget.changeCallback!(true);
                                       } else {
-                                        widget.changeCallback!(false, []);
+                                        widget.changeCallback!(false);
                                       }
                                     }
                                   },
@@ -506,9 +500,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                       if (widget.changeCallback != null) {
                                         if (_widthController.text !=
                                             _initialEnvironment.dimension?.width.value.toString()) {
-                                          widget.changeCallback!(true, []);
+                                          widget.changeCallback!(true);
                                         } else {
-                                          widget.changeCallback!(false, []);
+                                          widget.changeCallback!(false);
                                         }
                                       }
                                     }),
@@ -526,9 +520,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                         if (_lengthController.text !=
                                             _initialEnvironment.dimension?.length.value
                                                 .toString()) {
-                                          widget.changeCallback!(true, []);
+                                          widget.changeCallback!(true);
                                         } else {
-                                          widget.changeCallback!(false, []);
+                                          widget.changeCallback!(false);
                                         }
                                       }
                                     }),
@@ -545,9 +539,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                     if (widget.changeCallback != null) {
                                       if (_heightController.text !=
                                           _initialEnvironment.dimension?.height.value.toString()) {
-                                        widget.changeCallback!(true, []);
+                                        widget.changeCallback!(true);
                                       } else {
-                                        widget.changeCallback!(false, []);
+                                        widget.changeCallback!(false);
                                       }
                                     }
                                   },
@@ -581,9 +575,9 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
       if (widget.changeCallback != null) {
         if (widget.environment != null) {
           if (_currentLightHours != _initialEnvironment.lightDetails.lightHours.toDouble()) {
-            widget.changeCallback!(true, []);
+            widget.changeCallback!(true);
           } else {
-            widget.changeCallback!(false, []);
+            widget.changeCallback!(false);
           }
         }
       }
@@ -597,9 +591,11 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
       if (widget.changeCallback != null) {
         if (widget.environment != null) {
           if (_currentLightType != _initialEnvironment.lightDetails.lights.first.type) {
-            widget.changeCallback!(true, []);
+            widget.changeCallback!(true);
           } else {
-            widget.changeCallback!(false, []);
+            widget.changeCallback!(
+              false,
+            );
           }
         }
       }
@@ -745,43 +741,15 @@ class CreateEnvironmentView extends StatefulWidget {
 class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
   final _formKey = GlobalKey<FormState>();
 
-  bool _hasChanged = false;
-
-  List<File> _images = [];
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: !_hasChanged,
-      onPopInvoked: (didPop) async {
-        if (didPop) {
-          return;
-        }
-        if (_hasChanged) {
-          final confirmed = await discardChangesDialog(context);
-          if (confirmed && context.mounted) {
-            // Delete all images that were added.
-            for (var image in _images) {
-              if (image.path.contains('app_flutter')) {
-                image.delete();
-              }
-            }
-            Navigator.of(context).pop();
-          }
-        }
-      },
-      child: EnvironmentForm(
-        formKey: _formKey,
-        title: tr('environments.create'),
-        environment: null,
-        environmentsProvider: widget.environmentsProvider,
-        changeCallback: (bool hasChanged, List<dynamic> objects) => setState(() {
-          _hasChanged = hasChanged;
-          if (objects.isNotEmpty) {
-            _images = objects[0] as List<File>;
-          }
-        }),
-      ),
+    return EnvironmentForm(
+      formKey: _formKey,
+      title: tr('environments.create'),
+      environment: null,
+      environmentsProvider: widget.environmentsProvider,
+      changeCallback: null,
     );
   }
 }
@@ -802,7 +770,6 @@ class _EditEnvironmentViewState extends State<EditEnvironmentView> {
   final _formKey = GlobalKey<FormState>();
 
   bool _hasChanged = false;
-  List<File> _images = [];
 
   @override
   Widget build(BuildContext context) {
@@ -816,12 +783,6 @@ class _EditEnvironmentViewState extends State<EditEnvironmentView> {
         if (_hasChanged) {
           final confirmed = await discardChangesDialog(context);
           if (confirmed && context.mounted) {
-            // Delete all images that were added.
-            for (var image in _images) {
-              if (image.path.contains('app_flutter')) {
-                image.delete();
-              }
-            }
             Navigator.of(context).pop();
           }
         }
@@ -831,11 +792,8 @@ class _EditEnvironmentViewState extends State<EditEnvironmentView> {
         title: '$editTranslation ${widget.environment.name}',
         environment: widget.environment,
         environmentsProvider: widget.environmentsProvider,
-        changeCallback: (bool hasChanged, List<dynamic> objects) => setState(() {
+        changeCallback: (bool hasChanged) => setState(() {
           _hasChanged = hasChanged;
-          if (objects.isNotEmpty) {
-            _images = objects[0] as List<File>;
-          }
         }),
       ),
     );
