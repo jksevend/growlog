@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/provider.dart';
@@ -59,11 +57,6 @@ void _onEnvironmentDeleted(
   await environmentsProvider.removeEnvironment(environment);
   await plantsProvider.removePlantsInEnvironment(environment.id);
   await actionsProvider.removeActionsForEnvironment(environment.id);
-
-  final bannerImage = File(environment.bannerImagePath);
-  if (await bannerImage.exists()) {
-    await bannerImage.delete();
-  }
 
   if (!context.mounted) {
     return;

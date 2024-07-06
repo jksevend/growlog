@@ -155,7 +155,7 @@ const _$PlantActionTypeEnumMap = {
   PlantActionType.harvesting: 'harvesting',
   PlantActionType.replanting: 'replanting',
   PlantActionType.training: 'training',
-  PlantActionType.measurement: 'measuring',
+  PlantActionType.measurement: 'measurement',
   PlantActionType.picture: 'picture',
   PlantActionType.death: 'death',
   PlantActionType.other: 'other',

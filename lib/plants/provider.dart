@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:weedy/common/filestore.dart';
 import 'package:weedy/plants/model.dart';
+import 'package:weedy/plants/relocation/model.dart';
 
 /// A provider class that manages the plants.
 ///
@@ -12,7 +13,7 @@ import 'package:weedy/plants/model.dart';
 /// which will also update the JSON file on the device's file system.
 class PlantsProvider with ChangeNotifier {
   /// The name of the JSON file that holds the plants.
-  static const String _fileName = 'plants.txt';
+  static const String _plantsFileName = 'plants.txt';
 
   /// The standard plants that are used if the JSON file does not exist.
   static final Plants _standardPlants = Plants.standard();
@@ -26,16 +27,32 @@ class PlantsProvider with ChangeNotifier {
   /// The plants that are currently stored in the provider.
   late Plants _plants;
 
+  /// The file name of the relocations.
+  static const String _fileName = 'plant_relocations.txt';
+
+  /// The standard relocations.
+  static final PlantRelocations _standardRelocations = PlantRelocations.standard();
+
+  /// The relocations as a stream.
+  final BehaviorSubject<List<PlantRelocation>> _relocations = BehaviorSubject();
+
+  /// The relocations as a stream.
+  ValueStream<List<PlantRelocation>> get relocations => _relocations.stream;
+
+  /// The relocations.
+  late PlantRelocations _plantRelocations;
+
   /// Initializes the plants provider by reading the JSON file from the device's file system.
   PlantsProvider() {
-    _initialize();
+    _initializePlants();
+    _initializePlantRelocations();
   }
 
   /// Reads the JSON file from the device's file system and initializes the plants provider.
-  void _initialize() async {
+  void _initializePlants() async {
     final params = await getEncryptionParams();
     final plantsJson = await readJsonFile(
-      name: _fileName,
+      name: _plantsFileName,
       preset: json.encode(_standardPlants.toJson()),
       params: params,
     );
@@ -43,11 +60,51 @@ class PlantsProvider with ChangeNotifier {
     await _setPlants(_plants, params);
   }
 
+  /// Initializes the provider.
+  Future<void> _initializePlantRelocations() async {
+    final params = await getEncryptionParams();
+    final transitionsJson = await readJsonFile(
+      name: _fileName,
+      preset: json.encode(_standardRelocations.toJson()),
+      params: params,
+    );
+    _plantRelocations = PlantRelocations.fromJson(transitionsJson);
+    await _setRelocations(_plantRelocations, params);
+  }
+
+  /// Sets the [relocations].
+  Future<void> _setRelocations(
+    PlantRelocations relocations,
+    EncryptionParams params,
+  ) async {
+    _plantRelocations.relocations = relocations.relocations;
+    await writeJsonFile(
+      name: _fileName,
+      content: relocations.toJson(),
+      params: params,
+    );
+    _relocations.sink.add(relocations.relocations);
+  }
+
+  /// Adds a new [relocation].
+  Future<void> addRelocation(PlantRelocation relocation) async {
+    final relocations = _plantRelocations.relocations;
+    relocations.add(relocation);
+    await _setRelocations(_plantRelocations, await getEncryptionParams());
+  }
+
+  /// Removes all relocations for the plant with the given [plantId].
+  Future<void> removeRelocationsForPlant(String plantId) async {
+    final relocations = _plantRelocations.relocations;
+    relocations.removeWhere((relocation) => relocation.plantId == plantId);
+    await _setRelocations(_plantRelocations, await getEncryptionParams());
+  }
+
   /// Sets the current plants to [plants] and updates the JSON file on the device's file system.
   Future<void> _setPlants(Plants plants, EncryptionParams params) async {
     _plants.plants = plants.plants;
     await writeJsonFile(
-      name: _fileName,
+      name: _plantsFileName,
       content: plants.toJson(),
       params: params,
     );

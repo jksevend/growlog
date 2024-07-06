@@ -7,6 +7,7 @@ import 'package:weedy/environments/sheet.dart';
 import 'package:weedy/plants/dialog.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
+import 'package:weedy/plants/relocation/model.dart';
 import 'package:weedy/plants/transition/model.dart';
 import 'package:weedy/plants/transition/provider.dart';
 import 'package:weedy/plants/view.dart';
@@ -95,15 +96,15 @@ Future<void> showPlantDetailSheet(
                 : ListTile(
                     leading: const Icon(Icons.lightbulb, color: Colors.yellow),
                     title: Text(tr('common.environment')),
-                    subtitle: Text(plantEnvironment.name),
-                    trailing: IconButton(
+                      subtitle: Text(plantEnvironment!.name),
+                      trailing: IconButton(
                       icon: const Icon(Icons.arrow_right_alt),
                       onPressed: () async => _navigateToEnvironmentDetailSheet(
                         context,
                         bottomNavigationBarKey,
                         plant,
-                        plantEnvironment,
-                        plants,
+                          plantEnvironment!,
+                          plants,
                         plantsProvider,
                         environmentsProvider,
                         actionsProvider,
@@ -111,6 +112,75 @@ Future<void> showPlantDetailSheet(
                     ),
                   ),
             const Divider(),
+              StreamBuilder<Map<String, Environment>>(
+                  stream: environmentsProvider.environments,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+
+                    final environments = snapshot.data!;
+                    final otherEnvironments = environments.values
+                        .where((environment) => environment.id != plantEnvironment?.id)
+                        .toList();
+                    return ListTile(
+                      leading: const Icon(Icons.moving_rounded),
+                      title: Text(tr('plants.relocations')),
+                      subtitle:
+                          otherEnvironments.isEmpty ? Text(tr('plants.relocations_none')) : null,
+                      trailing: otherEnvironments.isEmpty
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.arrow_right_alt),
+                              onPressed: () async {
+                                final Environment? selected = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text(tr('plants.relocate')),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: otherEnvironments
+                                              .map((environment) => ListTile(
+                                                    title: Text(environment.name),
+                                                    onTap: () =>
+                                                        Navigator.of(context).pop(environment),
+                                                  ))
+                                              .toList(),
+                                        ),
+                                      );
+                                    });
+                                if (selected != null) {
+                                  // Create a relocation event
+                                  final relocation = PlantRelocation(
+                                    plantId: plant.id,
+                                    environmentIdFrom: plantEnvironment!.id,
+                                    environmentIdTo: selected.id,
+                                    timestamp: DateTime.now(),
+                                  );
+                                  await plantsProvider.addRelocation(relocation);
+
+                                  // Update the plant
+                                  plant.environmentId = selected.id;
+                                  final updatedPlant = await plantsProvider.updatePlant(plant);
+                                  setState(() {
+                                    plant = updatedPlant;
+                                  });
+
+                                  final updatedEnvironment = environments[selected.id]!;
+                                  setState(() {
+                                    plantEnvironment = updatedEnvironment;
+                                  });
+                                }
+                              },
+                            ),
+                    );
+                  }),
+              const Divider(),
               // Lifecycle transitions
               ListTile(
                 leading: const Icon(Icons.change_circle_outlined),

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:weedy/actions/provider.dart';
@@ -52,12 +50,9 @@ Future<void> _onPlantDeleted(
   PlantLifecycleTransitionProvider transitionProvider,
 ) async {
   await plantsProvider.removePlant(plant);
+  await plantsProvider.removeRelocationsForPlant(plant.id);
   await actionsProvider.removeActionsForPlant(plant.id);
   await transitionProvider.removeTransitionsForPlant(plant.id);
-  final bannerImage = File(plant.bannerImagePath);
-  if (await bannerImage.exists()) {
-    await bannerImage.delete();
-  }
 
   if (!context.mounted) {
     return;
