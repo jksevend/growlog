@@ -75,6 +75,7 @@
     "measurement": "Measurement",
     "name": "Name",
     "name_mandatory": "Please enter a name",
+    "next": "Next",
     "next_lifecycle": "Next lifecycle state",
     "no_description": "No description",
     "no_image": "No image selected",

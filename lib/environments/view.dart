@@ -16,7 +16,7 @@ import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 
 /// A widget that shows an overview of the environments.
-class EnvironmentOverview extends StatefulWidget {
+class EnvironmentOverview extends StatelessWidget {
   final EnvironmentsProvider environmentsProvider;
   final PlantsProvider plantsProvider;
   final ActionsProvider actionsProvider;
@@ -29,16 +29,11 @@ class EnvironmentOverview extends StatefulWidget {
   });
 
   @override
-  State<EnvironmentOverview> createState() => _EnvironmentOverviewState();
-}
-
-class _EnvironmentOverviewState extends State<EnvironmentOverview> {
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: CombineLatestStream.list([
-        widget.environmentsProvider.environments,
-        widget.plantsProvider.plants,
+        environmentsProvider.environments,
+        plantsProvider.plants,
       ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -114,9 +109,9 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                                 context,
                                 environment,
                                 plantsInEnvironment,
-                                widget.environmentsProvider,
-                                widget.plantsProvider,
-                                widget.actionsProvider);
+                                environmentsProvider,
+                                plantsProvider,
+                                actionsProvider);
                           },
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -126,8 +121,8 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => CreateEnvironmentActionView(
-                                            environmentsProvider: widget.environmentsProvider,
-                                            actionsProvider: widget.actionsProvider,
+                                            environmentsProvider: environmentsProvider,
+                                            actionsProvider: actionsProvider,
                                           )));
                                 },
                               ),
@@ -137,8 +132,8 @@ class _EnvironmentOverviewState extends State<EnvironmentOverview> {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => EnvironmentActionOverview(
                                             environment: environment,
-                                            actionsProvider: widget.actionsProvider,
-                                            environmentsProvider: widget.environmentsProvider,
+                                            actionsProvider: actionsProvider,
+                                            environmentsProvider: environmentsProvider,
                                           )));
                                 },
                               ),
@@ -729,16 +724,11 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
 }
 
 /// A view that allows the user to create a new environment.
-class CreateEnvironmentView extends StatefulWidget {
+class CreateEnvironmentView extends StatelessWidget {
   final EnvironmentsProvider environmentsProvider;
 
-  const CreateEnvironmentView({super.key, required this.environmentsProvider});
+  CreateEnvironmentView({super.key, required this.environmentsProvider});
 
-  @override
-  State<CreateEnvironmentView> createState() => _CreateEnvironmentViewState();
-}
-
-class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -747,7 +737,7 @@ class _CreateEnvironmentViewState extends State<CreateEnvironmentView> {
       formKey: _formKey,
       title: tr('environments.create'),
       environment: null,
-      environmentsProvider: widget.environmentsProvider,
+      environmentsProvider: environmentsProvider,
       changeCallback: null,
     );
   }

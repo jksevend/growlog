@@ -155,7 +155,7 @@ class EnvironmentActionOverview extends StatelessWidget {
 }
 
 /// An over view of all plant actions.
-class PlantActionOverview extends StatefulWidget {
+class PlantActionOverview extends StatelessWidget {
   final Plant plant;
   final PlantsProvider plantsProvider;
   final ActionsProvider actionsProvider;
@@ -172,11 +172,6 @@ class PlantActionOverview extends StatefulWidget {
   });
 
   @override
-  State<PlantActionOverview> createState() => _PlantActionOverviewState();
-}
-
-class _PlantActionOverviewState extends State<PlantActionOverview> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -184,21 +179,21 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Hero(
-              tag: widget.plant.id,
-              child: Text(widget.plant.lifeCycleState.icon),
+              tag: plant.id,
+              child: Text(plant.lifeCycleState.icon),
             ),
             const SizedBox(width: 10),
-            Text(widget.plant.name),
+            Text(plant.name),
           ],
         ),
         centerTitle: true,
       ),
       body: StreamBuilder<List<dynamic>>(
         stream: CombineLatestStream.list([
-          widget.actionsProvider.plantActions,
-          widget.plantsProvider.transitions,
-          widget.plantsProvider.relocations,
-          widget.environmentsProvider.environments
+          actionsProvider.plantActions,
+          plantsProvider.transitions,
+          plantsProvider.relocations,
+          environmentsProvider.environments
         ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -214,12 +209,12 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
           final plantActions = snapshot.data![0] as List<PlantAction>;
           final plantRelocations = snapshot.data![2] as List<PlantRelocation>;
           final specificPlantActions =
-              plantActions.where((action) => action.plantId == widget.plant.id).toList();
+              plantActions.where((action) => action.plantId == plant.id).toList();
           final specificPlantLifecycleTransitions =
               (snapshot.data![1] as List<PlantLifecycleTransition>)
-                  .where((transition) => transition.plantId == widget.plant.id);
+                  .where((transition) => transition.plantId == plant.id);
           final specificPlantRelocations =
-              plantRelocations.where((relocation) => relocation.plantId == widget.plant.id);
+              plantRelocations.where((relocation) => relocation.plantId == plant.id);
           final combinedActions = [
             ...specificPlantActions,
             ...specificPlantLifecycleTransitions,
@@ -286,10 +281,10 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                           final action = actions[index];
                           if (action is PlantAction) {
                             return PlantActionLogItem(
-                              plantsProvider: widget.plantsProvider,
-                              actionsProvider: widget.actionsProvider,
-                              fertilizerProvider: widget.fertilizerProvider,
-                              plant: widget.plant,
+                              plantsProvider: plantsProvider,
+                              actionsProvider: actionsProvider,
+                              fertilizerProvider: fertilizerProvider,
+                              plant: plant,
                               action: action,
                               isFirst: index == 0,
                               isLast: index == actions.length - 1,
@@ -381,7 +376,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
                                       Flexible(
                                         flex: 1,
                                         child: Text(
-                                          _lifecycleMessage(widget.plant.name, transition.from),
+                                          _lifecycleMessage(plant.name, transition.from),
                                           style: const TextStyle(fontSize: 16),
                                         ),
                                       ),
@@ -587,7 +582,8 @@ class _ChooseActionViewState extends State<ChooseActionView> {
                     ));
                   }
                 },
-                child: Text('Next'))
+              child: Text(tr('common.next')),
+            )
           ],
         ),
       ),
@@ -2124,7 +2120,7 @@ class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm>
 }
 
 /// A view to create a plant action.
-class CreatePlantActionView extends StatefulWidget {
+class CreatePlantActionView extends StatelessWidget {
   final PlantsProvider plantsProvider;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
@@ -2137,24 +2133,19 @@ class CreatePlantActionView extends StatefulWidget {
   });
 
   @override
-  State<CreatePlantActionView> createState() => _CreatePlantActionViewState();
-}
-
-class _CreatePlantActionViewState extends State<CreatePlantActionView> {
-  @override
   Widget build(BuildContext context) {
     return PlantActionForm(
       title: tr('actions.plants.create'),
       action: null,
-      actionsProvider: widget.actionsProvider,
-      plantsProvider: widget.plantsProvider,
-      fertilizerProvider: widget.fertilizerProvider,
+      actionsProvider: actionsProvider,
+      plantsProvider: plantsProvider,
+      fertilizerProvider: fertilizerProvider,
     );
   }
 }
 
 /// A view to create an environment action.
-class CreateEnvironmentActionView extends StatefulWidget {
+class CreateEnvironmentActionView extends StatelessWidget {
   final ActionsProvider actionsProvider;
   final EnvironmentsProvider environmentsProvider;
 
@@ -2165,17 +2156,12 @@ class CreateEnvironmentActionView extends StatefulWidget {
   });
 
   @override
-  State<CreateEnvironmentActionView> createState() => _CreateEnvironmentActionViewState();
-}
-
-class _CreateEnvironmentActionViewState extends State<CreateEnvironmentActionView> {
-  @override
   Widget build(BuildContext context) {
     return EnvironmentActionForm(
       title: tr('actions.environments.create'),
       action: null,
-      actionsProvider: widget.actionsProvider,
-      environmentsProvider: widget.environmentsProvider,
+      actionsProvider: actionsProvider,
+      environmentsProvider: environmentsProvider,
     );
   }
 }
@@ -2439,7 +2425,7 @@ class _PlantActionFormState extends State<PlantActionForm> {
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
+        lastDate: DateTime.now());
     if (picked != null) {
       dateCallback(picked);
     }
@@ -3274,7 +3260,7 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
+        lastDate: DateTime.now());
     if (picked != null) {
       dateCallback(picked);
     }

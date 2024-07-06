@@ -626,21 +626,16 @@ class _PlantFormState extends State<PlantForm> {
 }
 
 /// A view to create a plant.
-class CreatePlantView extends StatefulWidget {
+class CreatePlantView extends StatelessWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
 
-  const CreatePlantView({
+  CreatePlantView({
     super.key,
     required this.plantsProvider,
     required this.environmentsProvider,
   });
 
-  @override
-  State<CreatePlantView> createState() => _CreatePlantViewState();
-}
-
-class _CreatePlantViewState extends State<CreatePlantView> {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -649,8 +644,8 @@ class _CreatePlantViewState extends State<CreatePlantView> {
       formKey: _formKey,
       title: tr('plants.create'),
       plant: null,
-      plantsProvider: widget.plantsProvider,
-      environmentsProvider: widget.environmentsProvider,
+      plantsProvider: plantsProvider,
+      environmentsProvider: environmentsProvider,
       changeCallback: null,
     );
   }

@@ -11,7 +11,7 @@ import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 
 /// Home view that displays the actions performed today.
-class HomeView extends StatefulWidget {
+class HomeView extends StatelessWidget {
   final PlantsProvider plantsProvider;
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
@@ -26,19 +26,14 @@ class HomeView extends StatefulWidget {
   });
 
   @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder(
       stream: CombineLatestStream.list(
         [
-          widget.plantsProvider.plants,
-          widget.environmentsProvider.environments,
-          widget.actionsProvider.plantActions,
-          widget.actionsProvider.environmentActions,
+          plantsProvider.plants,
+          environmentsProvider.environments,
+          actionsProvider.plantActions,
+          actionsProvider.environmentActions,
         ],
       ),
       builder: (context, snapshot) {
@@ -172,9 +167,9 @@ class _HomeViewState extends State<HomeView> {
                                             (action) => PlantActionLogHomeWidget(
                                               plant: plants[action.plantId]!,
                                               action: action,
-                                              actionsProvider: widget.actionsProvider,
-                                              fertilizerProvider: widget.fertilizerProvider,
-                                              plantsProvider: widget.plantsProvider,
+                                              actionsProvider: actionsProvider,
+                                              fertilizerProvider: fertilizerProvider,
+                                              plantsProvider: plantsProvider,
                                             ),
                                           )
                                           .toList(),
@@ -225,8 +220,8 @@ class _HomeViewState extends State<HomeView> {
                                             (action) => EnvironmentActionLogHomeWidget(
                                               environment: environments[action.environmentId]!,
                                               action: action,
-                                              actionsProvider: widget.actionsProvider,
-                                              environmentsProvider: widget.environmentsProvider,
+                                              actionsProvider: actionsProvider,
+                                              environmentsProvider: environmentsProvider,
                                             ),
                                           )
                                           .toList(),
