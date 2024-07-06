@@ -3260,7 +3260,7 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
         context: context,
         initialDate: DateTime.now(),
         firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
+        lastDate: DateTime.now());
     if (picked != null) {
       dateCallback(picked);
     }
