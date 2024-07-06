@@ -23,7 +23,6 @@ import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 import 'package:weedy/plants/relocation/model.dart';
 import 'package:weedy/plants/transition/model.dart';
-import 'package:weedy/plants/transition/provider.dart';
 
 /// An over view of all environment actions.
 class EnvironmentActionOverview extends StatelessWidget {
@@ -162,7 +161,6 @@ class PlantActionOverview extends StatefulWidget {
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
   final EnvironmentsProvider environmentsProvider;
-  final PlantLifecycleTransitionProvider plantLifecycleTransitionProvider;
 
   const PlantActionOverview({
     super.key,
@@ -171,7 +169,6 @@ class PlantActionOverview extends StatefulWidget {
     required this.actionsProvider,
     required this.fertilizerProvider,
     required this.environmentsProvider,
-    required this.plantLifecycleTransitionProvider,
   });
 
   @override
@@ -199,7 +196,7 @@ class _PlantActionOverviewState extends State<PlantActionOverview> {
       body: StreamBuilder<List<dynamic>>(
         stream: CombineLatestStream.list([
           widget.actionsProvider.plantActions,
-          widget.plantLifecycleTransitionProvider.transitions,
+          widget.plantsProvider.transitions,
           widget.plantsProvider.relocations,
           widget.environmentsProvider.environments
         ]),

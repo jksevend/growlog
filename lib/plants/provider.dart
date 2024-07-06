@@ -5,6 +5,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:weedy/common/filestore.dart';
 import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/relocation/model.dart';
+import 'package:weedy/plants/transition/model.dart';
 
 /// A provider class that manages the plants.
 ///
@@ -28,7 +29,7 @@ class PlantsProvider with ChangeNotifier {
   late Plants _plants;
 
   /// The file name of the relocations.
-  static const String _fileName = 'plant_relocations.txt';
+  static const String _plantRelocationsFileName = 'plant_relocations.txt';
 
   /// The standard relocations.
   static final PlantRelocations _standardRelocations = PlantRelocations.standard();
@@ -42,10 +43,67 @@ class PlantsProvider with ChangeNotifier {
   /// The relocations.
   late PlantRelocations _plantRelocations;
 
+  /// The file name of the lifecycle transitions.
+  static const String _plantLifecycleTransitionsFileName = 'plant_transitions.txt';
+
+  /// The standard transitions.
+  static final PlantLifecycleTransitions _standardTransitions =
+      PlantLifecycleTransitions.standard();
+
+  /// The transitions as a stream.
+  final BehaviorSubject<List<PlantLifecycleTransition>> _transitions = BehaviorSubject();
+
+  /// The transitions as a stream.
+  Stream<List<PlantLifecycleTransition>> get transitions => _transitions.stream;
+
+  /// The transitions.
+  late PlantLifecycleTransitions _lifecycleTransitions;
+
   /// Initializes the plants provider by reading the JSON file from the device's file system.
   PlantsProvider() {
     _initializePlants();
     _initializePlantRelocations();
+    _initializePlantLifecycleTransitions();
+  }
+
+  /// Initializes the provider.
+  Future<void> _initializePlantLifecycleTransitions() async {
+    final params = await getEncryptionParams();
+    final transitionsJson = await readJsonFile(
+      name: _plantLifecycleTransitionsFileName,
+      preset: json.encode(_standardTransitions.toJson()),
+      params: params,
+    );
+    _lifecycleTransitions = PlantLifecycleTransitions.fromJson(transitionsJson);
+    await _setTransitions(_lifecycleTransitions, params);
+  }
+
+  /// Sets the [transitions].
+  Future<void> _setTransitions(
+    PlantLifecycleTransitions transitions,
+    EncryptionParams params,
+  ) async {
+    _lifecycleTransitions.transitions = transitions.transitions;
+    await writeJsonFile(
+      name: _plantLifecycleTransitionsFileName,
+      content: transitions.toJson(),
+      params: params,
+    );
+    _transitions.sink.add(transitions.transitions);
+  }
+
+  /// Adds a new [transition].
+  Future<void> addTransition(PlantLifecycleTransition transition) async {
+    final transitions = _lifecycleTransitions.transitions;
+    transitions.add(transition);
+    await _setTransitions(_lifecycleTransitions, await getEncryptionParams());
+  }
+
+  /// Removes all transitions for the plant with the given [plantId].
+  Future<void> removeTransitionsForPlant(String plantId) async {
+    final transitions = _lifecycleTransitions.transitions;
+    transitions.removeWhere((transition) => transition.plantId == plantId);
+    await _setTransitions(_lifecycleTransitions, await getEncryptionParams());
   }
 
   /// Reads the JSON file from the device's file system and initializes the plants provider.
@@ -64,7 +122,7 @@ class PlantsProvider with ChangeNotifier {
   Future<void> _initializePlantRelocations() async {
     final params = await getEncryptionParams();
     final transitionsJson = await readJsonFile(
-      name: _fileName,
+      name: _plantRelocationsFileName,
       preset: json.encode(_standardRelocations.toJson()),
       params: params,
     );
@@ -79,7 +137,7 @@ class PlantsProvider with ChangeNotifier {
   ) async {
     _plantRelocations.relocations = relocations.relocations;
     await writeJsonFile(
-      name: _fileName,
+      name: _plantRelocationsFileName,
       content: relocations.toJson(),
       params: params,
     );

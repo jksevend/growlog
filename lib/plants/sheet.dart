@@ -9,7 +9,6 @@ import 'package:weedy/plants/model.dart';
 import 'package:weedy/plants/provider.dart';
 import 'package:weedy/plants/relocation/model.dart';
 import 'package:weedy/plants/transition/model.dart';
-import 'package:weedy/plants/transition/provider.dart';
 import 'package:weedy/plants/view.dart';
 
 /// Shows a bottom sheet with detailed information about a [plant].
@@ -22,7 +21,6 @@ Future<void> showPlantDetailSheet(
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
   EnvironmentsProvider environmentsProvider,
-  PlantLifecycleTransitionProvider transitionProvider,
   GlobalKey<State<BottomNavigationBar>> bottomNavigationBarKey,
 ) async {
   await showModalBottomSheet(
@@ -58,8 +56,8 @@ Future<void> showPlantDetailSheet(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      onPressed: () async => _onDeletePlant(
-                          context, plant, plantsProvider, actionsProvider, transitionProvider),
+                      onPressed: () async =>
+                          _onDeletePlant(context, plant, plantsProvider, actionsProvider),
                       icon: const Icon(
                         Icons.delete_forever,
                         color: Colors.red,
@@ -71,7 +69,6 @@ Future<void> showPlantDetailSheet(
                         plant,
                         plantsProvider,
                         environmentsProvider,
-                        transitionProvider,
                         (updatedPlant) {
                           setState(
                             () {
@@ -129,7 +126,6 @@ Future<void> showPlantDetailSheet(
                           onPressed: () async => _onLifecycleTransition(
                             plant,
                             lifecycleTransition,
-                            transitionProvider,
                             plantsProvider,
                             (updatedParams) {
                               final updatedPlant = updatedParams[0] as Plant;
@@ -253,7 +249,6 @@ Future<void> showPlantDetailSheet(
 Future<void> _onLifecycleTransition(
   Plant plant,
   PlantLifecycleTransition lifecycleTransition,
-  PlantLifecycleTransitionProvider transitionProvider,
   PlantsProvider plantsProvider,
   Function(List<dynamic>) stateSetter,
 ) async {
@@ -273,7 +268,7 @@ Future<void> _onLifecycleTransition(
     plantId: plant.id,
     timestamp: DateTime.now(),
   );
-  await transitionProvider.addTransition(transition);
+  await plantsProvider.addTransition(transition);
 
   // Update the plant in the provider.
   plant.lifeCycleState = nextLifecycleState;
@@ -291,10 +286,9 @@ Future<void> _onDeletePlant(
   Plant plant,
   PlantsProvider plantsProvider,
   ActionsProvider actionsProvider,
-  PlantLifecycleTransitionProvider transitionProvider,
 ) async {
-  final confirmed = await confirmDeletionOfPlantDialog(
-      context, plant, plantsProvider, actionsProvider, transitionProvider);
+  final confirmed =
+      await confirmDeletionOfPlantDialog(context, plant, plantsProvider, actionsProvider);
   if (confirmed == true) {
     if (!context.mounted) {
       return;
@@ -314,15 +308,14 @@ Future<void> _onUpdatePlant(
   Plant plant,
   PlantsProvider plantsProvider,
   EnvironmentsProvider environmentsProvider,
-  PlantLifecycleTransitionProvider transitionProvider,
   Function(Plant?) stateSetter,
 ) async {
   final updatedPlant = await Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => EditPlantView(
           plant: plant,
           plantsProvider: plantsProvider,
-          environmentsProvider: environmentsProvider,
-          transitionsProvider: transitionProvider)));
+            environmentsProvider: environmentsProvider,
+          )));
   stateSetter(updatedPlant);
 }
 
