@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rxdart/streams.dart';
+import 'package:uri_to_file/uri_to_file.dart';
 import 'package:uuid/uuid.dart';
 import 'package:weedy/actions/fertilizer/dialog.dart';
 import 'package:weedy/actions/fertilizer/model.dart';
@@ -12,6 +13,7 @@ import 'package:weedy/actions/fertilizer/sheet.dart';
 import 'package:weedy/actions/model.dart';
 import 'package:weedy/actions/provider.dart';
 import 'package:weedy/actions/widget.dart';
+import 'package:weedy/common/gallery_saver.dart';
 import 'package:weedy/common/measurement.dart';
 import 'package:weedy/common/temperature.dart';
 import 'package:weedy/common/validators.dart';
@@ -1875,6 +1877,15 @@ class PictureFormState extends State<PictureForm> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
+                  leading: const Icon(Icons.camera_alt),
+                  title: Text(tr('common.take_image_camera')),
+                  onTap: () async {
+                    final file = await _getImage(ImageSource.camera);
+                    if (!context.mounted) return;
+                    Navigator.of(context).pop(file);
+                  },
+                ),
+                ListTile(
                   leading: const Icon(Icons.photo),
                   title: Text(tr('common.select_image_gallery')),
                   onTap: () async {
@@ -1905,6 +1916,14 @@ class PictureFormState extends State<PictureForm> {
   Future<File> _getImage(final ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile == null) throw Exception('No image picked');
+    if (source == ImageSource.camera) {
+      final result = await GallerySaver.saveImage(pickedFile.path);
+      if (result == null) {
+        throw Exception('Failed to save image');
+      }
+      File file = await toFile(result);
+      return file;
+    }
     return File(pickedFile.path);
   }
 }
