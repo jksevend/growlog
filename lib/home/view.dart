@@ -67,31 +67,47 @@ class _HomeViewState extends State<HomeView> {
 
         List<weedy.Action> allActions = [...plantActions, ...environmentActions];
         allActions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        final List<weedy.Action> fourLatestActions =
-            allActions.where((action) => action.isToday()).take(4).toList();
-
-        final List<Widget> actionIndicators = fourLatestActions.map((action) {
-          if (action is weedy.PlantAction) {
-            return Container(
-              width: 5,
-              height: 5,
-              decoration: const BoxDecoration(
-                color: Colors.green,
-                shape: BoxShape.circle,
-              ),
-            );
-          } else if (action is weedy.EnvironmentAction) {
-            return Container(
-              width: 5,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.yellow[900],
-                shape: BoxShape.circle,
-              ),
-            );
+        final Map<DateTime, List<weedy.Action>> fourLatestActionsByDate = allActions
+            .fold<Map<DateTime, List<weedy.Action>>>({},
+                (Map<DateTime, List<weedy.Action>> map, weedy.Action action) {
+          final dateKey =
+              DateTime(action.createdAt.year, action.createdAt.month, action.createdAt.day);
+          if (!map.containsKey(dateKey)) {
+            map[dateKey] = [];
           }
-          throw Exception('Unknown action type');
-        }).toList();
+          map[dateKey]!.add(action);
+          return map;
+        });
+        final Map<DateTime, List<Widget>> actionIndicatorsGrouped = fourLatestActionsByDate.map(
+          (date, actions) {
+            return MapEntry(
+              date,
+              actions.map(
+                (action) {
+                  if (action is weedy.PlantAction) {
+                    return Container(
+                      width: 5,
+                      height: 5,
+                      decoration: const BoxDecoration(
+                        color: Colors.green,
+                        shape: BoxShape.circle,
+                      ),
+                    );
+                  } else {
+                    return Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.yellow[900],
+                        shape: BoxShape.circle,
+                      ),
+                    );
+                  }
+                },
+              ).toList(),
+            );
+          },
+        );
 
         return Padding(
           padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 20),
@@ -100,7 +116,7 @@ class _HomeViewState extends State<HomeView> {
             children: [
               Card(
                 child: WeekAndMonthView(
-                  actionIndicators: actionIndicators,
+                  actionIndicators: actionIndicatorsGrouped,
                 ),
               ),
               Card(
