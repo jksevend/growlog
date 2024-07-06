@@ -28,35 +28,36 @@ Future<void> showPlantDetailSheet(
   await showModalBottomSheet(
     context: context,
     builder: (context) {
-      return StatefulBuilder(builder: (context, setState) {
-        return Column(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.info),
-              title: Row(
-                children: [
-                  Text(plant.name),
-                  const SizedBox(width: 8.0),
-                  Text(plant.lifeCycleState.icon),
-                ],
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    plant.medium.name,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Column(
+            children: [
+              ListTile(
+                leading: const Icon(Icons.info),
+                title: Row(
+                  children: [
+                    Text(plant.name),
+                    const SizedBox(width: 8.0),
+                    Text(plant.lifeCycleState.icon),
+                  ],
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      plant.medium.name,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
-                  ),
-                  Text(plant.description),
-                ],
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
+                    Text(plant.description),
+                  ],
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
                       onPressed: () async => _onDeletePlant(
                           context, plant, plantsProvider, actionsProvider, transitionProvider),
                       icon: const Icon(
@@ -88,8 +89,8 @@ Future<void> showPlantDetailSheet(
                     ),
                   ],
                 ),
-            ),
-            const Divider(),
+              ),
+              const Divider(),
               ListTile(
                 leading: const Icon(Icons.change_circle_outlined),
                 title: Text(tr('plants.transitions')),
@@ -149,27 +150,27 @@ Future<void> showPlantDetailSheet(
               ),
               const Divider(),
               // Information about the plants' environment
-            plantEnvironment == null
-                ? Text(tr('environments.none'))
-                : ListTile(
-                    leading: const Icon(Icons.lightbulb, color: Colors.yellow),
-                    title: Text(tr('common.environment')),
+              plantEnvironment == null
+                  ? Text(tr('environments.none'))
+                  : ListTile(
+                      leading: const Icon(Icons.lightbulb, color: Colors.yellow),
+                      title: Text(tr('common.environment')),
                       subtitle: Text(plantEnvironment!.name),
                       trailing: IconButton(
-                      icon: const Icon(Icons.arrow_right_alt),
-                      onPressed: () async => _navigateToEnvironmentDetailSheet(
-                        context,
-                        bottomNavigationBarKey,
-                        plant,
+                        icon: const Icon(Icons.arrow_right_alt),
+                        onPressed: () async => _navigateToEnvironmentDetailSheet(
+                          context,
+                          bottomNavigationBarKey,
+                          plant,
                           plantEnvironment!,
                           plants,
-                        plantsProvider,
-                        environmentsProvider,
-                        actionsProvider,
+                          plantsProvider,
+                          environmentsProvider,
+                          actionsProvider,
+                        ),
                       ),
                     ),
-                  ),
-            const Divider(),
+              const Divider(),
               StreamBuilder<Map<String, Environment>>(
                   stream: environmentsProvider.environments,
                   builder: (context, snapshot) {

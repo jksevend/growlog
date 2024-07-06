@@ -665,8 +665,6 @@ class EnvironmentCO2MeasurementFormState extends State<EnvironmentCO2Form> {
       ),
     );
   }
-
-
 }
 
 /// A form to display the distance of the light in the environment.
@@ -688,7 +686,6 @@ class EnvironmentLightDistanceForm extends StatefulWidget {
 class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLightDistanceForm> {
   late TextEditingController _distanceController;
   late MeasurementUnit _distanceUnit;
-
 
   @override
   void initState() {
@@ -766,8 +763,6 @@ class EnvironmentLightDistanceMeasurementFormState extends State<EnvironmentLigh
     );
   }
 
-
-
   /// Update the distance unit.
   void _updateMeasurementUnit(MeasurementUnit? value) {
     setState(() {
@@ -793,8 +788,6 @@ class EnvironmentHumidityForm extends StatefulWidget {
 
 class EnvironmentHumidityMeasurementFormState extends State<EnvironmentHumidityForm> {
   late TextEditingController _humidityController;
-
-
 
   @override
   void initState() {
@@ -2037,6 +2030,7 @@ class EnvironmentMeasurementForm extends StatefulWidget {
 
 class _EnvironmentMeasurementFormState extends State<EnvironmentMeasurementForm> {
   late EnvironmentMeasurementType _measurementType;
+
   @override
   void initState() {
     super.initState();
@@ -2154,10 +2148,10 @@ class _CreatePlantActionViewState extends State<CreatePlantActionView> {
   Widget build(BuildContext context) {
     return PlantActionForm(
       title: tr('actions.plants.create'),
-        action: null,
-        actionsProvider: widget.actionsProvider,
-        plantsProvider: widget.plantsProvider,
-        fertilizerProvider: widget.fertilizerProvider,
+      action: null,
+      actionsProvider: widget.actionsProvider,
+      plantsProvider: widget.plantsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
     );
   }
 }
@@ -2501,10 +2495,10 @@ class _PlantActionFormState extends State<PlantActionForm> {
         final pictureAction = widget.action as PlantPictureAction?;
         return PictureForm(
           key: _plantPictureFormState,
-            value: pictureAction,
-            allowMultiple: true,
-            images: pictureAction == null
-                ? []
+          value: pictureAction,
+          allowMultiple: true,
+          images: pictureAction == null
+              ? []
               : pictureAction.images.map((image) => File(image)).toList(),
           changeCallback: null,
         );
@@ -2853,7 +2847,6 @@ class _EnvironmentActionFormState extends State<EnvironmentActionForm> {
   late final TextEditingController _environmentActionDescriptionTextController =
       TextEditingController();
   DateTime _environmentActionDate = DateTime.now();
-
 
   @override
   void initState() {

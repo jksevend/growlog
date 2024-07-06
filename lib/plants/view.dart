@@ -299,9 +299,9 @@ class _PlantFormState extends State<PlantForm> {
                         maxLines: null,
                         minLines: 5,
                         decoration: InputDecoration(
-                            labelText: tr('common.description'),
-                            hintText: tr('plants.hint_description'),
-                          ),
+                          labelText: tr('common.description'),
+                          hintText: tr('plants.hint_description'),
+                        ),
                         onChanged: (value) {
                           if (widget.changeCallback != null) {
                             if (widget.plant != null) {
@@ -651,6 +651,7 @@ class CreatePlantView extends StatefulWidget {
 
 class _CreatePlantViewState extends State<CreatePlantView> {
   final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return PlantForm(
