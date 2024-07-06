@@ -41,6 +41,7 @@ class PlantOverview extends StatelessWidget {
         stream: CombineLatestStream.list([
           plantsProvider.plants,
           environmentsProvider.environments,
+          plantsProvider.transitions,
         ]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
