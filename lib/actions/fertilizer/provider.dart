@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:growlog/actions/fertilizer/model.dart';
+import 'package:growlog/common/filestore.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:weedy/actions/fertilizer/model.dart';
-import 'package:weedy/common/filestore.dart';
 
 /// A provider for fertilizers.
 ///

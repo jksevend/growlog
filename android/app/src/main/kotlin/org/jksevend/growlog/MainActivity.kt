@@ -1,4 +1,4 @@
-package org.jksevend.weedy
+package org.jksevend.growlog
 
 import android.content.ContentValues
 import android.net.Uri
@@ -11,7 +11,7 @@ import java.io.IOException
 import java.io.OutputStream
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "org.jksevend.weedy"
+    private val CHANNEL = "org.jksevend.growlog"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -44,7 +44,7 @@ class MainActivity : FlutterActivity() {
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, file.name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/Weedy")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/GrowLog")
         }
 
         val uri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)

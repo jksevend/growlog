@@ -1,15 +1,15 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/environments/model.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/environments/sheet.dart';
-import 'package:weedy/plants/dialog.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
-import 'package:weedy/plants/relocation/model.dart';
-import 'package:weedy/plants/transition/model.dart';
-import 'package:weedy/plants/view.dart';
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/environments/model.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/environments/sheet.dart';
+import 'package:growlog/plants/dialog.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
+import 'package:growlog/plants/relocation/model.dart';
+import 'package:growlog/plants/transition/model.dart';
+import 'package:growlog/plants/view.dart';
 
 /// Shows a bottom sheet with detailed information about a [plant].
 Future<void> showPlantDetailSheet(

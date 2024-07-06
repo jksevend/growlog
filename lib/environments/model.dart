@@ -1,6 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:growlog/common/measurement.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:weedy/common/measurement.dart';
 
 part 'model.g.dart';
 

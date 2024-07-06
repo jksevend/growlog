@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/fertilizer/dialog.dart';
-import 'package:weedy/actions/fertilizer/model.dart';
-import 'package:weedy/actions/fertilizer/provider.dart';
+import 'package:growlog/actions/fertilizer/dialog.dart';
+import 'package:growlog/actions/fertilizer/model.dart';
+import 'package:growlog/actions/fertilizer/provider.dart';
 
 /// Show a bottom sheet with the details of the [fertilizers].
 Future<void> showFertilizerDetailSheet(

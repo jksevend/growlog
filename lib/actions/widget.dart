@@ -2,18 +2,18 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/dialog.dart';
-import 'package:weedy/actions/fertilizer/model.dart';
-import 'package:weedy/actions/fertilizer/provider.dart';
-import 'package:weedy/actions/model.dart';
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/actions/sheet.dart';
-import 'package:weedy/common/measurement.dart';
-import 'package:weedy/common/temperature.dart';
-import 'package:weedy/environments/model.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
+import 'package:growlog/actions/dialog.dart';
+import 'package:growlog/actions/fertilizer/model.dart';
+import 'package:growlog/actions/fertilizer/provider.dart';
+import 'package:growlog/actions/model.dart';
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/actions/sheet.dart';
+import 'package:growlog/common/measurement.dart';
+import 'package:growlog/common/temperature.dart';
+import 'package:growlog/environments/model.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
 
 /// A list item to display a [PlantAction].
 class PlantActionLogItem extends StatelessWidget {

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:growlog/actions/model.dart' as growlog;
+import 'package:growlog/common/filestore.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:weedy/actions/model.dart' as weedy;
-import 'package:weedy/common/filestore.dart';
 
 /// A provider for actions.
 ///
@@ -14,22 +14,22 @@ class ActionsProvider with ChangeNotifier {
   static const String _fileName = 'actions.txt';
 
   /// The standard actions.
-  static final weedy.Actions _standardActions = weedy.Actions.standard();
+  static final growlog.Actions _standardActions = growlog.Actions.standard();
 
   /// The plant actions as a stream.
-  final BehaviorSubject<List<weedy.PlantAction>> _plantActions = BehaviorSubject();
+  final BehaviorSubject<List<growlog.PlantAction>> _plantActions = BehaviorSubject();
 
   /// The environment actions as a stream.
-  final BehaviorSubject<List<weedy.EnvironmentAction>> _environmentActions = BehaviorSubject();
+  final BehaviorSubject<List<growlog.EnvironmentAction>> _environmentActions = BehaviorSubject();
 
   /// The plant actions as a stream.
-  Stream<List<weedy.PlantAction>> get plantActions => _plantActions.stream;
+  Stream<List<growlog.PlantAction>> get plantActions => _plantActions.stream;
 
   /// The environment actions as a stream.
-  Stream<List<weedy.EnvironmentAction>> get environmentActions => _environmentActions.stream;
+  Stream<List<growlog.EnvironmentAction>> get environmentActions => _environmentActions.stream;
 
   /// The actions.
-  late weedy.Actions _actions;
+  late growlog.Actions _actions;
 
   /// Creates a new actions provider.
   ActionsProvider() {
@@ -45,14 +45,14 @@ class ActionsProvider with ChangeNotifier {
       params: params,
     );
 
-    _actions = weedy.Actions.fromJson(actionsJson);
+    _actions = growlog.Actions.fromJson(actionsJson);
     await _setPlantActions(_actions.plantActions, params);
     await _setEnvironmentActions(_actions.environmentActions, params);
   }
 
   /// Sets the [plantActions].
   Future<void> _setPlantActions(
-    List<weedy.PlantAction> plantActions,
+    List<growlog.PlantAction> plantActions,
     EncryptionParams params,
   ) async {
     _actions.plantActions = plantActions;
@@ -66,7 +66,7 @@ class ActionsProvider with ChangeNotifier {
 
   /// Sets the [environmentActions].
   Future<void> _setEnvironmentActions(
-    List<weedy.EnvironmentAction> environmentActions,
+    List<growlog.EnvironmentAction> environmentActions,
     EncryptionParams params,
   ) async {
     _actions.environmentActions = environmentActions;
@@ -79,7 +79,7 @@ class ActionsProvider with ChangeNotifier {
   }
 
   /// Adds a [plantAction].
-  Future<void> addPlantAction(weedy.PlantAction plantAction) async {
+  Future<void> addPlantAction(growlog.PlantAction plantAction) async {
     final params = await getEncryptionParams();
     final plantActions = await _plantActions.first;
     plantActions.add(plantAction);
@@ -87,14 +87,14 @@ class ActionsProvider with ChangeNotifier {
   }
 
   /// Adds an [environmentAction].
-  Future<void> addEnvironmentAction(weedy.EnvironmentAction environmentAction) async {
+  Future<void> addEnvironmentAction(growlog.EnvironmentAction environmentAction) async {
     final params = await getEncryptionParams();
     final environmentActions = await _environmentActions.first;
     environmentActions.add(environmentAction);
     await _setEnvironmentActions(environmentActions, params);
   }
 
-  Future<void> updateEnvironmentAction(weedy.EnvironmentAction environmentAction) async {
+  Future<void> updateEnvironmentAction(growlog.EnvironmentAction environmentAction) async {
     final params = await getEncryptionParams();
     final environmentActions = await _environmentActions.first;
     final index = environmentActions.indexWhere((action) => action.id == environmentAction.id);
@@ -122,7 +122,7 @@ class ActionsProvider with ChangeNotifier {
   }
 
   /// Deletes a plant action by its [id].
-  Future<void> deletePlantAction(weedy.PlantAction plantAction) async {
+  Future<void> deletePlantAction(growlog.PlantAction plantAction) async {
     final params = await getEncryptionParams();
     final plantActions = await _plantActions.first;
     plantActions.remove(plantAction);
@@ -130,7 +130,7 @@ class ActionsProvider with ChangeNotifier {
   }
 
   /// Deletes an environment action by its [id].
-  Future<void> deleteEnvironmentAction(weedy.EnvironmentAction environmentAction) async {
+  Future<void> deleteEnvironmentAction(growlog.EnvironmentAction environmentAction) async {
     final params = await getEncryptionParams();
     final environmentActions = await _environmentActions.first;
     environmentActions.remove(environmentAction);

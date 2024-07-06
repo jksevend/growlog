@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:growlog/common/filestore.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/relocation/model.dart';
+import 'package:growlog/plants/transition/model.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:weedy/common/filestore.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/relocation/model.dart';
-import 'package:weedy/plants/transition/model.dart';
 
 /// A provider class that manages the plants.
 ///

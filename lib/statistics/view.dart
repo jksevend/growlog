@@ -39,7 +39,7 @@ class StatisticsView extends StatelessWidget {
   GestureRecognizer _tapRecognizer() {
     return TapGestureRecognizer()
       ..onTap = () async {
-        const url = 'https://github.com/jksevend/weedy';
+        const url = 'https://github.com/jksevend/growlog';
         if (await canLaunchUrl(Uri.parse(url))) {
           await launchUrl(Uri.parse(url));
         } else {

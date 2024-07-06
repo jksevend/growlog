@@ -1,18 +1,18 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/fertilizer/provider.dart';
-import 'package:weedy/actions/model.dart' as weedy;
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/actions/sheet.dart';
-import 'package:weedy/environments/model.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
+import 'package:growlog/actions/fertilizer/provider.dart';
+import 'package:growlog/actions/model.dart' as growlog;
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/actions/sheet.dart';
+import 'package:growlog/environments/model.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
 
 /// An item of a list of plant actions
 class PlantActionLogHomeWidget extends StatelessWidget {
   final Plant plant;
-  final weedy.PlantAction action;
+  final growlog.PlantAction action;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
   final PlantsProvider plantsProvider;
@@ -44,10 +44,10 @@ class PlantActionLogHomeWidget extends StatelessWidget {
 
   /// The icon of the displayed action
   String _determineIcon() {
-    if (action.type != weedy.PlantActionType.measurement) {
+    if (action.type != growlog.PlantActionType.measurement) {
       return action.type.icon;
     }
-    final fertilizerAction = action as weedy.PlantMeasurementAction;
+    final fertilizerAction = action as growlog.PlantMeasurementAction;
     return fertilizerAction.measurement.type.icon;
   }
 }
@@ -55,7 +55,7 @@ class PlantActionLogHomeWidget extends StatelessWidget {
 /// An item of a list of environment actions
 class EnvironmentActionLogHomeWidget extends StatelessWidget {
   final Environment environment;
-  final weedy.EnvironmentAction action;
+  final growlog.EnvironmentAction action;
   final ActionsProvider actionsProvider;
   final EnvironmentsProvider environmentsProvider;
 
@@ -90,10 +90,10 @@ class EnvironmentActionLogHomeWidget extends StatelessWidget {
 
   /// The icon of the displayed action
   String _determineIcon() {
-    if (action.type != weedy.EnvironmentActionType.measurement) {
+    if (action.type != growlog.EnvironmentActionType.measurement) {
       return action.type.icon;
     }
-    final measurementAction = action as weedy.EnvironmentMeasurementAction;
+    final measurementAction = action as growlog.EnvironmentMeasurementAction;
     return measurementAction.measurement.type.icon;
   }
 }

@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/model.dart';
-import 'package:weedy/actions/provider.dart';
+import 'package:growlog/actions/model.dart';
+import 'package:growlog/actions/provider.dart';
 
 /// Cancel the dialog.
 void _close<T>(BuildContext context, final T value) {

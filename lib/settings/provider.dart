@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:growlog/common/filestore.dart';
+import 'package:growlog/settings/model.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:weedy/common/filestore.dart';
-import 'package:weedy/settings/model.dart';
 
 /// A provider class that manages the application's settings.
 ///

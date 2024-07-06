@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/fertilizer/provider.dart';
-import 'package:weedy/actions/model.dart';
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/actions/widget.dart';
-import 'package:weedy/environments/model.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
+import 'package:growlog/actions/fertilizer/provider.dart';
+import 'package:growlog/actions/model.dart';
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/actions/widget.dart';
+import 'package:growlog/environments/model.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
 
 /// Show a bottom sheet with the details of the [plantAction].
 Future<void> showPlantActionDetailSheet(

@@ -2,18 +2,18 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/actions/view.dart';
+import 'package:growlog/common/dialog.dart';
+import 'package:growlog/common/measurement.dart';
+import 'package:growlog/common/validators.dart';
+import 'package:growlog/environments/model.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/environments/sheet.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/actions/view.dart';
-import 'package:weedy/common/dialog.dart';
-import 'package:weedy/common/measurement.dart';
-import 'package:weedy/common/validators.dart';
-import 'package:weedy/environments/model.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/environments/sheet.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
 
 /// A widget that shows an overview of the environments.
 class EnvironmentOverview extends StatelessWidget {

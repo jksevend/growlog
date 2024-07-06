@@ -2,19 +2,19 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:growlog/actions/fertilizer/provider.dart';
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/actions/view.dart';
+import 'package:growlog/common/date_utils.dart';
+import 'package:growlog/common/dialog.dart';
+import 'package:growlog/environments/model.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
+import 'package:growlog/plants/sheet.dart';
+import 'package:growlog/plants/transition/model.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
-import 'package:weedy/actions/fertilizer/provider.dart';
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/actions/view.dart';
-import 'package:weedy/common/date_utils.dart';
-import 'package:weedy/common/dialog.dart';
-import 'package:weedy/environments/model.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
-import 'package:weedy/plants/sheet.dart';
-import 'package:weedy/plants/transition/model.dart';
 
 /// A widget that displays an overview of all plants.
 class PlantOverview extends StatelessWidget {

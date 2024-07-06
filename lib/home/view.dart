@@ -1,14 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:growlog/actions/fertilizer/provider.dart';
+import 'package:growlog/actions/model.dart' as growlog;
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/environments/model.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/home/widget.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
 import 'package:rxdart/streams.dart';
-import 'package:weedy/actions/fertilizer/provider.dart';
-import 'package:weedy/actions/model.dart' as weedy;
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/environments/model.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/home/widget.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
 
 /// Home view that displays the actions performed today.
 class HomeView extends StatelessWidget {
@@ -48,8 +48,8 @@ class HomeView extends StatelessWidget {
         // Extract data
         var plants = snapshot.data![0] as Map<String, Plant>;
         var environments = snapshot.data![1] as Map<String, Environment>;
-        var plantActions = snapshot.data![2] as List<weedy.PlantAction>;
-        var environmentActions = snapshot.data![3] as List<weedy.EnvironmentAction>;
+        var plantActions = snapshot.data![2] as List<growlog.PlantAction>;
+        var environmentActions = snapshot.data![3] as List<growlog.EnvironmentAction>;
 
         // Filter actions performed today
         var todayPlantActions =
@@ -60,11 +60,11 @@ class HomeView extends StatelessWidget {
         var todayPlantActionsPerformed = todayPlantActions.length;
         var todayEnvironmentActionsPerformed = todayEnvironmentActions.length;
 
-        List<weedy.Action> allActions = [...plantActions, ...environmentActions];
+        List<growlog.Action> allActions = [...plantActions, ...environmentActions];
         allActions.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        final Map<DateTime, List<weedy.Action>> fourLatestActionsByDate = allActions
-            .fold<Map<DateTime, List<weedy.Action>>>({},
-                (Map<DateTime, List<weedy.Action>> map, weedy.Action action) {
+        final Map<DateTime, List<growlog.Action>> fourLatestActionsByDate = allActions
+            .fold<Map<DateTime, List<growlog.Action>>>({},
+                (Map<DateTime, List<growlog.Action>> map, growlog.Action action) {
           final dateKey =
               DateTime(action.createdAt.year, action.createdAt.month, action.createdAt.day);
           if (!map.containsKey(dateKey)) {
@@ -79,7 +79,7 @@ class HomeView extends StatelessWidget {
               date,
               actions.map(
                 (action) {
-                  if (action is weedy.PlantAction) {
+                  if (action is growlog.PlantAction) {
                     return Container(
                       width: 5,
                       height: 5,

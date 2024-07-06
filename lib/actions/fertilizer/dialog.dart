@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:growlog/actions/fertilizer/model.dart';
+import 'package:growlog/actions/fertilizer/provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:weedy/actions/fertilizer/model.dart';
-import 'package:weedy/actions/fertilizer/provider.dart';
 
 /// Show a dialog to add or edit a fertilizer.
 Future<void> showFertilizerForm(

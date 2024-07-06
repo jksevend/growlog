@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 class GallerySaver {
-  static const MethodChannel _channel = MethodChannel('org.jksevend.weedy');
+  static const MethodChannel _channel = MethodChannel('org.jksevend.growlog');
 
   /// Save image to gallery.
   static Future<String?> saveImage(String imagePath) async {

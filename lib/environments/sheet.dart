@@ -1,13 +1,13 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/common/measurement.dart';
-import 'package:weedy/environments/dialog.dart';
-import 'package:weedy/environments/model.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/environments/view.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/common/measurement.dart';
+import 'package:growlog/environments/dialog.dart';
+import 'package:growlog/environments/model.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/environments/view.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
 
 /// Shows a bottom sheet with the details of the [environment].
 Future<void> showEnvironmentDetailSheet(

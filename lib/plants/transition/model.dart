@@ -1,5 +1,5 @@
+import 'package:growlog/plants/model.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:weedy/plants/model.dart';
 
 part 'model.g.dart';
 

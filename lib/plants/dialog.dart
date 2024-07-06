@@ -1,8 +1,8 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/plants/model.dart';
-import 'package:weedy/plants/provider.dart';
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/plants/model.dart';
+import 'package:growlog/plants/provider.dart';
 
 /// Shows a dialog that asks the user to confirm the deletion of a plant.
 Future<bool> confirmDeletionOfPlantDialog(

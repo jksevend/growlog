@@ -1,8 +1,9 @@
-# 🌱 Weedy
-[![Test](https://github.com/jksevend/weedy/actions/workflows/test.yaml/badge.svg)](https://github.com/jksevend/weedy/actions/workflows/test.yaml)
-[![Build](https://github.com/jksevend/weedy/actions/workflows/build.yaml/badge.svg)](https://github.com/jksevend/weedy/actions/workflows/build.yaml)
+# 🌱 GrowLog - Cannabis diary
 
-Weedy is a simple, lightweight and free diary app to track the progress of your plants.
+[![Test](https://github.com/jksevend/growlog/actions/workflows/test.yaml/badge.svg)](https://github.com/jksevend/growlog/actions/workflows/test.yaml)
+[![Build](https://github.com/jksevend/growlog/actions/workflows/build.yaml/badge.svg)](https://github.com/jksevend/growlog/actions/workflows/build.yaml)
+
+GrowLog is a simple, lightweight and free diary app to track the progress of your plants.
 
 ## Features
 
@@ -17,13 +18,13 @@ Weedy is a simple, lightweight and free diary app to track the progress of your 
 
 ## Tracking progress
 
-We use [GitHub Projects](https://github.com/users/jksevend/projects/20) to track the progress of Weedy.
+We use [GitHub Projects](https://github.com/users/jksevend/projects/20) to track the progress of GrowLog.
 
 ## Reporting an issue
 
 Open a bug report by creating an
-issue [here](https://github.com/jksevend/weedy/issues/new?assignees=jksevend&labels=bug&projects=&template=bug_report.md&title=).
+issue [here](https://github.com/jksevend/growlog/issues/new?assignees=jksevend&labels=bug&projects=&template=bug_report.md&title=).
 
 ## License
 
-Weedy is licensed under the [MIT License](LICENSE).
+GrowLog is licensed under the [MIT License](LICENSE).

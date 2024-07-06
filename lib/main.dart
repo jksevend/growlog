@@ -1,19 +1,19 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:growlog/actions/fertilizer/provider.dart';
+import 'package:growlog/actions/provider.dart';
+import 'package:growlog/actions/view.dart';
+import 'package:growlog/common/filestore.dart';
+import 'package:growlog/environments/provider.dart';
+import 'package:growlog/environments/view.dart';
+import 'package:growlog/home/view.dart';
+import 'package:growlog/plants/provider.dart';
+import 'package:growlog/plants/view.dart';
+import 'package:growlog/settings/provider.dart';
+import 'package:growlog/settings/view.dart';
+import 'package:growlog/statistics/view.dart';
 import 'package:provider/provider.dart';
-import 'package:weedy/actions/fertilizer/provider.dart';
-import 'package:weedy/actions/provider.dart';
-import 'package:weedy/actions/view.dart';
-import 'package:weedy/common/filestore.dart';
-import 'package:weedy/environments/provider.dart';
-import 'package:weedy/environments/view.dart';
-import 'package:weedy/home/view.dart';
-import 'package:weedy/plants/provider.dart';
-import 'package:weedy/plants/view.dart';
-import 'package:weedy/settings/provider.dart';
-import 'package:weedy/settings/view.dart';
-import 'package:weedy/statistics/view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,13 +58,13 @@ void main() async {
       supportedLocales: const [Locale('en', 'US'), Locale('de', 'DE')],
       path: 'assets/translations',
       fallbackLocale: const Locale('en', 'US'),
-      child: const WeedyApp(),
+      child: const GrowLogApp(),
     ),
   );
 }
 
-class WeedyApp extends StatelessWidget {
-  const WeedyApp({super.key});
+class GrowLogApp extends StatelessWidget {
+  const GrowLogApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class WeedyApp extends StatelessWidget {
         builder: (context, settingsProvider, plantsProvider, environmentsProvider, actionsProvider,
             fertilizerProvider, _) {
           return MaterialApp(
-            title: 'Weedy',
+            title: 'GrowLog - Cannabis diary',
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
@@ -152,7 +152,7 @@ class _MainViewState extends State<MainView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Weedy'),
+        title: const Text('GrowLog - Cannabis diary'),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings),
