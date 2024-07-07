@@ -116,7 +116,19 @@ class PlantOverview extends StatelessWidget {
                                 style: const TextStyle(fontSize: 22.0),
                               ),
                             ),
-                            title: Text(plant.name),
+                            title: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(plant.name),
+                                if (plant.strainDetails != null)
+                                  Text(
+                                    '${plant.strainDetails!.name} - ${plant.strainDetails!.type}',
+                                    style:
+                                        const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
+                                  )
+                              ],
+                            ),
                             subtitle: Text(
                                 '${daysSince(plant.createdAt)} days (W${weeksSince(plant.createdAt)})'),
                             onTap: () async {
@@ -210,6 +222,7 @@ class _PlantFormState extends State<PlantForm> {
   late List<bool> _selectedLifeCycleState;
   late Medium _selectedMedium;
   Environment? _currentEnvironment;
+  StrainDetails? _selectedStrain;
 
   late final Plant _initialPlant;
 
@@ -311,6 +324,57 @@ class _PlantFormState extends State<PlantForm> {
                   ),
                 ),
               ),
+              if (widget.plant == null)
+                StreamBuilder<List<StrainDetails>>(
+                    stream: widget.plantsProvider.strains,
+                    builder: (context, snapshot) {
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Text(tr('common.choose_strain')),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Autocomplete<StrainDetails>(
+                                      initialValue:
+                                          TextEditingValue(text: _selectedStrain?.name ?? ''),
+                                      optionsBuilder: (TextEditingValue textEditingValue) {
+                                        if (textEditingValue.text.isEmpty) {
+                                          return const Iterable<StrainDetails>.empty();
+                                        }
+                                        return snapshot.data!.where((StrainDetails option) {
+                                          return option.name
+                                              .toLowerCase()
+                                              .contains(textEditingValue.text.toLowerCase());
+                                        });
+                                      },
+                                      onSelected: (StrainDetails strain) {
+                                        setState(() {
+                                          _selectedStrain = strain;
+                                        });
+                                      },
+                                      displayStringForOption: (StrainDetails option) => option.name,
+                                    ),
+                                  ),
+                                  if (_selectedStrain != null)
+                                    IconButton(
+                                      icon: const Icon(Icons.clear),
+                                      onPressed: () {
+                                        setState(() {
+                                          _selectedStrain = null;
+                                        });
+                                      },
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+
               if (widget.plant == null)
                 Card(
                   child: Padding(
@@ -542,6 +606,7 @@ class _PlantFormState extends State<PlantForm> {
             lifeCycleState: _lifeCycleState,
             bannerImagePath: formPicture,
             createdAt: widget.plant!.createdAt,
+            strainDetails: _selectedStrain,
           );
           await widget.plantsProvider
               .updatePlant(plant)
@@ -558,6 +623,7 @@ class _PlantFormState extends State<PlantForm> {
                 ? ''
                 : _pictureFormKey.currentState!.images.first,
             createdAt: DateTime.now(),
+            strainDetails: _selectedStrain,
           );
 
           // Add an initial transition to the plant if it is new

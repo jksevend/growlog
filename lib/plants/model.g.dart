@@ -19,6 +19,9 @@ Map<String, dynamic> _$PlantsToJson(Plants instance) => <String, dynamic>{
 Plant _$PlantFromJson(Map<String, dynamic> json) => Plant(
       id: json['id'] as String,
       name: json['name'] as String,
+      strainDetails: json['strainDetails'] == null
+          ? null
+          : StrainDetails.fromJson(json['strainDetails'] as Map<String, dynamic>),
       description: json['description'] as String,
       lifeCycleState: $enumDecode(_$LifeCycleStateEnumMap, json['lifeCycleState']),
       medium: $enumDecode(_$MediumEnumMap, json['medium']),
@@ -30,6 +33,7 @@ Plant _$PlantFromJson(Map<String, dynamic> json) => Plant(
 Map<String, dynamic> _$PlantToJson(Plant instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'strainDetails': instance.strainDetails,
       'description': instance.description,
       'lifeCycleState': _$LifeCycleStateEnumMap[instance.lifeCycleState]!,
       'medium': _$MediumEnumMap[instance.medium]!,
@@ -52,3 +56,13 @@ const _$MediumEnumMap = {
   Medium.coco: 'coco',
   Medium.hydroponics: 'hydroponics',
 };
+
+StrainDetails _$StrainDetailsFromJson(Map<String, dynamic> json) => StrainDetails(
+      name: json['name'] as String,
+      type: json['type'] as String,
+    );
+
+Map<String, dynamic> _$StrainDetailsToJson(StrainDetails instance) => <String, dynamic>{
+      'name': instance.name,
+      'type': instance.type,
+    };

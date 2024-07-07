@@ -118,6 +118,7 @@ extension LifeCycleStateExtension on LifeCycleState {
 class Plant {
   final String id;
   final String name;
+  final StrainDetails? strainDetails;
   final String description;
   LifeCycleState lifeCycleState;
   final Medium medium;
@@ -129,6 +130,7 @@ class Plant {
   Plant({
     required this.id,
     required this.name,
+    required this.strainDetails,
     required this.description,
     required this.lifeCycleState,
     required this.medium,
@@ -140,4 +142,35 @@ class Plant {
   factory Plant.fromJson(Map<String, dynamic> json) => _$PlantFromJson(json);
 
   Map<String, dynamic> toJson() => _$PlantToJson(this);
+}
+
+@JsonSerializable()
+class StrainDetails {
+  final String name;
+  final String type;
+
+  StrainDetails({
+    required this.name,
+    required this.type,
+  });
+
+  factory StrainDetails.fromJson(Map<String, dynamic> json) => _$StrainDetailsFromJson(json);
+
+  factory StrainDetails.fromList(List<dynamic> list) => StrainDetails(
+        name: list[0],
+        type: list[1],
+      );
+
+  Map<String, dynamic> toJson() => _$StrainDetailsToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StrainDetails &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          type == other.type;
+
+  @override
+  int get hashCode => name.hashCode ^ type.hashCode;
 }

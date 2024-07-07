@@ -452,7 +452,7 @@ class _EnvironmentFormState extends State<EnvironmentForm> {
                                   decoration: InputDecoration(
                                     labelText: tr('common.watt'),
                                     hintText: tr('common.watt_hint'),
-                                    suffixIcon: Icon(Icons.electrical_services),
+                                    suffixIcon: const Icon(Icons.electrical_services),
                                   ),
                                   validator: (value) => validateInput(value, isDouble: true),
                                   onChanged: (value) {
