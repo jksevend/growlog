@@ -179,7 +179,13 @@
       "description": "Information about the app",
       "title": "About"
     },
-    "title": "Settings"
+    "title": "Settings",
+    "update": {
+      "title": "Update",
+      "description": "Check for updates",
+      "error": "An error occurred while checking for updates",
+      "no_update": "No updates available"
+    }
   },
   "statistics": {
     "coming_soon": "The statistics feature is in development. Check out the progress "

@@ -179,7 +179,13 @@
       "description": "Información sobre la aplicación",
       "title": "Acerca de"
     },
-    "title": "Configuración"
+    "title": "Configuración",
+    "update": {
+      "title": "Buscar actualizaciones",
+      "description": "Buscar actualizaciones de la aplicación",
+      "error": "Error al buscar actualizaciones",
+      "no_update": "No hay actualizaciones disponibles"
+    }
   },
   "statistics": {
     "coming_soon": "La función de estadísticas está en desarrollo. Mira el progreso "
