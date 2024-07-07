@@ -428,7 +428,6 @@ class _PlantFormState extends State<PlantForm> {
                                   child: Text(tr('environments.none')),
                                 );
                               }
-                              _currentEnvironment = environments[environments.keys.first]!;
                               return DropdownButton<Environment>(
                                 icon: const Icon(Icons.arrow_downward_sharp),
                                 isExpanded: true,
@@ -441,6 +440,7 @@ class _PlantFormState extends State<PlantForm> {
                                     )
                                     .toList(),
                                 onChanged: (Environment? value) => _updateCurrentEnvironment(value),
+                                hint: Text(tr('environments.mandatory')),
                                 value: _currentEnvironment,
                               );
                             }),

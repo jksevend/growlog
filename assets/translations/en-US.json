@@ -131,8 +131,7 @@
     "name_hint": "Enter the name of the environment",
     "none": "No environments",
     "plants": "Plants in this environment",
-    "select": "Select an environment",
-    "select_mandatory": "Please select an environment"
+    "select": "Select an environment"
   },
   "fertilizers": {
     "create": "Create fertilizer",
