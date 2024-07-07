@@ -20,6 +20,11 @@ class StatisticsView extends StatelessWidget {
                 const TextSpan(text: '🚧 '),
                 TextSpan(
                   text: tr('statistics.coming_soon'),
+                  style: TextStyle(
+                    color: Theme.of(context).brightness == Brightness.light
+                        ? Colors.black
+                        : Colors.white,
+                  ),
                 ),
                 TextSpan(
                   text: tr('common.here'),
