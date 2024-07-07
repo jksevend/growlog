@@ -3,7 +3,8 @@
 [![Test](https://github.com/jksevend/growlog/actions/workflows/test.yaml/badge.svg)](https://github.com/jksevend/growlog/actions/workflows/test.yaml)
 [![Build](https://github.com/jksevend/growlog/actions/workflows/build.yaml/badge.svg)](https://github.com/jksevend/growlog/actions/workflows/build.yaml)
 
-GrowLog is a simple, lightweight and free diary app to track the progress of your plants.
+GrowLog is a simple, lightweight and free diary app to track the progress of your plants. It is designed to be secure
+and private, so you can keep your data safe.
 
 ## Features
 
@@ -15,6 +16,10 @@ GrowLog is a simple, lightweight and free diary app to track the progress of you
 - 📅 View a calendar of your actions
 - 📝 Add notes to your plants and environments
 - 🌐 Available in multiple languages
+
+## Platforms
+
+<a href='https://play.google.com/store/apps/details?id=org.jksevend.growlog'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height="80"/></a>
 
 ## Tracking progress
 
