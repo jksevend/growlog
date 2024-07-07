@@ -7,6 +7,8 @@ import 'package:growlog/actions/view.dart';
 import 'package:growlog/common/filestore.dart';
 import 'package:growlog/environments/provider.dart';
 import 'package:growlog/environments/view.dart';
+import 'package:growlog/grow/provider.dart';
+import 'package:growlog/grow/view.dart';
 import 'package:growlog/home/view.dart';
 import 'package:growlog/plants/provider.dart';
 import 'package:growlog/plants/view.dart';
@@ -75,11 +77,12 @@ class GrowLogApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => EnvironmentsProvider()),
         ChangeNotifierProvider(create: (_) => ActionsProvider()),
         ChangeNotifierProvider(create: (_) => FertilizerProvider()),
+        ChangeNotifierProvider(create: (_) => GrowProvider()),
       ],
-      child: Consumer5<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider,
-          FertilizerProvider>(
+      child: Consumer6<SettingsProvider, PlantsProvider, EnvironmentsProvider, ActionsProvider,
+          FertilizerProvider, GrowProvider>(
         builder: (context, settingsProvider, plantsProvider, environmentsProvider, actionsProvider,
-            fertilizerProvider, _) {
+            fertilizerProvider, growProvider, _) {
           return MaterialApp(
             title: 'GrowLog - Cannabis diary',
             localizationsDelegates: context.localizationDelegates,
@@ -94,6 +97,7 @@ class GrowLogApp extends StatelessWidget {
               environmentsProvider: environmentsProvider,
               actionsProvider: actionsProvider,
               fertilizerProvider: fertilizerProvider,
+              growProvider: growProvider,
             ),
           );
         },
@@ -109,6 +113,7 @@ class MainView extends StatefulWidget {
   final EnvironmentsProvider environmentsProvider;
   final ActionsProvider actionsProvider;
   final FertilizerProvider fertilizerProvider;
+  final GrowProvider growProvider;
 
   const MainView({
     super.key,
@@ -117,6 +122,7 @@ class MainView extends StatefulWidget {
     required this.environmentsProvider,
     required this.actionsProvider,
     required this.fertilizerProvider,
+    required this.growProvider,
   });
 
   @override
@@ -144,6 +150,13 @@ class _MainViewState extends State<MainView> {
       environmentsProvider: widget.environmentsProvider,
       plantsProvider: widget.plantsProvider,
       actionsProvider: widget.actionsProvider,
+    ),
+    GrowOverview(
+      plantsProvider: widget.plantsProvider,
+      environmentsProvider: widget.environmentsProvider,
+      actionsProvider: widget.actionsProvider,
+      fertilizerProvider: widget.fertilizerProvider,
+      growProvider: widget.growProvider,
     ),
     const StatisticsView(),
   ];
@@ -185,6 +198,11 @@ class _MainViewState extends State<MainView> {
             icon: const Icon(Icons.lightbulb_outlined),
             activeIcon: const Icon(Icons.lightbulb),
             label: tr('main.environments_label'),
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.yard_outlined),
+            activeIcon: const Icon(Icons.yard),
+            label: 'Grows',
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.bar_chart_outlined),
@@ -272,6 +290,33 @@ class _MainViewState extends State<MainView> {
         child: const Stack(
           children: <Widget>[
             Icon(Icons.lightbulb, size: 36),
+            Positioned(
+              top: 22,
+              left: 22,
+              child: Icon(Icons.add, size: 18),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_selectedIndex == 3) {
+      return FloatingActionButton(
+        backgroundColor: Colors.brown[900],
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CreateGrowView(
+                    plantsProvider: widget.plantsProvider,
+                    environmentsProvider: widget.environmentsProvider,
+                    actionsProvider: widget.actionsProvider,
+                    fertilizerProvider: widget.fertilizerProvider,
+                    growProvider: widget.growProvider,
+                  )));
+        },
+        tooltip: 'Add grow',
+        child: const Stack(
+          children: <Widget>[
+            Icon(Icons.yard, size: 36),
             Positioned(
               top: 22,
               left: 22,
