@@ -179,7 +179,13 @@
       "description": "Informationen über die App",
       "title": "Über"
     },
-    "title": "Einstellungen"
+    "title": "Einstellungen",
+    "update": {
+      "title": "Nach Updates suchen",
+      "description": "Suchen Sie nach Updates für die App",
+      "error": "Fehler beim Suchen nach Updates",
+      "no_update": "Keine Updates verfügbar"
+    }
   },
   "statistics": {
     "coming_soon": "Die Statistikfunktion ist in Entwicklung. Schauen Sie sich den Fortschritt an "
