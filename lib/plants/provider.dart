@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:growlog/common/filestore.dart';
+import 'package:growlog/common/strains.dart';
 import 'package:growlog/plants/model.dart';
 import 'package:growlog/plants/relocation/model.dart';
 import 'package:growlog/plants/transition/model.dart';
@@ -59,11 +60,24 @@ class PlantsProvider with ChangeNotifier {
   /// The transitions.
   late PlantLifecycleTransitions _lifecycleTransitions;
 
+  /// The strains as a stream controller.
+  final BehaviorSubject<List<StrainDetails>> _strains = BehaviorSubject();
+
+  /// The strains as a stream.
+  Stream<List<StrainDetails>> get strains => _strains.stream;
+
   /// Initializes the plants provider by reading the JSON file from the device's file system.
   PlantsProvider() {
     _initializePlants();
     _initializePlantRelocations();
     _initializePlantLifecycleTransitions();
+    _initializeStrains();
+  }
+
+  /// Initializes the provider.
+  Future<void> _initializeStrains() async {
+    final List<StrainDetails> strains = await Strains.all();
+    _strains.sink.add(strains);
   }
 
   /// Initializes the provider.
