@@ -113,7 +113,7 @@ class SettingsView extends StatelessWidget {
                           applicationIcon:
                               Image.asset('assets/img/app_icon.png', width: 50, height: 50),
                           applicationName: 'GrowLog - Cannabis diary',
-                          applicationVersion: '1.0.0',
+                          applicationVersion: '1.0.1',
                           applicationLegalese:
                               'MIT LICENSE 2024 GrowLog\ngithub.com/jksevend/growlog',
                         );
