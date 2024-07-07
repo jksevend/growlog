@@ -140,7 +140,7 @@ class _SettingsViewState extends State<SettingsView> {
                           applicationIcon:
                               Image.asset('assets/img/app_icon.png', width: 50, height: 50),
                           applicationName: 'GrowLog - Cannabis diary',
-                          applicationVersion: '1.2.0',
+                          applicationVersion: '1.2.1',
                           applicationLegalese:
                               'MIT LICENSE 2024 GrowLog\ngithub.com/jksevend/growlog',
                         );
