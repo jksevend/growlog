@@ -7,6 +7,7 @@ import 'package:growlog/actions/provider.dart';
 import 'package:growlog/actions/view.dart';
 import 'package:growlog/common/date_utils.dart';
 import 'package:growlog/common/dialog.dart';
+import 'package:growlog/common/strains.dart';
 import 'package:growlog/environments/model.dart';
 import 'package:growlog/environments/provider.dart';
 import 'package:growlog/plants/model.dart';
@@ -232,6 +233,7 @@ class _PlantFormState extends State<PlantForm> {
 
     if (widget.plant != null) {
       _initialPlant = widget.plant!;
+      _selectedStrain = widget.plant!.strainDetails;
       // Add postframe callback to set the initial values
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         _currentEnvironment =
@@ -324,56 +326,79 @@ class _PlantFormState extends State<PlantForm> {
                   ),
                 ),
               ),
-              if (widget.plant == null)
-                StreamBuilder<List<StrainDetails>>(
-                    stream: widget.plantsProvider.strains,
-                    builder: (context, snapshot) {
-                      return Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Text(tr('common.choose_strain')),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Autocomplete<StrainDetails>(
-                                      initialValue:
-                                          TextEditingValue(text: _selectedStrain?.name ?? ''),
-                                      optionsBuilder: (TextEditingValue textEditingValue) {
-                                        if (textEditingValue.text.isEmpty) {
-                                          return const Iterable<StrainDetails>.empty();
+
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FutureBuilder<List<StrainDetails>>(
+                      future: Strains.all(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+
+                        if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        }
+
+                        return Column(
+                          children: [
+                            Text(tr('common.choose_strain')),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Autocomplete<StrainDetails>(
+                                    initialValue: TextEditingValue(
+                                        text: _selectedStrain != null ? _selectedStrain!.name : ''),
+                                    optionsBuilder: (TextEditingValue textEditingValue) {
+                                      return snapshot.data!.where((StrainDetails option) {
+                                        return option.name
+                                            .toLowerCase()
+                                            .contains(textEditingValue.text.toLowerCase());
+                                      });
+                                    },
+                                    onSelected: (StrainDetails strain) {
+                                      setState(() {
+                                        _selectedStrain = strain;
+                                        if (widget.changeCallback != null) {
+                                          if (widget.plant != null) {
+                                            if (_initialPlant.strainDetails != strain) {
+                                              widget.changeCallback!(true);
+                                            } else {
+                                              widget.changeCallback!(false);
+                                            }
+                                          }
                                         }
-                                        return snapshot.data!.where((StrainDetails option) {
-                                          return option.name
-                                              .toLowerCase()
-                                              .contains(textEditingValue.text.toLowerCase());
-                                        });
-                                      },
-                                      onSelected: (StrainDetails strain) {
-                                        setState(() {
-                                          _selectedStrain = strain;
-                                        });
-                                      },
-                                      displayStringForOption: (StrainDetails option) => option.name,
-                                    ),
+                                      });
+                                    },
+                                    displayStringForOption: (StrainDetails option) => option.name,
                                   ),
-                                  if (_selectedStrain != null)
-                                    IconButton(
-                                      icon: const Icon(Icons.clear),
-                                      onPressed: () {
-                                        setState(() {
-                                          _selectedStrain = null;
-                                        });
-                                      },
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
+                                ),
+                                if (_selectedStrain != null)
+                                  IconButton(
+                                    icon: const Icon(Icons.clear),
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedStrain = null;
+                                        if (widget.changeCallback != null) {
+                                          if (widget.plant != null) {
+                                            if (_initialPlant.strainDetails != null) {
+                                              widget.changeCallback!(true);
+                                            } else {
+                                              widget.changeCallback!(false);
+                                            }
+                                          }
+                                        }
+                                      });
+                                    },
+                                  ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }),
+                ),
+              ),
 
               if (widget.plant == null)
                 Card(
