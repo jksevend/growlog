@@ -22,7 +22,7 @@ dependencies:
   image_picker: ^1.1.2
   collection: ^1.15.0
   url_launcher: ^6.3.0
-  shared_preferences: ^2.2.3
+  shared_preferences: ^2.3.1
   easy_localization: ^3.0.7
   encrypt: ^5.0.3
   flutter_secure_storage: ^9.2.2
