@@ -17,7 +17,7 @@ The project uses the data only for the purpose of the application. The data is n
 
 ## Data Deletion
 
-The project does not store any data on the server. All data is stored on the user's device. The user can delete all data
+The user can delete all data
 by uninstalling the application.
 Images taken by the user are stored in the user's gallery. The user can delete these images at any time.
 
